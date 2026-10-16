@@ -1,0 +1,100 @@
+# Blueprint Render — déploie Hubly (frontend + backend + Postgres) sur render.com.
+#
+# Utilisation : Render Dashboard > New + > Blueprint > choisir ce dépôt.
+# Render lit ce fichier et crée les 3 ressources ci-dessous.
+#
+# Topologie : le backend est un service PUBLIC (compatible offre gratuite).
+# Le frontend l'appelle en HTTPS via BACKEND_INTERNAL_URL — c'est un appel
+# serveur-à-serveur (le proxy backend/src/app/api/[...path]/route.ts transmet
+# lui-même le cookie), donc AUCUN problème de CORS malgré les origines distinctes.
+#
+# Après le premier déploiement, ajuster les URLs si Render renomme un service
+# (suffixe aléatoire ajouté quand un nom est déjà pris) :
+#   - NEXTAUTH_URL (backend)            = URL publique du frontend
+#   - BACKEND_INTERNAL_URL (frontend)   = URL publique du backend
+# Puis déclarer les redirect URIs OAuth (voir README) :
+#   https://<frontend>.onrender.com/api/auth/callback/github
+#   https://<frontend>.onrender.com/api/auth/callback/google
+
+services:
+  # ---------------------------------------------------------------------------
+  # Backend : API Next.js + Prisma + timer central/SSE.
+  # Exposé publiquement (les routes exigent une session, sauf /about.json).
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: hubly-backend
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hubly-db
+          property: connectionString
+      # URL PUBLIQUE du frontend (celle vue par le navigateur) — génère les
+      # redirections OAuth et l'option cookie Secure (le code détecte https://).
+      - key: NEXTAUTH_URL
+        value: https://hubly-frontend.onrender.com
+      # Signature des sessions (n'importe quelle chaîne aléatoire convient).
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      # Chiffrement AES-256-GCM des tokens OAuth : DOIT décoder en exactement
+      # 32 octets base64 -> à saisir à la main dans le dashboard :
+      #     openssl rand -base64 32
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false
+      # OAuth (optionnel : laisser vide désactive le provider, le reste marche).
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Clés d'API serveur optionnelles (sinon chaque utilisateur saisit la sienne).
+      - key: STEAM_API_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      # Destinataire du formulaire /contact.
+      - key: CONTACT_EMAIL
+        value: rayannbachabi0@gmail.com
+      # ⚠️ SMTP : à renseigner IMPÉRATIVEMENT avant d'exposer le service au public.
+      # Sans SMTP configuré, /api/auth/register renvoie devConfirmationToken dans
+      # sa réponse (canal de repli prévu pour le dev) — fuite du token de
+      # confirmation. Décommenter et renseigner (ex. Gmail + mot de passe d'application) :
+      #   - key: SMTP_HOST
+      #     sync: false
+      #   - key: SMTP_PORT
+      #     sync: false
+      #   - key: SMTP_USER
+      #     sync: false
+      #   - key: SMTP_PASS
+      #     sync: false
+      #   - key: MAIL_FROM
+      #     sync: false
+
+  # ---------------------------------------------------------------------------
+  # Frontend : pages + composants, seule origine publique « propre ».
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: hubly-frontend
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: frontend
+    dockerfilePath: ./Dockerfile
+    envVars:
+      # URL PUBLIQUE du backend (Render fournit https://<nom>.onrender.com).
+      - key: BACKEND_INTERNAL_URL
+        value: https://hubly-backend.onrender.com
+
+databases:
+  - name: hubly-db
+    plan: free
+    region: frankfurt
+    databaseName: dashboard
+    user: dashboard

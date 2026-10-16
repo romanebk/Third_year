@@ -1,0 +1,15 @@
+my_pgp
+tests/test_bigint
+explications/
+*.o
+*.out
+*.gch
+*.dSYM/
+vgcore.*
+*.d
+.claude/
+unit_tests
+*.gcno
+*.gcda
+*.gcov
+coverage*.html

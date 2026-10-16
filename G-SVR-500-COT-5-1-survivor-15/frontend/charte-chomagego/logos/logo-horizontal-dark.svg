@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120" role="img" aria-label="GéoEmploi sur fond sombre">
+  <rect width="480" height="120" fill="#141715"/>
+  <path d="M56 14C36 14 20 30 20 50c0 25 36 51 36 51s36-26 36-51C92 30 76 14 56 14Z" fill="#2D6A4F"/>
+  <circle cx="56" cy="48" r="14" fill="#fff"/>
+  <text x="120" y="74" font-family="Montserrat, Arial, sans-serif" font-size="46" font-weight="800" letter-spacing="-1.6" fill="#ffffff">Géo<tspan fill="#C8E6C0">Emploi</tspan></text>
+</svg>

@@ -1,0 +1,18 @@
+# Lancement du projet (mode Docker — defense)
+
+```bash
+sudo snap restart docker
+# Open WebUI tourne AUSSI en processus hote sur le 8080 (pas seulement en
+# conteneur) : le tuer, sinon le port reste occupe apres le restart.
+sudo pkill -f "uvicorn open_webui" || true
+ss -tln | grep 8080 || echo "8080 libre"
+cd /home/ariel/3rd_Year/G-WEB-500-COT-5-1-dashboard-38
+docker rm -f dash-front-8081 2>/dev/null
+docker compose up --build -d
+sleep 30 && curl -s -o /dev/null -w "8080 HTTP:%{http_code}\n" http://localhost:8080/
+```
+
+Si le curl renvoie `8080 HTTP:200` : ouvrir http://localhost:8080.
+Sinon : garder la sortie complete et la montrer pour diagnostic.
+
+Details et depannage : voir docs/runbook.md (§3, §8, §9).

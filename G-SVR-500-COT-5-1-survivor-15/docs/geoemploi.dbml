@@ -1,0 +1,165 @@
+// GéoEmploi, schéma de base de données (DBML)
+// Généré depuis prisma/schema.prisma (source de vérité).
+// PostgreSQL 16 + PostGIS. À importer sur dbdiagram.io pour une vue interactive.
+
+Enum Role {
+  JOBSEEKER
+  EMPLOYER
+  ADMIN
+}
+
+Enum OfferStatus {
+  ACTIVE
+  EXPIRED
+  ARCHIVED
+  REPORTED
+}
+
+Enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+Enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+Table User {
+  id                  uuid      [pk, default: `uuid()`]
+  email               text      [unique, not null]
+  passwordHash        text      [not null, note: 'jamais renvoyé par l\'API']
+  role                Role      [not null]
+  isSuspended         boolean   [not null, default: false]
+  geoConsent          boolean   [not null, default: false]
+  geoConsentUpdatedAt timestamp
+  deletedAt           timestamp [note: 'soft delete RGPD']
+  createdAt           timestamp [not null, default: `now()`]
+  updatedAt           timestamp [not null]
+
+  Indexes {
+    role
+    isSuspended
+    deletedAt
+  }
+}
+
+Table JobseekerProfile {
+  id             uuid      [pk, default: `uuid()`]
+  userId         uuid      [unique, not null, ref: - User.id]
+  firstName      text      [not null]
+  lastName       text      [not null]
+  phone          text
+  skills         "text[]"  [not null]
+  experience     text
+  availability   text
+  latitude       float
+  longitude      float
+  cvPath         text      [note: 'stockage souverain, jamais exposé tel quel']
+  cvOriginalName text
+  cvUploadedAt   timestamp
+  createdAt      timestamp [not null, default: `now()`]
+  updatedAt      timestamp [not null]
+}
+
+Table EmployerProfile {
+  id          uuid      [pk, default: `uuid()`]
+  userId      uuid      [unique, not null, ref: - User.id]
+  companyName text      [not null]
+  siret       text
+  verified    boolean   [not null, default: false]
+  description text
+  website     text
+  createdAt   timestamp [not null, default: `now()`]
+  updatedAt   timestamp [not null]
+}
+
+Table Offer {
+  id              uuid        [pk, default: `uuid()`]
+  employerId      uuid        [not null, ref: > EmployerProfile.id]
+  title           text        [not null]
+  description     text        [not null]
+  latitude        float       [not null]
+  longitude       float       [not null]
+  address         text
+  commune         text
+  radiusKm        float       [not null, default: 10]
+  viewCount       int         [not null, default: 0]
+  status          OfferStatus [not null, default: 'ACTIVE']
+  sector          text        [note: 'Restauration/Logistique/Santé/Commerce/Bâtiment/Tech/Services']
+  contractType    text        [note: 'CDI/CDD/Intérim/Extra/Alternance/Stage']
+  salaryMin       float
+  salaryMax       float
+  salaryKind      text        [note: 'brut/net']
+  workTime        text
+  experienceLevel text
+  requiredSkills  "text[]"    [not null, default: `[]`]
+  geocodeSource   text        [note: 'traçabilité géocodage, toujours "api-adresse"']
+  geocodeScore    float       [note: 'confiance BAN, 0..1']
+  geocodeCitycode text       [note: 'code INSEE résolu']
+  geocodedAt      timestamp   [note: 'date du géocodage']
+  publishedAt     timestamp   [not null, default: `now()`]
+  expiresAt       timestamp   [not null]
+  createdAt       timestamp   [not null, default: `now()`]
+  updatedAt       timestamp   [not null]
+
+  Indexes {
+    status
+    expiresAt
+    employerId
+  }
+}
+
+Table Application {
+  id        uuid              [pk, default: `uuid()`]
+  offerId   uuid              [not null, ref: > Offer.id]
+  userId    uuid              [not null, ref: > User.id]
+  status    ApplicationStatus [not null, default: 'PENDING']
+  message   text
+  createdAt timestamp         [not null, default: `now()`]
+  updatedAt timestamp         [not null]
+
+  Indexes {
+    (offerId, userId) [unique]
+    userId
+    offerId
+  }
+}
+
+Table Notification {
+  id        uuid      [pk, default: `uuid()`]
+  userId    uuid      [not null, ref: > User.id]
+  title     text      [not null]
+  message   text      [not null]
+  read      boolean   [not null, default: false]
+  type      text      [not null, note: 'application_received/application_status/alert']
+  createdAt timestamp [not null, default: `now()`]
+
+  Indexes {
+    (userId, read)
+  }
+}
+
+Table Report {
+  id        uuid         [pk, default: `uuid()`]
+  offerId   uuid         [not null, ref: > Offer.id]
+  userId    uuid         [not null, ref: > User.id]
+  reason    text         [not null]
+  status    ReportStatus [not null, default: 'PENDING']
+  createdAt timestamp    [not null, default: `now()`]
+
+  Indexes {
+    (offerId, userId) [unique]
+  }
+}
+
+Table Session {
+  id           uuid      [pk, default: `uuid()`]
+  userId       uuid      [not null, ref: > User.id]
+  refreshToken text      [unique, not null, note: 'haché sha256']
+  expiresAt    timestamp [not null]
+  createdAt    timestamp [not null, default: `now()`]
+}

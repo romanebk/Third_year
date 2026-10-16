@@ -1,0 +1,49 @@
+{
+  "name": "geoemploi-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API REST GéoEmploi : Node.js, Express, TypeScript, Prisma",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "postinstall": "prisma generate --schema=../prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema=../prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema=../prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema=../prisma/schema.prisma",
+    "prisma:validate": "prisma validate --schema=../prisma/schema.prisma",
+    "geocoding:migrate": "tsx src/scripts/regeocode-offers.ts",
+    "geocoding:fix-commune": "tsx src/scripts/fix-commune-precision.ts",
+    "purge:accounts": "tsx src/scripts/purge-deleted-accounts.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.3.0",
+    "nodemailer": "^10.0.1",
+    "pdfkit": "^0.20.2",
+    "socket.io": "^4.8.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^8.0.1",
+    "@types/pdfkit": "^0.17.6",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "prisma": "^6.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,431 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply m-0 bg-black text-ink font-sans font-medium text-base leading-relaxed antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .b {
+    @apply font-extrabold tracking-[-0.03em] leading-[1.05] m-0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid #1b4332;
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[14px] px-[26px] py-3.5 font-semibold text-[14.5px];
+    transition:
+      transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.22s,
+      color 0.22s,
+      box-shadow 0.22s;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-60;
+    transform: none;
+  }
+
+  /* Sur fond sombre (hero, sidebar) */
+  .btn-lime {
+    @apply bg-lime text-ink;
+  }
+
+  .btn-lime:hover:not(:disabled) {
+    @apply bg-limeDeep;
+  }
+
+  /* Action primaire sur fond clair, CSS direct (évite conflit @apply bg-forest dans .btn-forest) */
+  .btn-forest {
+    background-color: #1b4332;
+    color: #fff;
+    box-shadow: 0 4px 16px -4px rgba(20, 23, 21, 0.08), 0 1px 3px rgba(20, 23, 21, 0.04);
+  }
+
+  .btn-forest:hover:not(:disabled) {
+    background-color: #2d6a4f;
+  }
+
+  .btn-white {
+    @apply bg-white text-ink shadow-soft;
+  }
+
+  .btn-dark {
+    background-color: #1b4332;
+    color: #fff;
+    box-shadow: 0 4px 16px -4px rgba(20, 23, 21, 0.08), 0 1px 3px rgba(20, 23, 21, 0.04);
+  }
+
+  .btn-dark:hover:not(:disabled) {
+    background-color: #2d6a4f;
+  }
+
+  .btn-outline {
+    @apply border border-line bg-white text-ink;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    border-color: #1b4332;
+    color: #1b4332;
+  }
+
+  .btn-lg {
+    @apply px-8 py-[17px] text-[15.5px];
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] font-bold tracking-[0.01em];
+    background-color: #e8f2e8;
+    color: #1b4332;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink;
+  }
+
+  .field-input {
+    @apply w-full rounded-[14px] border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none transition;
+  }
+
+  .field-input:focus {
+    border-color: #1b4332;
+    box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.2);
+  }
+
+  .field-input[aria-invalid='true'] {
+    @apply border-danger;
+    box-shadow: 0 0 0 2px rgba(196, 92, 74, 0.15);
+  }
+
+  .field-hint {
+    @apply mt-1.5 text-[12.5px] text-muted;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-[12.5px] font-semibold text-danger;
+  }
+
+  .social-btn {
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[14px] border border-line bg-white px-3 py-3 text-[13px] font-semibold text-ink transition hover:-translate-y-0.5 hover:shadow-soft;
+  }
+
+  .social-btn:hover {
+    border-color: #1b4332;
+  }
+
+  .surface-card {
+    @apply rounded-block border border-line/80 bg-paper shadow-soft;
+  }
+
+  .shell {
+    padding: 0;
+  }
+
+  @media (max-width: 767px) {
+    .btn-lg {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      padding-top: 0.875rem;
+      padding-bottom: 0.875rem;
+      font-size: 14.5px;
+    }
+
+    .wrap {
+      padding-inline: 14px;
+    }
+  }
+
+  .wrap {
+    @apply mx-auto max-w-[1280px];
+    padding-inline: clamp(18px, 3.4vw, 44px);
+  }
+
+  .pin-wrap {
+    background: transparent;
+    border: none;
+  }
+
+  .pin {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50% 50% 50% 8px;
+    transform: rotate(-45deg);
+    background: #1b4332;
+    box-shadow: 0 12px 22px -10px rgba(0, 0, 0, 0.45);
+    border: 2px solid #fff;
+    transition: transform 0.2s;
+  }
+
+  .pin span {
+    transform: rotate(45deg);
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* La couleur seule ne distingue jamais un état : chaque variante ajoute une
+     forme ou un badge (RGAA 1.3 - ne pas coder l'information uniquement par
+     la couleur). */
+  .pin.new {
+    background: #2d6a4f;
+  }
+
+  .pin.new::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #f4b400;
+    border: 2px solid #fff;
+    transform: rotate(45deg);
+  }
+
+  .pin.sel {
+    background: #8fbc8f;
+    border-width: 3px;
+    border-style: dashed;
+  }
+
+  .pin.got {
+    background: #1b4332;
+    opacity: 0.85;
+  }
+
+  .pin.got::after {
+    content: '✓';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    color: #1b4332;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 16px;
+    text-align: center;
+    transform: rotate(45deg);
+  }
+
+  .pin.pulse {
+    animation: pin-pulse 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .pin-wrap:hover .pin,
+  .pin-wrap:focus-within .pin {
+    transform: rotate(-45deg) scale(1.14);
+  }
+
+  .pin-wrap:focus-within .pin {
+    outline: 2px solid #1b4332;
+    outline-offset: 3px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 16px;
+    box-shadow: 0 16px 40px -16px rgba(20, 23, 21, 0.35);
+  }
+
+  .leaflet-popup-content {
+    margin: 16px 18px;
+    font-family: Inter, sans-serif;
+  }
+
+  .leaflet-container {
+    font-family: Inter, sans-serif;
+    background: #f4f5f3;
+    touch-action: none;
+    cursor: grab;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .leaflet-dragging .leaflet-container,
+  .leaflet-container.leaflet-drag-target {
+    cursor: grabbing;
+  }
+
+  .leaflet-control-attribution {
+    font-size: 10px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+  }
+
+  @media (max-width: 1023px) {
+    .leaflet-bottom.leaflet-right {
+      bottom: 4px;
+      right: 8px;
+    }
+  }
+
+  .chip {
+    @apply rounded-full border border-line bg-white/95 px-[15px] py-[9px] text-[13px] font-semibold shadow-soft backdrop-blur;
+    transition: 0.18s;
+  }
+
+  .chip[aria-pressed='true'] {
+    border-color: #1b4332;
+    background-color: #1b4332;
+    color: #fff;
+  }
+
+  .chip b {
+    margin-left: 5px;
+    opacity: 0.55;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #8fbc8f;
+    box-shadow: 0 0 0 0 rgba(143, 188, 143, 0.55);
+    animation: ping 2s infinite;
+  }
+
+  .link-forest {
+    font-weight: 600;
+    color: #1b4332;
+    text-underline-offset: 2px;
+  }
+
+  .link-forest:hover {
+    text-decoration: underline;
+  }
+
+  /* Scroll fluide dans les shells (admin / pro / app), Inter hérité via font-sans.
+     Pas de overscroll-behavior-y: contain ici : AdminShell laisse le conteneur grandir
+     avec son contenu (md:h-auto/md:min-h-screen) plutôt que de le borner en hauteur,
+     donc <main> n'a jamais son propre overflow interne. Avec "contain", la molette
+     tentait de faire défiler <main> (0 px de marge), et le comportement bloquait le
+     relais vers le scroll réel de la page au lieu de le laisser remonter : plus aucun
+     défilement à la molette nulle part sur les écrans admin. */
+  .admin-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@keyframes pin-pulse {
+  0% {
+    transform: rotate(-45deg) scale(1);
+  }
+  40% {
+    transform: rotate(-45deg) scale(1.35);
+  }
+  100% {
+    transform: rotate(-45deg) scale(1);
+  }
+}
+
+@keyframes ping {
+  70% {
+    box-shadow: 0 0 0 8px rgba(143, 188, 143, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(143, 188, 143, 0);
+  }
+}
+
+@keyframes ticker-slide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes hero-up {
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+input[type='range'] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  background: #f4f5f3;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1b4332;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.35);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1b4332;
+  border: 3px solid #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

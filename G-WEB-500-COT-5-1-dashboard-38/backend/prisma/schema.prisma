@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Schéma minimal de démarrage — à étendre :
+// Service, UserService, Widget, WidgetInstance (params + refreshRate), etc.
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  // name/image : absents jusqu'ici, mais le PrismaAdapter NextAuth les envoie tels
+  // quels depuis le profil OAuth (cf. profile() de GitHubProvider dans auth.ts) —
+  // sans ces colonnes, la création d'un User via GitHub plante (Unknown argument).
+  name          String?
+  image         String?
+  // Optionnel : un compte créé uniquement via GitHub OAuth n'a jamais de mot de
+  // passe local. Reste obligatoire "en pratique" pour les comptes credentials —
+  // vérifié en code (register), pas par le schéma.
+  passwordHash  String?
+  // emailVerified: null = compte pas encore confirmé. Nom repris de la convention
+  // NextAuth (PrismaAdapter) pour rester compatible avec l'OAuth GitHub.
+  emailVerified DateTime?
+  // Pas d'UI pour se promouvoir soi-même : le premier admin est désigné à la main
+  // via `npm run admin:promote -- <email>` (prisma/promote-admin.ts).
+  role          Role      @default(USER)
+  // Désactivation par un admin (section admin) : bloque les nouvelles connexions
+  // (credentials et OAuth, cf. authorize()/signIn() dans auth.ts) ET les sessions
+  // déjà ouvertes — le callback jwt() revérifie ce champ en DB à chaque requête
+  // serveur (getServerSession), donc l'effet est quasi immédiat malgré la session
+  // JWT stateless, pas seulement à la prochaine reconnexion.
+  disabled      Boolean   @default(false)
+  // Acceptation des Conditions d'utilisation et de la Politique de
+  // confidentialité : case obligatoire à l'inscription (register), mention
+  // "en continuant, vous acceptez" pour GitHub/Google (events.createUser).
+  // null = compte créé avant l'ajout de ce consentement.
+  termsAcceptedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  accounts                Account[]
+  sessions                Session[]
+  widgetInstances         WidgetInstance[]
+  serviceSubscriptions    ServiceSubscription[]
+  settings                UserSettings?
+}
+
+// Préférences utilisateur persistées côté serveur (contrairement aux anciens
+// localStorage hubly.* du front) : ville/unité météo, dépôt GitHub et flux RSS.
+// Elles servent de config centralisée pour les widgets par défaut — changer un
+// champ ici met à jour les instances par défaut correspondantes (cf.
+// src/server/settings/settings.ts) au lieu de laisser chaque panneau lire son
+// propre localStorage.
+model UserSettings {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weatherCity      String   @default("Paris")
+  weatherUnit      String   @default("celsius")
+  githubRepository String   @default("vercel/next.js")
+  rssFeedUrl       String   @default("https://hnrss.org/frontpage")
+  // Centres d'intérêt de l'utilisateur, clés séparées par des virgules
+  // ("technology,sports") — alimentent le widget rss_interest_feed par défaut
+  // (cf. services/rss/interests.ts pour le mapping clé -> flux à agréger).
+  rssInterests     String   @default("technology,world,science")
+  // Une fois les instances par défaut créées (premier chargement du dashboard),
+  // ne pas les recréer : si l'utilisateur supprime tout, le dashboard reste vide.
+  defaultsSeeded   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+// Souscription d'un utilisateur à un service (github, steam...) — condition pour
+// utiliser ses widgets (ajouter une instance, récupérer ses données). Trouvé
+// manquant lors d'un audit de conformité : la page /services ne faisait avant ça
+// qu'une préférence d'affichage en localStorage, jamais vérifiée côté serveur.
+// Les services "auth: none" (weather, rss) n'ont pas besoin d'une ligne ici —
+// isSubscribed() (src/server/services/subscriptions.ts) les autorise toujours.
+model ServiceSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service   String
+  // Clé d'API de l'utilisateur pour un service "apikey" (Steam, YouTube),
+  // chiffrée (AES-256-GCM, cf. server/services/api-keys.ts) — jamais en clair.
+  // null : le service utilise la clé du serveur, ou n'a pas de clé (OAuth).
+  apiKey    String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, service])
+}
+
+// Une instance de widget configurée sur le dashboard d'un utilisateur. service/widget
+// identifient l'entrée du registre (src/server/services/*/index.ts) ; params est
+// volontairement du JSON libre plutôt qu'une table à part — chaque widget a des
+// params différents (juste des paires string/integer, cf. WidgetInfo.params), pas
+// besoin de sur-modéliser pour ça.
+model WidgetInstance {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service String
+  widget  String
+  params  Json
+
+  refreshRateSeconds Int
+  // Ordre d'affichage linéaire (pas x/y) : react-grid-layout gère le
+  // placement/la taille réels côté front (localStorage, cf. ADR 0005) — ce
+  // champ ne sert qu'à synchroniser l'ordre de lecture entre appareils/
+  // navigateurs, pas la géométrie exacte de la grille.
+  position           Int
+
+  // Marque les instances créées automatiquement pour un nouvel utilisateur
+  // (weather + rss, services sans compte externe) — utiles pour savoir quelles
+  // instances suivent la config centralisée du compte lors d'un changement de
+  // préférences (cf. src/server/settings/settings.ts).
+  isDefault          Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Compte tiers (GitHub) lié à un User. @@unique([provider, providerAccountId])
+// empêche qu'un même compte GitHub soit lié deux fois à deux User différents.
+model Account {
+  id                String @id @default(cuid())
+  userId            String
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+
+  // access_token / refresh_token : CHIFFRÉS avant écriture par le code applicatif
+  // (src/server/auth/token-encryption.ts) — jamais en clair en DB. Le schéma ne
+  // peut pas l'imposer : Postgres/Prisma n'ont pas de type "encrypted", donc ça
+  // reste des colonnes String ordinaires vues d'ici.
+  access_token             String?
+  refresh_token            String?
+  expires_at               Int?
+  // Présent uniquement si "Expire user access tokens" est activé côté GitHub OAuth
+  // App — sans cette colonne, prisma.account.create() plante (Unknown argument).
+  refresh_token_expires_in Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([provider, providerAccountId])
+}
+
+// Fait partie du contrat du PrismaAdapter NextAuth même si on reste en session
+// "jwt" (pas "database") — l'adapter s'attend à ce que ce modèle existe.
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+// Token à usage unique envoyé par email pour confirmer l'inscription (lien /confirm?token=...).
+// Nommé "Email..." (et pas juste "VerificationToken") pour ne pas entrer en collision avec le
+// modèle VerificationToken que le PrismaAdapter de NextAuth ajoutera pour l'OAuth GitHub —
+// ce sont deux mécanismes différents, pas la même table.
+model EmailVerificationToken {
+  id     String @id @default(cuid())
+  // Généré côté code applicatif (crypto random), jamais par Prisma : un cuid() est
+  // prévisible/triable, donc impropre à servir de secret dans une URL publique.
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Pas de validité infinie : un lien de confirmation vieux de plusieurs jours doit expirer.
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// Lien "mot de passe oublié" (POST /api/auth/forgot-password puis
+// /api/auth/reset-password). Contrairement au token de confirmation ci-dessus,
+// celui-ci donne le contrôle du compte : on ne stocke donc que son empreinte
+// SHA-256 (une fuite de la base ne permet pas de réinitialiser un mot de
+// passe), il expire au bout d'une heure et ne sert qu'une fois.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

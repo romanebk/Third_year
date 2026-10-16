@@ -1,0 +1,247 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::selection {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Skip link for keyboard navigation */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000000;
+  color: #ffffff;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Focus visible styles for better accessibility */
+*:focus-visible {
+  outline: 2px solid #FAFAFA;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero (responsive-hero-banner) : entrée en cascade du badge/titre/CTA */
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-in-1 {
+  animation: fade-slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-slide-in-2 {
+  animation: fade-slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.animate-fade-slide-in-3 {
+  animation: fade-slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.animate-fade-slide-in-4 {
+  animation: fade-slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both;
+}
+
+/* ---------------------------------------------------------------------------
+   Affiche à cartes basculantes (flip-countdown.tsx)
+   Chaque chiffre est découpé en deux demi-cartes qui se rejoignent par une
+   ligne médiane. Le conteneur .flipper (2 faces, preserve-3d) bascule de 0 à
+   -180deg : la demi-face haute (chiffre précédent) se rabat vers l'avant
+   pendant que la demi-face basse, tournée de 180deg et en backface-visibility
+   hidden, ne devient lisible qu'une fois le basculement terminé. Les deux
+   demi-cartes statiques underneath portent l'état de repos.
+   Les couleurs viennent des variables --flip-card-bg / --flip-card-text, posées
+   en style inline par le composant — d'où le repli sur le thème sombre.
+   La durée est pilotée par --flip-duration.
+--------------------------------------------------------------------------- */
+.flip-countdown-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.14em;
+}
+
+.flip-countdown-separator {
+  align-self: center;
+  padding: 0 0.1em;
+  color: var(--flip-separator-color, rgba(255, 255, 255, 0.55));
+  font-weight: 600;
+  line-height: 1;
+  user-select: none;
+}
+
+.flip-unit {
+  position: relative;
+  width: 1.12em;
+  height: 1.6em;
+  /* perspective sur le PARENT de l'élément en rotation (3D children) */
+  perspective: 18em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.flip-card {
+  position: absolute;
+  left: 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0.22em;
+  background: var(--flip-card-bg, #1e1e1e);
+  color: var(--flip-card-text, #ffffff);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Le glyphe est une vraie boîte de la hauteur ENTIÈRE de la carte (200% de la
+   demi-carte), centrée verticalement. Les deux demi-cartes n'ont plus qu'à la
+   décaler : moitié haute = flex-start, moitié basse = flex-end. Les deux
+   moitiés affichent alors le même glyphe, coupé exactement sur la ligne médiane
+   et sans aucun décalage entre elles. C'est indispensable : le texte étant un
+   item anonyme de flex, on ne peut pas le positionner de façon fiable, et un
+   simple align-items + padding laisse un trou au milieu de la carte. */
+.flip-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200%;
+}
+
+/* Demi-carte haute : affiche le haut du glyphe, qui se replie vers le bas. */
+.flip-card__top,
+.flipper__top {
+  top: 0;
+  height: 50%;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 0.22em 0.22em 0 0;
+  transform-origin: bottom;
+}
+
+/* Demi-carte basse : affiche le bas du même glyphe. */
+.flip-card__bottom,
+.flipper__bottom {
+  top: 50%;
+  height: 50%;
+  align-items: flex-end;
+  border-radius: 0 0 0.22em 0.22em;
+  transform-origin: top;
+}
+
+/* Ordre de superposition : les demi-cartes statiques d'abord, le basculeur
+   par-dessus (c'est lui qui doit masquer l'ancien chiffre de la moitié haute). */
+.flip-card__bottom { z-index: 1; }
+.flip-card__top { z-index: 2; }
+/* La face basse du basculeur n'est visible qu'en fin d'animation : au départ
+   elle est tournée de 180deg, donc dos à l'écran. */
+.flipper__bottom {
+  z-index: 3;
+  transform: rotateX(180deg);
+}
+.flipper__top { z-index: 4; }
+
+.flipper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.flipper.is-flipping {
+  animation: flip-top var(--flip-duration, 0.55s) ease-in forwards;
+}
+
+@keyframes flip-top {
+  100% {
+    transform: rotateX(-180deg);
+  }
+}
+
+/* Accessibilité : le décompte est déjà annoncé via aria-label sur le composant
+   (role="timer"), donc les chiffres purement visuels sont masqués aux lecteurs
+   d'écran — sauf quand l'utilisateur demande explicitement le mouvement. */
+@media (prefers-reduced-motion: reduce) {
+  .flipper.is-flipping {
+    animation-duration: 0.01ms;
+  }
+}
+/* ---------------------------------------------------------------------------
+   Texte des pages légales (/privacy, /terms) : listes, liens et mises en
+   avant, en noir et blanc comme le reste du site.
+--------------------------------------------------------------------------- */
+.legal-prose ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.legal-prose strong {
+  color: #fafafa;
+  font-weight: 600;
+}
+
+.legal-prose a {
+  color: #fafafa;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.legal-prose a:hover {
+  text-decoration: none;
+}

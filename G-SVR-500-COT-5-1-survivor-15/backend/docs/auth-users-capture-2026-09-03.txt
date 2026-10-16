@@ -1,0 +1,37 @@
+--- Backend: npm run dev (port 3010), base peuplée par prisma/seed.ts ---
+
+### 1) POST /api/auth/register
+{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwiZW1haWwiOiJhcmNoLWNhbmQtMTc4ODQ2OTg2MkB0ZXN0LmZyIiwiaWF0IjoxNzg4NDY5ODYyLCJleHAiOjE3ODg0NzA3NjJ9.I3Fwra53tdvBVrgc1S_D_XRG6jdtpOtRPMqkluuG15M","refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwianRpIjoiOTAwYjc4YjktNjEwOS00M2VkLThhYzMtNDNkOGYzZDczNjIyIiwiaWF0IjoxNzg4NDY5ODYyLCJleHAiOjE3ODkwNzQ2NjJ9._yh3FBV0xKwddaENxYlbYhUX8tn0VTkenTK8BqXBl7w","user":{"id":"cc466915-33df-479a-aaae-1ff6ef7e82e1","email":"arch-cand-1788469862@test.fr","role":"JOBSEEKER","geoConsent":false,"firstName":"Ariane","lastName":"Docs"}}
+
+### 2) POST /api/auth/login
+{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwiZW1haWwiOiJhcmNoLWNhbmQtMTc4ODQ2OTg2MkB0ZXN0LmZyIiwiaWF0IjoxNzg4NDY5ODYyLCJleHAiOjE3ODg0NzA3NjJ9.I3Fwra53tdvBVrgc1S_D_XRG6jdtpOtRPMqkluuG15M","refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwianRpIjoiMjkwY2FkMWItMmUyMy00NzcyLTliODgtOWI1MjY3ODc1ODVlIiwiaWF0IjoxNzg4NDY5ODYyLCJleHAiOjE3ODkwNzQ2NjJ9.nr7uNjiKOu5o_Q39GOZq2UZbZBjOXWl9nUcwlwPMeWg","user":{"id":"cc466915-33df-479a-aaae-1ff6ef7e82e1","email":"arch-cand-1788469862@test.fr","role":"JOBSEEKER","geoConsent":false,"firstName":"Ariane","lastName":"Docs"}}
+### 3) POST /api/auth/refresh
+{"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwiZW1haWwiOiJhcmNoLWNhbmQtMTc4ODQ2OTg2MkB0ZXN0LmZyIiwiaWF0IjoxNzg4NDY5ODYzLCJleHAiOjE3ODg0NzA3NjN9.Dggm2xigNgZHDMc3y0XLnmiE7piUWgovrkuQFNtJYyw","refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJyb2xlIjoiSk9CU0VFS0VSIiwianRpIjoiMzRkMTUxZDYtMWI5Ny00ZmU2LTk4NTctMmVhMWVlMmM4ZjlhIiwiaWF0IjoxNzg4NDY5ODYzLCJleHAiOjE3ODkwNzQ2NjN9.Oa8oRaNDzmWl48wYhv8t16Gg4938FED1oqXFJuyPYKc","user":{"id":"cc466915-33df-479a-aaae-1ff6ef7e82e1","email":"arch-cand-1788469862@test.fr","role":"JOBSEEKER","geoConsent":false,"firstName":"Ariane","lastName":"Docs"}}
+
+### 4) GET /api/users/me
+{"id":"cc466915-33df-479a-aaae-1ff6ef7e82e1","email":"arch-cand-1788469862@test.fr","role":"JOBSEEKER","isSuspended":false,"geoConsent":false,"geoConsentUpdatedAt":null,"createdAt":"2026-09-03T21:11:02.385Z","profile":{"type":"JOBSEEKER","data":{"id":"158f07ae-d940-47a9-8c91-7dd3767d4a15","userId":"cc466915-33df-479a-aaae-1ff6ef7e82e1","firstName":"Ariane","lastName":"Docs","phone":null,"skills":[],"experience":null,"availability":null,"latitude":null,"longitude":null,"cvOriginalName":null,"cvUploadedAt":null,"createdAt":"2026-09-03T21:11:02.394Z","updatedAt":"2026-09-03T21:11:02.394Z","hasCv":false}}}
+### 5) PATCH /api/users/me
+{"id":"cc466915-33df-479a-aaae-1ff6ef7e82e1","email":"arch-cand-1788469862@test.fr","role":"JOBSEEKER","isSuspended":false,"geoConsent":false,"geoConsentUpdatedAt":null,"createdAt":"2026-09-03T21:11:02.385Z","profile":{"type":"JOBSEEKER","data":{"id":"158f07ae-d940-47a9-8c91-7dd3767d4a15","userId":"cc466915-33df-479a-aaae-1ff6ef7e82e1","firstName":"Ariane","lastName":"Docs","phone":"0655443322","skills":["Accueil","Caisse"],"experience":null,"availability":null,"latitude":null,"longitude":null,"cvOriginalName":null,"cvUploadedAt":null,"createdAt":"2026-09-03T21:11:02.394Z","updatedAt":"2026-09-03T21:11:03.273Z","hasCv":false}}}
+### 6) PUT /api/users/me/geo-consent
+
+HTTP 204
+
+### 7) POST /api/users/me/cv
+
+HTTP 204
+
+### 8) GET /api/users/me/cv (juste le statut, fichier binaire) 
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: http://localhost:5173
+Content-Disposition: attachment; filename="arch-cv.pdf"
+HTTP 200, Content-Disposition: 
+
+### 9) POST /api/auth/forgot-password
+{"resetToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYzQ2NjkxNS0zM2RmLTQ3OWEtYWFhZS0xZmY2ZWY3ZTgyZTEiLCJpYXQiOjE3ODg0Njk4NzAsImV4cCI6MTc4ODQ3MDc3MH0.PyoT2lvMy0JfUsfEIa8CTDF61KR1iRDpkjFRIr6nKEE"}
+### 10) POST /api/auth/logout
+
+HTTP 204
+
+HTTP 204
+{"message":"Mot de passe réinitialisé"}
+HTTP 200

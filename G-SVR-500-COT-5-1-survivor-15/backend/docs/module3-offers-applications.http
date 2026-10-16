@@ -1,0 +1,109 @@
+### Module 3 (Employeur & candidatures), séquence de vérification des endpoints.
+### Format REST Client (VSCode) / IntelliJ HTTP Client, chaque requête est exécutable telle quelle.
+### Exécuté et capturé en réel le 2026-09-03 contre le backend local (npm run dev, port 3010).
+### Les exemples des blocs @openapi de offers.routes.ts et applications.routes.ts
+### proviennent de ce fichier, pas d'une rédaction manuelle.
+
+@baseUrl = http://localhost:3010/api
+
+### 1) Créer un compte employeur
+# @name registerEmployer
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "swagger-emp-demo@test.fr",
+  "password": "Employer2026!",
+  "role": "EMPLOYER",
+  "companyName": "Swagger Demo SARL"
+}
+
+### -> capture le token pour la suite
+@empToken = {{registerEmployer.response.body.$.accessToken}}
+
+### 2) Publier une offre géolocalisée (coordonnées dérivées de l'adresse, jamais du client)
+# @name createOffer
+POST {{baseUrl}}/offers
+Authorization: Bearer {{empToken}}
+Content-Type: application/json
+
+{
+  "title": "Développeur Full-Stack",
+  "description": "Stack React/Node, équipe produit à Lyon.",
+  "address": "1 Place Bellecour, 69002 Lyon",
+  "radiusKm": 20
+}
+
+@offerId = {{createOffer.response.body.$.offer.id}}
+
+### 3) Offres actives dans un rayon (PostGIS ST_DWithin)
+GET {{baseUrl}}/offers/nearby?lat=45.764&lng=4.8357&radiusKm=20
+
+### 4) Mes offres (employeur), avec nombre de candidatures
+GET {{baseUrl}}/offers/mine
+Authorization: Bearer {{empToken}}
+
+### 5) Tableau de bord employeur (vues, candidatures agrégées)
+GET {{baseUrl}}/offers/dashboard
+Authorization: Bearer {{empToken}}
+
+### 6) Détail d'une offre (incrémente le compteur de vues)
+GET {{baseUrl}}/offers/{{offerId}}
+
+### 7) Modifier une offre
+PATCH {{baseUrl}}/offers/{{offerId}}
+Authorization: Bearer {{empToken}}
+Content-Type: application/json
+
+{
+  "radiusKm": 25
+}
+
+### 8) Créer un compte demandeur d'emploi
+# @name registerJobseeker
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "swagger-cand-demo@test.fr",
+  "password": "Seeker2026!",
+  "role": "JOBSEEKER",
+  "firstName": "Camille",
+  "lastName": "Swagger"
+}
+
+@candToken = {{registerJobseeker.response.body.$.accessToken}}
+
+### 9) Postuler à l'offre (notifie l'employeur)
+# @name apply
+POST {{baseUrl}}/applications
+Authorization: Bearer {{candToken}}
+Content-Type: application/json
+
+{
+  "offerId": "{{offerId}}",
+  "message": "Disponible immédiatement, très motivée."
+}
+
+@applicationId = {{apply.response.body.$.application.id}}
+
+### 10) Mes candidatures (demandeur)
+GET {{baseUrl}}/applications/mine
+Authorization: Bearer {{candToken}}
+
+### 11) Candidatures reçues pour une offre (employeur, avec contact du candidat)
+GET {{baseUrl}}/applications/offer/{{offerId}}
+Authorization: Bearer {{empToken}}
+
+### 12) Changer le statut d'une candidature (notifie le demandeur)
+PATCH {{baseUrl}}/applications/{{applicationId}}
+Authorization: Bearer {{empToken}}
+Content-Type: application/json
+
+{
+  "status": "ACCEPTED"
+}
+
+### 13) Supprimer une offre
+DELETE {{baseUrl}}/offers/{{offerId}}
+Authorization: Bearer {{empToken}}

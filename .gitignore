@@ -1,0 +1,52 @@
+# Deps
+node_modules/
+**/node_modules/
+
+# Next / builds
+.next/
+**/.next/
+out/
+dist/
+**/dist/
+build/
+**/build/
+frontend/.vite/
+
+# Envs / secrets - jamais sur GitHub perso
+.env
+.env.*
+!.env.example
+client_secret_*.json
+*.pem
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# C
+*.o
+*.out
+*.gch
+*.dSYM/
+*.d
+*.gcno
+*.gcda
+*.gcov
+
+# OS / editeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Locaux - jamais commité
+backend/storage/
+backend/mail-outbox/
+*.db
+.vercel/
+*.tsbuildinfo
+prisma/migrations/*.lock

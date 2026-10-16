@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: GéoEmploi API
+  version: 0.1.0
+  description: |
+    API REST de mise en relation emploi géolocalisée.
+    Contrats de référence, à compléter par chaque module feature/*.
+
+    Ce fichier est un squelette (chemins + résumés), pas la source de vérité.
+    La doc vivante et curl-vérifiée (exemples réels de requête/réponse) est
+    servie directement par le backend sur /api/docs (JSDoc @openapi dans
+    chaque *.routes.ts). En cas de doute, se fier à /api/docs, pas à ce
+    fichier — voir docs/JOURNAL_MODULE3.md pour le détail des captures.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Environnement local
+
+tags:
+  - name: auth
+    description: Authentification (feature/auth)
+  - name: users
+    description: Utilisateurs et profils (feature/auth)
+  - name: offers
+    description: Offres géolocalisées (feature/employer)
+  - name: applications
+    description: Candidatures (feature/employer, consommation feature/job-seeker)
+  - name: notifications
+    description: Notifications in-app (feature/admin)
+  - name: reports
+    description: Signalements (feature/admin)
+  - name: admin
+    description: Administration (feature/admin)
+
+paths:
+  /health:
+    get:
+      summary: Santé de l'API
+      responses:
+        '200':
+          description: Service opérationnel
+
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Inscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, role]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [JOBSEEKER, EMPLOYER] }
+      responses:
+        '201':
+          description: Compte créé
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Connexion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Tokens JWT
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Renouvellement du token d'accès
+      responses:
+        '200':
+          description: Nouveau access token
+
+  /users/me:
+    get:
+      tags: [users]
+      summary: Profil de l'utilisateur connecté
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Profil courant
+    patch:
+      tags: [users]
+      summary: Mise à jour du profil
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Profil mis à jour
+    delete:
+      tags: [users]
+      summary: Suppression de compte (RGPD)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204':
+          description: Compte supprimé ou anonymisé
+
+  /offers/nearby:
+    get:
+      tags: [offers]
+      summary: Offres à proximité (consultation publique)
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema: { type: number }
+        - name: lng
+          in: query
+          required: true
+          schema: { type: number }
+        - name: radius
+          in: query
+          schema: { type: number, default: 10 }
+      responses:
+        '200':
+          description: Liste des offres avec distance
+
+  /offers/{id}:
+    get:
+      tags: [offers]
+      summary: Détail d'une offre (consultation publique)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Détail de l'offre
+
+  /offers:
+    post:
+      tags: [offers]
+      summary: Créer une offre
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Offre créée
+
+  /applications:
+    post:
+      tags: [applications]
+      summary: Postuler à une offre (demandeur authentifié)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '201':
+          description: Candidature créée
+
+  /applications/mine:
+    get:
+      tags: [applications]
+      summary: Mes candidatures (demandeur)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Liste des candidatures
+
+  /applications/{id}:
+    patch:
+      tags: [applications]
+      summary: Mettre à jour le statut (employeur)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Statut mis à jour
+
+  /notifications:
+    get:
+      tags: [notifications]
+      summary: Mes notifications
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Liste des notifications
+
+  /notifications/{id}:
+    patch:
+      tags: [notifications]
+      summary: Marquer comme lue
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Notification mise à jour
+
+  /reports/{offerId}:
+    post:
+      tags: [reports]
+      summary: Signaler une offre
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Signalement enregistré
+
+  /admin/users:
+    get:
+      tags: [admin]
+      summary: Liste des utilisateurs
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Liste paginée
+
+  /admin/users/{id}:
+    patch:
+      tags: [admin]
+      summary: Suspendre / activer / vérifier un compte
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Utilisateur mis à jour
+
+  /admin/stats:
+    get:
+      tags: [admin]
+      summary: Métriques nationales
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Statistiques agrégées
+
+  /admin/offers/{id}:
+    patch:
+      tags: [admin]
+      summary: Modération d'une offre
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Offre modérée
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }

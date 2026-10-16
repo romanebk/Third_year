@@ -1,0 +1,117 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dashboard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dashboard}
+      POSTGRES_DB: ${POSTGRES_DB:-dashboard}
+    ports:
+      # Exposé pour lancer `prisma migrate dev` / inspecter la DB depuis l'host en dev.
+      # 5433 côté host (pas 5432) pour ne pas entrer en conflit avec un Postgres local
+      # déjà présent sur la machine du dev. Sans impact sur le sujet (qui ne teste que
+      # le port 8080, servi par le service frontend) ni sur la connexion interne
+      # backend->db (toujours 5432).
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # Sans ça, `depends_on: [db]` du service backend n'attend que le démarrage du
+    # conteneur, pas que Postgres accepte des connexions — sur un premier boot à
+    # froid, `prisma migrate deploy` pouvait donc tourner avant que la DB soit
+    # prête (le crash-loop est bénin, restart: unless-stopped le rattrape, mais
+    # c'est un cycle crash/restart confus à observer sur un premier lancement).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dashboard} -d ${POSTGRES_DB:-dashboard}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  # API + Prisma + timer central/SSE. Jamais exposé au host : uniquement joignable
+  # depuis le service frontend via le réseau interne docker-compose (http://backend:3002).
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # DNS explicites : le resolver intégré de Docker délègue sinon au DNS de
+    # l'hôte, qui devient intermittent sous VPN (EAI_AGAIN constatés sur
+    # accounts.google.com, geocoding-api.open-meteo.com…), faisant échouer les
+    # callbacks OAuth et les fetchers. Ces serveurs deviennent les upstreams du
+    # DNS intégré — la résolution interne (db, mailpit) continue de fonctionner.
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://dashboard:dashboard@db:5432/dashboard?schema=public}
+      # URL PUBLIQUE (celle du navigateur, servie par frontend sur 8080) — sert à
+      # générer les URLs de callback OAuth/redirection, pas à joindre ce conteneur
+      # lui-même. Ne pas la remplacer par l'adresse interne du service backend.
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:8080}
+      # Aucun secret dans ce fichier. Les deux secrets internes ci-dessous sont
+      # générés au premier démarrage s'ils sont vides, et conservés dans le
+      # volume backend-secrets (cf. backend/docker-entrypoint.sh).
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
+      # Identifiants des applications OAuth : à fournir dans .env (jamais dans
+      # git, cf. .env.example). Vides -> le provider n'est pas enregistré et ses
+      # boutons indiquent qu'il n'est pas configuré ; le reste de l'application
+      # fonctionne. URLs de retour à déclarer chez le fournisseur :
+      #   http://localhost:8080/api/auth/callback/github
+      #   http://localhost:8080/api/auth/callback/google
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Clés d'API serveur, optionnelles (.env). Sans elles, chaque utilisateur
+      # saisit sa propre clé en connectant Steam ou YouTube sur la page Services
+      # (vérifiée puis stockée chiffrée, cf. backend/src/server/services/api-keys.ts).
+      # Avec elles, personne n'a de clé à saisir.
+      STEAM_API_KEY: ${STEAM_API_KEY:-}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:-}
+      # SMTP auto-hébergé : par défaut le service mailpit du stack (aucun service
+      # d'envoi externe). Sans SMTP_HOST configuré, le mailer du backend retombe
+      # sur un log console et l'API expose alors le token de confirmation.
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      MAIL_FROM: ${MAIL_FROM:-hubly@localhost}
+      # Destinataire du formulaire /contact : l'adresse de l'équipe, surchargeable
+      # via CONTACT_EMAIL.
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-rayannbachabi0@gmail.com}
+    volumes:
+      - backend-secrets:/app/secrets
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  # SMTP local auto-hébergé (aucune API/dépendance externe) : reçoit les emails
+  # du backend et les expose dans une webapp. SMTP (1025) publié pour pouvoir
+  # relayer depuis l'host en dev ; l'UI (8025) sert à consulter les emails.
+  mailpit:
+    image: axllent/mailpit:v1.20
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # web UI : http://localhost:8025
+      - "1025:1025"   # SMTP
+
+  # Pages + composants. Seul service publié sur le host — proxy /api/* et
+  # /about.json vers backend en interne (cf. frontend/src/app/api/[...path]/route.ts).
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:3000"
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:3002
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+  backend-secrets:

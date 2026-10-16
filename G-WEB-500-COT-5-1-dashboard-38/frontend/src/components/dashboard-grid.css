@@ -1,0 +1,119 @@
+/* Overrides react-grid-layout : placeholder plat en pointillés (pas de fond
+ * rouge par défaut), aucune ombre portée, poignée de resize discrète et
+ * respect de prefers-reduced-motion. Couleurs alignées sur les tokens
+ * Tailwind du projet (monochrome). */
+.react-grid-item.react-grid-placeholder {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px dashed rgba(167, 139, 250, 0.6);
+  border-radius: 20px;
+  opacity: 1;
+  box-shadow: none;
+}
+
+.react-grid-item.react-draggable-dragging {
+  opacity: 0.85;
+  z-index: 3;
+  scale: 1.015;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+.react-grid-item.resizing {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 18px 40px rgba(0, 0, 0, 0.7);
+}
+
+.react-grid-item .react-resizable-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  z-index: 2;
+  cursor: se-resize;
+}
+
+.react-grid-item:hover .react-resizable-handle,
+.react-grid-item.resizing .react-resizable-handle {
+  opacity: 1;
+}
+
+/* Mode édition : poignée toujours visible et plus grande — au seul survol,
+ * elle restait introuvable (surtout au tactile, sans hover). */
+.rgl-editing .react-grid-item .react-resizable-handle {
+  opacity: 1;
+  width: 36px;
+  height: 36px;
+}
+
+.rgl-editing .react-grid-item .react-resizable-handle::after {
+  right: 8px;
+  bottom: 8px;
+  width: 10px;
+  height: 10px;
+  border-right-width: 2.5px;
+  border-bottom-width: 2.5px;
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.react-grid-item .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.react-resizable-hide .react-resizable-handle {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .react-grid-layout,
+  .react-grid-item,
+  .react-grid-item.react-grid-placeholder {
+    transition: none;
+  }
+}
+/* Entrée des cartes du dashboard : fondu + légère montée, en cascade (le délai
+ * est posé en ligne par carte, cf. Panel). Anime le contenu interne et pas la
+ * carte elle-même, dont react-grid-layout pilote déjà le transform. */
+@keyframes dashboard-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-panel-enter {
+  animation: dashboard-panel-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Barre de défilement fine et discrète dans les cartes à contenu long. */
+.dashboard-panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+
+.dashboard-panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-panel-enter {
+    animation: none;
+  }
+}

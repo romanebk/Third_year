@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>ChomageGo : Charte graphique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332; --forest2:#2D6A4F; --lime:#C8E6C0; --sage:#8FBC8F;
+    --ink:#141715; --paper:#FBFAF6; --line:#E2E3DE; --muted:#6B726E; --danger:#C45C4A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#d9d9d4}
+  body{font-family:'Montserrat',sans-serif;color:var(--ink);font-weight:500;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'Spline Sans Mono',monospace}
+
+  /* --- feuille A4 --- */
+  .sheet{position:relative;width:210mm;min-height:297mm;background:var(--paper);margin:0 auto;
+         padding:22mm 20mm 18mm;overflow:hidden}
+  @media screen{.sheet{margin:12px auto;box-shadow:0 10px 40px rgba(0,0,0,.15)}}
+
+  /* colonne de repère (fiche technique) */
+  .tag{position:absolute;top:22mm;right:20mm;font-family:'Spline Sans Mono',monospace;font-size:9pt;
+       letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .foot{position:absolute;left:20mm;right:20mm;bottom:12mm;display:flex;justify-content:space-between;
+        font-family:'Spline Sans Mono',monospace;font-size:8pt;letter-spacing:.08em;color:var(--muted);
+        border-top:1px solid var(--line);padding-top:3mm}
+
+  h1,h2,h3{font-weight:800;letter-spacing:-.03em;line-height:1.02}
+  .sec-h{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink);
+         padding-bottom:4mm;margin-bottom:10mm}
+  .sec-h .no{font-family:'Spline Sans Mono',monospace;font-weight:500;font-size:10pt;color:var(--forest2);letter-spacing:.12em}
+  .sec-h h2{font-size:26pt}
+  .lead{font-size:11.5pt;line-height:1.6;color:#3a413d;max-width:62ch}
+
+  /* pin */
+  .pin{display:grid;place-items:center;border-radius:50% 50% 50% 10%;transform:rotate(-45deg);
+       background:var(--forest);border:3px solid #fff}
+  .pin i{transform:rotate(45deg);border-radius:50%;background:#fff}
+  .pin.soft{background:var(--forest2)} .pin.sage{background:var(--sage)} .pin.got{opacity:.5}
+
+  /* ---------- COUVERTURE ---------- */
+  .cover{background:var(--forest);color:#fff}
+  .cover .kick{font-family:'Spline Sans Mono',monospace;font-size:10pt;letter-spacing:.24em;text-transform:uppercase;color:var(--lime)}
+  .cover .constr{position:absolute;top:52mm;left:50%;transform:translateX(-50%);width:96mm;height:96mm}
+  .cover .constr .g{position:absolute;inset:0}
+  .cover .constr .g span{position:absolute;background:rgba(255,255,255,.14)}
+  .cover .constr .ring{position:absolute;border:1px dashed rgba(200,230,192,.4);border-radius:50%}
+  .bigpin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-45deg);
+          width:52mm;height:52mm;border-radius:50% 50% 50% 12%;background:var(--lime);border:0;display:grid;place-items:center}
+  .bigpin i{transform:rotate(45deg);width:34%;height:34%;border-radius:50%;background:var(--forest)}
+  .cover .wm{position:absolute;left:20mm;right:20mm;bottom:40mm}
+  .cover .wm .name{font-size:44pt;font-weight:900;letter-spacing:-.04em}
+  .cover .wm .name b{color:var(--lime)}
+  .cover .wm .sub{font-size:12pt;color:#cfe3d6;margin-top:3mm;max-width:70ch}
+  .cover .meta{position:absolute;left:20mm;right:20mm;bottom:16mm;display:flex;justify-content:space-between;
+               font-family:'Spline Sans Mono',monospace;font-size:8.5pt;letter-spacing:.1em;color:rgba(255,255,255,.55);
+               border-top:1px solid rgba(255,255,255,.18);padding-top:3mm}
+
+  /* ---------- LOGO ---------- */
+  .lockrow{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:2mm}
+  .lock{border:1px solid var(--line);border-radius:3mm;min-height:44mm;display:grid;place-items:center;background:#fff}
+  .lock.d{background:var(--ink)} .lock.f{background:var(--forest)}
+  .wm2{display:flex;align-items:center;gap:4mm;font-weight:800;font-size:17pt;letter-spacing:-.03em}
+  .wm2.w{color:#fff}
+  .cap{font-family:'Spline Sans Mono',monospace;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2.5mm}
+  .rulewrap{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:8mm}
+  .rule{border:1px solid var(--line);border-radius:3mm;padding:6mm;background:#fff}
+  .rule h4{font-size:11pt;margin-bottom:2mm}
+  .rule p{font-size:9.5pt;color:var(--muted);line-height:1.5}
+  .clear{position:relative;height:40mm;border:1px dashed var(--sage);border-radius:2mm;margin-top:3mm;display:grid;place-items:center;background:var(--sageSoft,#F1F6F1)}
+
+  /* ---------- COULEURS ---------- */
+  .pal{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:3mm;overflow:hidden}
+  .pal .cell{padding:7mm;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;gap:5mm;align-items:center}
+  .pal .cell:nth-child(2n){border-right:0}
+  .sw{width:22mm;height:22mm;border-radius:2mm;flex:none;border:1px solid rgba(0,0,0,.06)}
+  .pal .n{font-weight:800;font-size:12pt} .pal .hx{font-family:'Spline Sans Mono',monospace;font-size:9.5pt;color:var(--muted);margin-top:1mm}
+  .pal .u{font-size:9pt;color:var(--muted);margin-top:2mm} .pal .cr{font-family:'Spline Sans Mono',monospace;font-size:8.5pt;color:var(--forest2);margin-top:1.5mm}
+
+  /* ---------- TYPO ---------- */
+  .spec div{border-bottom:1px solid var(--line);padding:6mm 0;display:flex;gap:8mm;align-items:baseline}
+  .spec .lab{font-family:'Spline Sans Mono',monospace;font-size:8.5pt;color:var(--muted);width:34mm;flex:none;letter-spacing:.06em}
+  .glyph{font-size:74pt;font-weight:900;letter-spacing:-.05em;line-height:.9;margin-top:6mm;color:var(--forest)}
+
+  /* ---------- MARQUEUR + COMPOSANTS ---------- */
+  .states{display:flex;gap:12mm;margin-top:2mm;flex-wrap:wrap}
+  .states figure{display:grid;justify-items:center;gap:3mm}
+  .states figcaption{font-family:'Spline Sans Mono',monospace;font-size:8pt;color:var(--muted);text-align:center}
+  .comp{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:9mm}
+  .card{border:1px solid var(--line);border-radius:3mm;padding:6mm;background:#fff}
+  .btn{display:inline-flex;align-items:center;font-weight:700;font-size:10pt;padding:3mm 6mm;border-radius:2.5mm;border:1px solid transparent}
+  .b-f{background:var(--forest);color:#fff} .b-l{background:var(--lime);color:var(--ink)} .b-o{background:#fff;border-color:var(--line)}
+  .pill{display:inline-flex;align-items:center;gap:2mm;background:#EEF5EE;color:var(--forest);font-weight:700;font-size:8.5pt;padding:1.6mm 3.5mm;border-radius:20px}
+  .row{display:flex;gap:3mm;flex-wrap:wrap;align-items:center}
+
+  /* ---------- VOIX ---------- */
+  .vg{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+  .v{border:1px solid var(--line);border-radius:3mm;padding:6mm;background:#fff}
+  .v .k{font-family:'Spline Sans Mono',monospace;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .v .ok{color:var(--forest);font-weight:700;font-size:11pt;margin-top:3mm;line-height:1.4}
+  .v .no{color:var(--danger);font-weight:600;font-size:10pt;margin-top:2.5mm;display:flex;gap:2mm;align-items:flex-start}
+
+  @page{size:A4;margin:0}
+  @media print{html,body{background:#fff}.sheet{margin:0;box-shadow:none;break-after:page}.sheet:last-child{break-after:auto}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+
+<!-- 00 · COUVERTURE -->
+<section class="sheet cover">
+  <p class="kick">Charte graphique · v1</p>
+  <div class="constr">
+    <div class="g">
+      <span style="left:50%;top:0;width:1px;height:100%"></span>
+      <span style="top:50%;left:0;height:1px;width:100%"></span>
+      <span style="left:25%;top:0;width:1px;height:100%"></span>
+      <span style="left:75%;top:0;width:1px;height:100%"></span>
+      <span style="top:25%;left:0;height:1px;width:100%"></span>
+      <span style="top:75%;left:0;height:1px;width:100%"></span>
+    </div>
+    <div class="ring" style="inset:8%"></div>
+    <div class="ring" style="inset:26%"></div>
+    <div class="bigpin"><i></i></div>
+  </div>
+  <div class="wm">
+    <div class="name">Chomage<b>Go</b></div>
+    <div class="sub">L'emploi près de chez vous. Chaque offre a une adresse, posée sur la carte à la rue près.</div>
+  </div>
+  <div class="meta"><span>Ministère du Job et Bonheur</span><span>chomagego.gouv.fr</span></div>
+</section>
+
+<!-- 01 · LOGO -->
+<section class="sheet">
+  <p class="tag">Identité · 01/06</p>
+  <div class="sec-h"><div><span class="no">01</span><h2 style="margin-top:2mm">Le logo</h2></div></div>
+  <p class="lead">La borne en goutte, le marqueur qu'on plante sur une offre, et un mot qui bascule sur l'action : <b>Go</b>, en vert, la couleur du départ. Le point blanc au centre, c'est l'utilisateur, ici et maintenant. La marque se décline sur clair, sur sombre et sur vert.</p>
+  <div class="lockrow">
+    <div class="lock"><div><div class="wm2"><span class="pin" style="width:11mm;height:11mm"><i style="width:34%;height:34%"></i></span>Chomage<span style="color:var(--forest)">Go</span></div></div></div>
+    <div class="lock d"><div class="wm2 w"><span class="pin soft" style="width:11mm;height:11mm;border-color:#fff"><i style="width:34%;height:34%"></i></span>Chomage<span style="color:var(--lime)">Go</span></div></div>
+    <div class="lock"><span class="pin" style="width:20mm;height:20mm"><i style="width:34%;height:34%"></i></span></div>
+    <div class="lock f"><div class="wm2 w" style="flex-direction:column;gap:3mm"><span class="pin sage" style="width:16mm;height:16mm;border-color:#fff"><i style="width:34%;height:34%"></i></span><span>Chomage<span style="color:var(--lime)">Go</span></span></div></div>
+  </div>
+  <div class="cap">Principale · sur fond sombre · marque seule · verticale sur vert</div>
+  <div class="rulewrap">
+    <div class="rule"><h4>Zone de protection</h4><p>Réservez autour du logo un espace libre au moins égal à la hauteur de la borne. Rien ne s'en approche : ni texte, ni image, ni bord.</p></div>
+    <div class="rule"><h4>À ne pas faire</h4><p>Ne pas déformer la borne, ne pas la recolorer hors palette, ne pas ajouter d'ombre ou de contour, ne pas la poser sur un fond qui nuit à la lisibilité.</p></div>
+  </div>
+  <div class="foot"><span>ChomageGo : Charte graphique</span><span>01 · Le logo</span></div>
+</section>
+
+<!-- 02 · COULEURS -->
+<section class="sheet">
+  <p class="tag">Identité · 02/06</p>
+  <div class="sec-h"><div><span class="no">02</span><h2 style="margin-top:2mm">Les couleurs</h2></div><span class="mono" style="font-size:9pt;color:var(--muted)">Vert = go</span></div>
+  <p class="lead" style="margin-bottom:9mm">Le vert forêt porte toutes les actions. Le lime éclaire les fonds sombres, la sauge signale les états. Les contrastes texte/fond visent le niveau AA du RGAA.</p>
+  <div class="pal">
+    <div class="cell"><span class="sw" style="background:#1B4332"></span><div><div class="n">Forêt</div><div class="hx">#1B4332</div><div class="u">Actions, marqueur, texte fort</div><div class="cr">Blanc dessus · 9.4:1 · AA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#2D6A4F"></span><div><div class="n">Forêt clair</div><div class="hx">#2D6A4F</div><div class="u">Survol, succès, offre live</div><div class="cr">Blanc dessus · 5.4:1 · AA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#C8E6C0"></span><div><div class="n">Lime</div><div class="hx">#C8E6C0</div><div class="u">Accent sur fond sombre</div><div class="cr">Encre dessus · 13.8:1 · AAA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#8FBC8F"></span><div><div class="n">Sauge</div><div class="hx">#8FBC8F</div><div class="u">Statuts, sélection</div><div class="cr">Encre dessus · 7.6:1 · AA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#141715"></span><div><div class="n">Encre</div><div class="hx">#141715</div><div class="u">Texte courant</div><div class="cr">Sur papier · 15.8:1 · AAA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#FBFAF6"></span><div><div class="n">Papier</div><div class="hx">#FBFAF6</div><div class="u">Fond principal</div><div class="cr">-</div></div></div>
+    <div class="cell"><span class="sw" style="background:#0E100F"></span><div><div class="n">Noir</div><div class="hx">#0E100F</div><div class="u">Fonds hero, sombres</div><div class="cr">Lime dessus · 15.5:1 · AAA</div></div></div>
+    <div class="cell"><span class="sw" style="background:#C45C4A"></span><div><div class="n">Alerte</div><div class="hx">#C45C4A</div><div class="u">Erreurs, signalements</div><div class="cr">Blanc dessus · 4.6:1 · AA</div></div></div>
+  </div>
+  <div class="foot"><span>ChomageGo : Charte graphique</span><span>02 · Les couleurs</span></div>
+</section>
+
+<!-- 03 · TYPO -->
+<section class="sheet">
+  <p class="tag">Identité · 03/06</p>
+  <div class="sec-h"><div><span class="no">03</span><h2 style="margin-top:2mm">La typographie</h2></div><span class="mono" style="font-size:9pt;color:var(--muted)">Montserrat · une seule voix</span></div>
+  <div class="glyph">Aa Gg 0–9</div>
+  <div class="spec" style="margin-top:8mm">
+    <div><span class="lab">Display · 900 · -5%</span><span style="font-size:26pt;font-weight:900;letter-spacing:-.04em">L'emploi près de vous</span></div>
+    <div><span class="lab">Titre · 800 · -3%</span><span style="font-size:18pt;font-weight:800;letter-spacing:-.03em">Publiez, gérez, recrutez</span></div>
+    <div><span class="lab">Sous-titre · 700</span><span style="font-size:13pt;font-weight:700">Les offres autour de vous</span></div>
+    <div><span class="lab">Corps · 500</span><span style="font-size:11pt;font-weight:500;color:#3a413d;max-width:70ch">Chaque offre a une adresse. Vous voyez ce qui recrute autour de vous et vous postulez en deux gestes, sans créer de compte pour regarder.</span></div>
+    <div><span class="lab">Data · mono</span><span class="mono" style="font-size:11pt">1,2 km · 47.213 N · 06 offres</span></div>
+  </div>
+  <div class="foot"><span>ChomageGo : Charte graphique</span><span>03 · La typographie</span></div>
+</section>
+
+<!-- 04 · MARQUEUR + COMPOSANTS -->
+<section class="sheet">
+  <p class="tag">Système · 04/06</p>
+  <div class="sec-h"><div><span class="no">04</span><h2 style="margin-top:2mm">Le marqueur &amp; les composants</h2></div><span class="mono" style="font-size:9pt;color:var(--muted)">Élément signature</span></div>
+  <p class="lead">La goutte inclinée, bord blanc, point central. Son état se lit à la couleur, jamais à la forme.</p>
+  <div class="states">
+    <figure><span class="pin" style="width:20mm;height:20mm"><i style="width:34%;height:34%"></i></span><figcaption>Offre<br>forêt</figcaption></figure>
+    <figure><span class="pin soft" style="width:20mm;height:20mm"><i style="width:34%;height:34%"></i></span><figcaption>Nouvelle (live)<br>forêt clair</figcaption></figure>
+    <figure><span class="pin sage" style="width:20mm;height:20mm"><i style="width:34%;height:34%"></i></span><figcaption>Sélectionnée<br>sauge</figcaption></figure>
+    <figure><span class="pin got" style="width:20mm;height:20mm"><i style="width:34%;height:34%"></i></span><figcaption>Déjà consultée<br>estompée</figcaption></figure>
+  </div>
+  <div class="comp">
+    <div class="card">
+      <div class="cap" style="margin:0 0 4mm">Boutons</div>
+      <div class="row"><span class="btn b-f">Ouvrir la carte</span><span class="btn b-o">En savoir plus</span></div>
+      <div class="row" style="margin-top:4mm;background:var(--ink);padding:4mm;border-radius:2.5mm"><span class="btn b-l">Postuler</span></div>
+    </div>
+    <div class="card">
+      <div class="cap" style="margin:0 0 4mm">Pastilles &amp; distance</div>
+      <div class="row"><span class="pill">Temps réel</span><span class="pill">CDI</span><span class="pill"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>1,2 km de vous</span></div>
+      <div class="row" style="margin-top:4mm"><span class="pill" style="background:#FBEDE9;color:var(--danger)">Offre signalée</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>ChomageGo : Charte graphique</span><span>04 · Marqueur &amp; composants</span></div>
+</section>
+
+<!-- 05 · VOIX -->
+<section class="sheet">
+  <p class="tag">Ton · 05/06</p>
+  <div class="sec-h"><div><span class="no">05</span><h2 style="margin-top:2mm">Voix &amp; ton</h2></div><span class="mono" style="font-size:9pt;color:var(--muted)">Direct, clair, jamais gadget</span></div>
+  <p class="lead" style="margin-bottom:8mm">On parle du côté de l'utilisateur, en voix active. Le mot du bouton devient le mot du succès. L'énergie « carte / proximité » reste une image, jamais un libellé d'action.</p>
+  <div class="vg">
+    <div class="v"><div class="k">Succès</div><div class="ok">« Candidature envoyée. L'employeur l'a reçue. »</div><div class="no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="flex:none;margin-top:1mm"><path d="M6 6l12 12M18 6 6 18"/></svg>« Opération effectuée avec succès. »</div></div>
+    <div class="v"><div class="k">Vide</div><div class="ok">« Rien ici pour l'instant. Élargissez le rayon ? »</div><div class="no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="flex:none;margin-top:1mm"><path d="M6 6l12 12M18 6 6 18"/></svg>« Aucun résultat. »</div></div>
+    <div class="v"><div class="k">Erreur</div><div class="ok">« On n'a pas trouvé cette adresse. Réessayez ? »</div><div class="no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="flex:none;margin-top:1mm"><path d="M6 6l12 12M18 6 6 18"/></svg>« Erreur 422. »</div></div>
+    <div class="v"><div class="k">Action</div><div class="ok">« Voir l'offre » · « Postuler »</div><div class="no"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" style="flex:none;margin-top:1mm"><path d="M6 6l12 12M18 6 6 18"/></svg>« Soumettre le formulaire »</div></div>
+  </div>
+  <div class="foot"><span>ChomageGo : Charte graphique</span><span>05 · Voix &amp; ton</span></div>
+</section>
+
+</body>
+</html>
