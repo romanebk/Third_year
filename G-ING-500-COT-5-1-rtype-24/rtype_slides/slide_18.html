@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 18 — Going Further</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-bonus {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 5vw 4vh 5vw;
+            gap: 2.2vh;
+        }
+
+        .head { display: flex; flex-direction: column; gap: 1vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4.2vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1vw; position: relative; z-index: 1; }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent, #8899EE);
+            padding: 1.2vh 1vw;
+            display: flex; flex-direction: column; gap: 0.7vh;
+            box-shadow: 0 2px 8px rgba(26, 26, 204, 0.05);
+        }
+        .card .name { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.3vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; }
+        .card .grp { font-family: "JetBrains Mono", monospace; font-size: 0.65vw; letter-spacing: 0.1em; text-transform: uppercase; color: #999; font-weight: 500; }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.35vw; }
+        .chips span {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.88vw;
+            padding: 0.4vh 0.55vw;
+            border-radius: 4px;
+            background: #F0F2F8;
+            color: #1A1ACC;
+            border: 1px solid #D0D8F0;
+        }
+
+        .star { --accent: #FF4400; background: #0d0d0d; }
+        .star .name { color: #fff; }
+        .star .grp { color: #FF7755; }
+        .star .chips span { background: #15152a; color: #cdd6f4; border-color: #3a3a6a; }
+        .star .chips span b { color: #00FFAA; font-weight: 700; }
+
+        .c-sub  { --accent: #1A1ACC; }
+        .c-mod  { --accent: #0d0d0d; }
+        .c-tool { --accent: #00C080; }
+
+        .boss {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; gap: 1.2vw;
+            background: var(--epi-blue);
+            color: #fff;
+            border-radius: 8px;
+            padding: 1.4vh 1.4vw;
+        }
+        .boss img { height: 2.4vw; image-rendering: pixelated; }
+        .boss .bt { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.4vw; white-space: nowrap; }
+        .boss .bd { font-size: 1.1vw; color: rgba(255,255,255,0.9); line-height: 1.35; }
+        .boss .bd b { color: var(--epi-mint); }
+
+        .note { position: relative; z-index: 1; font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #666; }
+        .note b { color: #cc3300; }
+
+        .slide-bonus .deco-block-1, .slide-bonus .deco-block-2 { background: #D0D8F0; }
+        .slide-bonus .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-bonus">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #1 · Advanced Architecture</div>
+            <div class="title">Going Further<span class="cursor"></span></div>
+            <div class="subtitle">You have an engine. Now make it a <b>real</b> one.</div>
+        </div>
+
+        <div class="grid">
+            <div class="card star">
+                <span class="name">Scenes &amp; prefabs <span class="grp">content</span></span>
+                <div class="chips">
+                    <span><b>scene files</b> .json</span>
+                    <span><b>prefabs</b>: entity templates</span>
+                    <span><b>scene loader</b>: file → registry</span>
+                    <span>loading screen, async</span>
+                </div>
+            </div>
+            <div class="card c-mod">
+                <span class="name">Modularity <span class="grp">build</span></span>
+                <div class="chips"><span>compile-time flags</span><span>link-time libs</span><span>runtime plugins</span></div>
+            </div>
+            <div class="card c-sub">
+                <span class="name">Rendering <span class="grp">subsystem</span></span>
+                <div class="chips"><span>particles</span><span>parallax layers</span><span>UI widgets</span><span>animation states</span></div>
+            </div>
+            <div class="card c-sub">
+                <span class="name">Physics <span class="grp">subsystem</span></span>
+                <div class="chips"><span>collision layers</span><span>quadtree</span><span>gravity · bounce</span></div>
+            </div>
+            <div class="card c-sub">
+                <span class="name">Audio &amp; Input <span class="grp">subsystem</span></span>
+                <div class="chips"><span>sfx · music</span><span>positional sound</span><span>key rebinding</span><span>gamepad</span></div>
+            </div>
+            <div class="card c-sub">
+                <span class="name">Messaging <span class="grp">subsystem</span></span>
+                <div class="chips"><span>event priorities</span><span>async queue</span><span>request / answer</span></div>
+            </div>
+            <div class="card c-sub">
+                <span class="name">Scripting <span class="grp">subsystem</span></span>
+                <div class="chips"><span>Lua behaviours</span><span>hot reload</span><span>no recompile</span></div>
+            </div>
+            <div class="card c-tool">
+                <span class="name">Dev tools <span class="grp">tooling</span></span>
+                <div class="chips"><span>console + CVars</span><span>FPS · lagometer</span><span>CPU · memory</span></div>
+            </div>
+            <div class="card c-tool">
+                <span class="name">Editor <span class="grp">tooling</span></span>
+                <div class="chips"><span>config files</span><span>CLI</span><span>drag &amp; drop GUI</span></div>
+            </div>
+        </div>
+
+        <div class="boss">
+            <img src="assets/force.png" alt="">
+            <span class="bt">Final boss</span>
+            <span class="bd">Ship the engine as a <b>standalone project</b> — R-Type uses it as a library — and build a <b>2nd game</b> on it. From Pong to a Mario clone.</span>
+        </div>
+
+        <div class="note">Advanced features can use <b>3rd-party libraries</b> — ask your unit manager first.</div>
+    </section>
+</body>
+</html>

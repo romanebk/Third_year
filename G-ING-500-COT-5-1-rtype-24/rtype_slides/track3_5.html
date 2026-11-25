@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Game Feel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-gf { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .gf-left {
+            position: relative; z-index: 1; width: 57%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.3vh;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+        canvas { width: 100%; aspect-ratio: 640 / 380; border-radius: 10px; background: #05050d; display: block; }
+
+        .tg { display: flex; gap: 0.5vw; align-items: center; font-family: "JetBrains Mono", monospace; }
+        .tg button {
+            font-family: inherit; font-size: 0.85vw; font-weight: 700; letter-spacing: 0.06em;
+            padding: 0.8vh 0.8vw; border-radius: 6px; cursor: pointer;
+            border: 1.5px solid #D0D8F0; background: #fff; color: #6B82D6;
+        }
+        .tg button.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .tg button.all { margin-left: auto; border-style: dashed; color: #cc3300; border-color: #FF440088; }
+        .hint { font-family: "JetBrains Mono", monospace; font-size: 0.8vw; color: #888; }
+        .hint b { color: #cc3300; }
+
+        .gf-right {
+            position: relative; z-index: 1; width: 43%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.5vh;
+            padding: 4vh 4.5vw 4vh 1.2vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 0.75vh; }
+        .pt { font-size: 1.02vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+
+        .box { font-size: 0.98vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; }
+        .net { border-left: 4px solid #00C080; background: #00FFAA14; }
+        .net b { color: #00885F; }
+        .a11y { border-left: 4px solid var(--epi-orange); background: #FF440010; }
+        .a11y b { color: #cc3300; }
+
+        .slide-gf .deco-block-1, .slide-gf .deco-block-2 { background: #D0D8F0; }
+        .slide-gf .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-gf">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="gf-left">
+            <canvas id="cv" width="640" height="380"></canvas>
+            <div class="tg">
+                <button data-k="sfx">SFX</button>
+                <button data-k="spatial">SPATIAL AUDIO</button>
+                <button data-k="vfx">VFX</button>
+                <button data-k="shake">CAM SHAKE</button>
+                <button data-k="hud">HUD</button>
+                <button class="all" id="all">ALL ON</button>
+            </div>
+            <div class="hint">Same game, same code. Turn them on <b>one by one</b>. (sound: turn your speakers on)</div>
+        </div>
+
+        <div class="gf-right">
+            <div class="eyebrow">Epitech Afrique — Track #3 · UX</div>
+            <div class="title">Game Feel<span class="cursor"></span></div>
+            <div class="subtitle">Nothing changes the rules. <b>Everything changes the fun.</b></div>
+
+            <div class="points">
+                <div class="pt"><b>SFX & music</b>: every action makes a sound. Music follows the intensity.</div>
+                <div class="pt"><b>Spatial audio</b>: an explosion on the left plays on the left, quieter when far.</div>
+                <div class="pt"><b>VFX</b>: particles, hit flash, muzzle flash. The hit must <i>feel</i> like a hit.</div>
+                <div class="pt"><b>Cam shake</b>: short, decays fast, bigger for bigger events.</div>
+                <div class="pt"><b>HUD</b>: score, lives, beam charge, teammates. Readable at a glance.</div>
+                <div class="pt"><b>Sync on the sound.</b> Measure its loudness curve and its cracks, then drive the shake, the snap, the spring from them (see the warp on the Galactic War slide).</div>
+            </div>
+
+            <div class="box net"><b>All client-side.</b> The room says "enemy 12 died at (x, y)". Each client plays its own boom. Never send particles.</div>
+            <div class="box a11y"><b>Accessibility is required.</b> Options to turn off shake and flashes, volume per channel, colour-blind-safe HUD.</div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 640, H = 380;
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SHIP = img('player_cyan.png'), FORCE = img('force.png');
+        const FOES = [img('bydos.png'), img('bug.png'), img('patapata.png')];
+
+        // ---------- toggles ----------
+        const on = { sfx: false, spatial: false, vfx: false, shake: false, hud: false };
+        const btns = [...document.querySelectorAll('.tg button[data-k]')];
+        const allBtn = document.getElementById('all');
+        function refresh() {
+            btns.forEach(b => b.classList.toggle('on', on[b.dataset.k]));
+            const all = Object.values(on).every(v => v);
+            allBtn.textContent = all ? 'ALL OFF' : 'ALL ON';
+        }
+        btns.forEach(b => b.addEventListener('click', () => { on[b.dataset.k] = !on[b.dataset.k]; if (on.sfx || on.spatial) audio(); refresh(); }));
+        allBtn.addEventListener('click', () => { const v = !Object.values(on).every(x => x); for (const k in on) on[k] = v; if (v) audio(); refresh(); });
+        refresh();
+
+        // ---------- audio (Web Audio, synthesized) ----------
+        let AC = null, master = null, noise = null;
+        function audio() {
+            if (AC) { AC.resume(); return; }
+            AC = new (window.AudioContext || window.webkitAudioContext)();
+            master = AC.createGain(); master.gain.value = 0.35; master.connect(AC.destination);
+            noise = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate);
+            const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        }
+        function out(x, y) {
+            // spatial: pan by x, volume by distance to the ship
+            const g = AC.createGain(), p = AC.createStereoPanner();
+            if (on.spatial) {
+                p.pan.value = Math.max(-1, Math.min(1, x / W * 2 - 1));
+                const dist = Math.hypot(x - ship.x, y - ship.y);
+                g.gain.value = Math.max(0.15, 1 - dist / 700);
+                meter.l = Math.max(meter.l, g.gain.value * (1 - p.pan.value) / 2 * 2);
+                meter.r = Math.max(meter.r, g.gain.value * (1 + p.pan.value) / 2 * 2);
+            }
+            g.connect(p); p.connect(master);
+            return g;
+        }
+        function sndShot() {
+            if (!on.sfx || !AC || paused) return;
+            const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+            o.type = 'square'; o.frequency.setValueAtTime(1100, t); o.frequency.exponentialRampToValueAtTime(420, t + 0.06);
+            g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+            o.connect(g); g.connect(out(ship.x, ship.y)); o.start(t); o.stop(t + 0.08);
+        }
+        function sndBoom(x, y, big) {
+            if (!on.sfx || !AC || paused) return;
+            const s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain(), t = AC.currentTime;
+            s.buffer = noise; f.type = 'lowpass'; f.frequency.setValueAtTime(big ? 900 : 1800, t); f.frequency.exponentialRampToValueAtTime(120, t + 0.35);
+            g.gain.setValueAtTime(big ? 0.9 : 0.55, t); g.gain.exponentialRampToValueAtTime(0.001, t + (big ? 0.5 : 0.3));
+            s.connect(f); f.connect(g); g.connect(out(x, y)); s.start(t); s.stop(t + 0.5);
+        }
+
+        // ---------- game ----------
+        const ship = { x: 90, y: 190 };
+        let t = 0, foes = [], shots = [], eshots = [], parts = [], flashes = [];
+        let trauma = 0, hurt = 0, score = 1250, lives = 3, charge = 0, spawnT = 0, fireT = 0, hitT = 4.5;
+        const meter = { l: 0, r: 0 };
+        const stars = Array.from({ length: 80 }, () => ({ x: Math.random() * W, y: Math.random() * H, v: 30 + Math.random() * 90 }));
+
+        function explode(x, y, big) {
+            sndBoom(x, y, big);
+            if (on.shake) trauma = Math.min(1, trauma + (big ? 0.75 : 0.28));
+            if (!on.vfx) return;
+            const n = big ? 40 : 22;
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * 6.28, v = 40 + Math.random() * (big ? 260 : 170);
+                parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, life: 0.35 + Math.random() * 0.4, c: Math.random() < 0.5 ? '#FFB000' : (Math.random() < 0.5 ? '#FF7755' : '#fff') });
+            }
+            flashes.push({ x, y, t: 0, r: big ? 60 : 34 });
+        }
+
+        function update(dt) {
+            t += dt;
+            stars.forEach(s => { s.x -= s.v * dt; if (s.x < 0) { s.x = W; s.y = Math.random() * H; } });
+            ship.y = 190 + 110 * Math.sin(t * 0.8);
+
+            spawnT -= dt;
+            if (spawnT <= 0) { spawnT = 0.75; foes.push({ x: W + 20, y: 50 + Math.random() * 280, ph: Math.random() * 6, im: FOES[(Math.random() * 3) | 0], hp: 2, fl: 0 }); }
+            foes.forEach(f => { f.x -= 110 * dt; f.y += Math.sin(t * 2 + f.ph) * 40 * dt; f.fl -= dt; });
+
+            fireT -= dt;
+            if (fireT <= 0) { fireT = 0.2; shots.push({ x: ship.x + 50, y: ship.y }); sndShot(); }
+            shots.forEach(s => s.x += 520 * dt);
+
+            // scripted hit on the player so the "big" feedback is visible
+            hitT -= dt;
+            if (hitT <= 0) { hitT = 5; eshots.push({ x: ship.x + 160, y: -10 }); }   // falls from above, homing
+            eshots.forEach(e => { const dx = ship.x - e.x, dy = ship.y - e.y, d = Math.hypot(dx, dy) || 1; e.x += dx / d * 330 * dt; e.y += dy / d * 330 * dt; });
+            eshots = eshots.filter(e => {
+                if (Math.hypot(e.x - ship.x, e.y - ship.y) < 18) { hurt = 0.4; lives = lives > 1 ? lives - 1 : 3; explode(ship.x + 10, ship.y, true); return false; }
+                return true;
+            });
+
+            shots = shots.filter(s => {
+                for (const f of foes) if (f.hp > 0 && Math.abs(s.x - f.x) < 20 && Math.abs(s.y - f.y) < 18) {
+                    f.hp--; f.fl = 0.08;
+                    if (f.hp <= 0) { score += 100; explode(f.x, f.y, false); }
+                    return false;
+                }
+                return s.x < W + 10;
+            });
+            foes = foes.filter(f => f.hp > 0 && f.x > -30);
+
+            parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; p.vy *= 0.96; });
+            parts = parts.filter(p => p.t < p.life);
+            flashes.forEach(f => f.t += dt); flashes = flashes.filter(f => f.t < 0.18);
+            trauma = Math.max(0, trauma - dt * 1.6);
+            hurt = Math.max(0, hurt - dt);
+            charge = (charge + dt * 0.35) % 1;
+            meter.l = Math.max(0, meter.l - dt * 2); meter.r = Math.max(0, meter.r - dt * 2);
+        }
+
+        function draw() {
+            ctx.save();
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            if (on.shake && trauma > 0) {
+                const k = trauma * trauma * 14;
+                ctx.translate((Math.random() * 2 - 1) * k, (Math.random() * 2 - 1) * k);
+            }
+            stars.forEach(s => { ctx.fillStyle = s.v > 90 ? '#cdd6f4' : '#3a3a6a'; ctx.fillRect(s.x, s.y, 2, 1.5); });
+
+            foes.forEach(f => {
+                if (!f.im.complete) return;
+                ctx.drawImage(f.im, f.x - 18, f.y - 16, 36, 32);
+                if (on.vfx && f.fl > 0) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.8; ctx.drawImage(f.im, f.x - 18, f.y - 16, 36, 32); ctx.drawImage(f.im, f.x - 18, f.y - 16, 36, 32); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
+            });
+            ctx.fillStyle = '#FFB000'; shots.forEach(s => ctx.fillRect(s.x - 7, s.y - 2, 14, 4));
+            ctx.fillStyle = '#FF7755'; eshots.forEach(e => { ctx.beginPath(); ctx.arc(e.x, e.y, 6, 0, 7); ctx.fill(); });
+
+            if (SHIP.complete) ctx.drawImage(SHIP, ship.x - 33, ship.y - 17, 66, 34);
+            if (FORCE.complete) ctx.drawImage(FORCE, ship.x + 30, ship.y - 15, 32, 30);
+            if (on.vfx && fireT > 0.14) { ctx.fillStyle = 'rgba(255,230,150,0.9)'; ctx.beginPath(); ctx.arc(ship.x + 64, ship.y, 6, 0, 7); ctx.fill(); }
+
+            if (on.vfx) {
+                flashes.forEach(f => { const a = 1 - f.t / 0.18; const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r); g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(0.4, `rgba(255,176,0,${a * 0.7})`); g.addColorStop(1, 'rgba(255,68,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 7); ctx.fill(); });
+                parts.forEach(p => { ctx.globalAlpha = 1 - p.t / p.life; ctx.fillStyle = p.c; ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3); });
+                ctx.globalAlpha = 1;
+            }
+            ctx.restore();
+
+            if (on.vfx && hurt > 0) {
+                const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.7);
+                g.addColorStop(0, 'rgba(255,0,0,0)'); g.addColorStop(1, `rgba(255,40,0,${hurt * 1.2})`);
+                ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+            }
+
+            ctx.font = '13px "JetBrains Mono", monospace';
+            if (on.hud) {
+                ctx.fillStyle = '#fff'; ctx.fillText('SCORE ' + String(score).padStart(7, '0'), 14, 22);
+                ctx.fillStyle = '#AAB6FF'; ctx.fillText('LIVES', W - 150, 22);
+                for (let i = 0; i < lives; i++) if (SHIP.complete) ctx.drawImage(SHIP, W - 100 + i * 30, 10, 26, 13);
+                ctx.fillStyle = '#AAB6FF'; ctx.fillText('BEAM', 14, H - 14);
+                ctx.strokeStyle = '#3a3a6a'; ctx.strokeRect(58, H - 25, 200, 12);
+                ctx.fillStyle = '#00FFAA'; ctx.fillRect(59, H - 24, 198 * charge, 10);
+                ctx.fillStyle = '#6B82D6'; ctx.fillText('P2 k4ze 148ms', W - 150, H - 14);
+            }
+            if (on.spatial) {
+                const bx = W / 2 - 50, by = 12;
+                ctx.fillStyle = '#6B82D6'; ctx.fillText('L', bx - 14, by + 10); ctx.fillText('R', bx + 106, by + 10);
+                ctx.fillStyle = '#1a1a2a'; ctx.fillRect(bx, by, 45, 12); ctx.fillRect(bx + 55, by, 45, 12);
+                ctx.fillStyle = '#FF00CC'; ctx.fillRect(bx + 45 - 45 * Math.min(1, meter.l), by, 45 * Math.min(1, meter.l), 12); ctx.fillRect(bx + 55, by, 45 * Math.min(1, meter.r), 12);
+                if (!on.sfx) { ctx.fillStyle = '#FF7755'; ctx.fillText('needs SFX', bx + 14, by + 30); }
+            }
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

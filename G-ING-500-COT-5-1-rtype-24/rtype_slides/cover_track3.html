@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Advanced Gameplay</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .track-num {
+            position: absolute;
+            right: 5vw;
+            bottom: -6vh;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 34vw;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.07);
+            user-select: none;
+        }
+        .cover-mascot { display: flex; align-items: center; gap: 0.6vw; width: auto; height: auto; }
+        .cover-mascot img { image-rendering: pixelated; }
+        .shot { width: 1.2vw; height: 0.35vw; border-radius: 1vw; background: #FFB000; box-shadow: 0 0 0.6vw #FFB000; animation: shoot 1.2s linear infinite; }
+        .shot.b { animation-delay: 0.6s; }
+        .lane { position: relative; width: 9vw; height: 1vw; }
+        .lane .shot { position: absolute; top: 0.3vw; }
+        @keyframes shoot { from { left: 0; opacity: 1; } 85% { opacity: 1; } to { left: 8vw; opacity: 0; } }
+        .boss { animation: bob 3s ease-in-out infinite; }
+        @keyframes bob { 50% { transform: translateY(-1.2vh); } }
+        .chapter {
+            margin-top: 3vh;
+            display: flex; gap: 0.8vw; flex-wrap: wrap;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .chapter span { border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px; padding: 0.4vh 0.7vw; }
+    </style>
+</head>
+<body>
+    <section class="slide slide-cover">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+        <div class="track-num">#3</div>
+
+        <div class="cover-content">
+            <div class="cover-eyebrow">R-Type — Track #3</div>
+            <h1 class="cover-title">
+                Advanced<br>
+                Gameplay<span class="cursor"></span>
+            </h1>
+            <p class="cover-subtitle">Building a fun and complete video game</p>
+            <div class="chapter"><span>monsters</span><span>the Force</span><span>levels</span><span>bosses</span><span>scripting</span><span>rules</span><span>sound</span></div>
+        </div>
+
+        <div class="cover-mascot">
+            <img src="assets/player_cyan.png" alt="" style="width:5.5vw">
+            <img src="assets/force.png" alt="" style="width:2.6vw">
+            <div class="lane"><span class="shot"></span><span class="shot b"></span></div>
+            <img class="boss" src="assets/dobkeratops.png" alt="Dobkeratops" style="width:11vw">
+        </div>
+    </section>
+</body>
+</html>

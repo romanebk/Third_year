@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #1 — Advanced Architecture</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .track-num {
+            position: absolute;
+            right: 5vw;
+            bottom: -6vh;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 34vw;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.07);
+            user-select: none;
+        }
+        .cover-mascot { display: flex; align-items: center; gap: 0.6vw; width: auto; height: auto; }
+        .cover-mascot img { image-rendering: pixelated; }
+        .chip {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            font-size: 1.1vw;
+            letter-spacing: 0.1em;
+            color: #fff;
+            background: #FF4400;
+            padding: 0.8vh 1vw;
+            border-radius: 6px;
+        }
+        .chapter {
+            margin-top: 3vh;
+            display: flex; gap: 0.8vw; flex-wrap: wrap;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .chapter span { border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px; padding: 0.4vh 0.7vw; }
+    </style>
+</head>
+<body>
+    <section class="slide slide-cover">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+        <div class="track-num">#1</div>
+
+        <div class="cover-content">
+            <div class="cover-eyebrow">R-Type — Track #1</div>
+            <h1 class="cover-title">
+                Advanced<br>
+                Architecture<span class="cursor"></span>
+            </h1>
+            <p class="cover-subtitle">Building a real game engine</p>
+            <div class="chapter"><span>ECS</span><span>layers</span><span>engine/</span><span>lifecycle</span><span>scenes &amp; prefabs</span><span>editor</span></div>
+        </div>
+
+        <div class="cover-mascot">
+            <span class="chip">ENGINE</span>
+            <img src="assets/bydos.png" alt="" style="width:3.5vw">
+            <img src="assets/force.png" alt="" style="width:4vw">
+        </div>
+    </section>
+</body>
+</html>

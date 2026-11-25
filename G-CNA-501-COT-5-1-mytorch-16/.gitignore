@@ -1,0 +1,17 @@
+dataset/
+dataset.zip
+
+# Données dérivées (créées par scripts/make_split.sh et scripts/train_*.sh)
+split/
+predictions*.txt
+
+# Compilation
+build/
+*.o
+*.d
+*.a
+/my_torch_analyzer
+/my_torch_generator
+
+# Notes de soutenance (locales, non livrées)
+/soutenance/

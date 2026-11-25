@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Kinds of Levels</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-kl {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 5vw 3.5vh 5vw; gap: 2.2vh;
+        }
+        .head { display: flex; flex-direction: column; gap: 0.8vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1vw; position: relative; z-index: 1; }
+        .card {
+            background: #fff; border-radius: 10px; border-top: 5px solid var(--c);
+            padding: 1.6vh 0.9vw; display: flex; flex-direction: column; gap: 1vh;
+            box-shadow: 0 2px 10px rgba(26, 26, 204, 0.06);
+        }
+        .cn { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.5vw; color: var(--epi-dark-blue); }
+        .cs { font-family: "JetBrains Mono", monospace; font-size: 0.8vw; color: var(--ct); font-weight: 700; }
+        canvas { width: 100%; aspect-ratio: 260 / 120; border-radius: 6px; background: #05050d; display: block; }
+        .pc { font-size: 0.92vw; color: #333; line-height: 1.35; }
+        .pc .p { color: #00885F; font-weight: 700; } .pc .c { color: #cc3300; font-weight: 700; }
+        .ex { margin-top: auto; font-family: "JetBrains Mono", monospace; font-size: 0.75vw; color: #888; border-top: 1px solid #E6E9F4; padding-top: 0.8vh; }
+        .ex b { color: #555; }
+
+        .c1 { --c: #8899EE; --ct: #3A4DB8; }
+        .c2 { --c: #00C080; --ct: #00885F; }
+        .c3 { --c: #FFB000; --ct: #A06E00; }
+        .c4 { --c: #FF00CC; --ct: #B0008E; }
+
+        .net {
+            position: relative; z-index: 1;
+            font-size: 1.05vw; color: #333; line-height: 1.4;
+            border-left: 4px solid #00C080; background: #00FFAA14; padding: 1vh 1vw;
+        }
+        .net b { color: #00885F; }
+        .net code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+
+        .slide-kl .deco-block-1, .slide-kl .deco-block-2 { background: #D0D8F0; }
+        .slide-kl .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-kl">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #3 · Levels</div>
+            <div class="title">Kinds of Levels<span class="cursor"></span></div>
+            <div class="subtitle">Who builds the level: <b>a designer, an algorithm, or both</b>?</div>
+        </div>
+
+        <div class="grid">
+            <div class="card c1">
+                <span class="cn">Hand-made</span>
+                <span class="cs">designer places everything</span>
+                <canvas id="k1" width="260" height="120"></canvas>
+                <div class="pc"><span class="p">+</span> full control of pacing, bosses, surprises<br><span class="c">−</span> costly to make, same every run</div>
+                <div class="ex">e.g. <b>the original R-Type</b></div>
+            </div>
+            <div class="card c2">
+                <span class="cn">Procedural</span>
+                <span class="cs">seed → generator → level</span>
+                <canvas id="k2" width="260" height="120"></canvas>
+                <div class="pc"><span class="p">+</span> endless variety, tiny to store<br><span class="c">−</span> can feel bland or unfair, hard to tune</div>
+                <div class="ex">e.g. <b>roguelikes · No Man's Sky</b></div>
+            </div>
+            <div class="card c3">
+                <span class="cn">Blueprints</span>
+                <span class="cs">hand-made chunks, stitched by rules</span>
+                <canvas id="k3" width="260" height="120"></canvas>
+                <div class="pc"><span class="p">+</span> handcrafted quality <b>and</b> variety<br><span class="c">−</span> chunks must fit together</div>
+                <div class="ex">e.g. <b>Spelunky · Dead Cells · Helldivers 2 missions</b></div>
+            </div>
+            <div class="card c4">
+                <span class="cn">Galactic map</span>
+                <span class="cs">levels are places in a world</span>
+                <canvas id="k4" width="260" height="120"></canvas>
+                <div class="pc"><span class="p">+</span> choice, progress, a reason to come back<br><span class="c">−</span> needs a persistent server state</div>
+                <div class="ex">e.g. <b>Helldivers 2 · FTL</b> — next slides</div>
+            </div>
+        </div>
+
+        <div class="net"><b>Procedural + online: send the seed, not the level.</b> Same seed + same generator = same level on every machine. Only if the random is yours: <code>std::mt19937</code> is identical everywhere, <code>std::uniform_int_distribution</code> is not.</div>
+    </section>
+
+    <script>
+        const C = id => { const c = document.getElementById(id); const x = c.getContext('2d'); x.imageSmoothingEnabled = false; return x; };
+        const k1 = C('k1'), k2 = C('k2'), k3 = C('k3'), k4 = C('k4');
+        const W = 260, H = 120;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SHIP = img('player_cyan.png'), BUG = img('bug.png'), BYDO = img('bydos.png');
+        let t = 0;
+
+        function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let r = Math.imul(seed ^ seed >>> 15, 1 | seed); r = r + Math.imul(r ^ r >>> 7, 61 | r) ^ r; return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+        function bg(x) { x.fillStyle = '#05050d'; x.fillRect(0, 0, W, H); for (let i = 0; i < 30; i++) { x.fillStyle = '#2a2a55'; x.fillRect((i * 83.3) % W, (i * 41.7) % H, 1.5, 1.5); } }
+
+        // 1. hand-made: fixed layout, designer pins
+        function draw1() {
+            bg(k1);
+            const sc = (t * 25) % 120;
+            k1.save(); k1.translate(-sc, 0);
+            k1.fillStyle = '#3a2c18';
+            k1.beginPath(); k1.moveTo(0, H); for (let u = 0; u <= 400; u += 10) k1.lineTo(u, 104 - (u > 140 && u < 230 ? 22 : 0)); k1.lineTo(400, H); k1.fill();
+            const pins = [[70, 40], [120, 70], [190, 50], [300, 36], [340, 70]];
+            pins.forEach(([px, py], i) => {
+                if (BYDO.complete) k1.drawImage(BYDO, px - 9, py - 8, 18, 16);
+                k1.fillStyle = '#8899EE'; k1.beginPath(); k1.arc(px, py - 14, 3, 0, 7); k1.fill();
+            });
+            k1.restore();
+            k1.font = '10px "JetBrains Mono", monospace'; k1.fillStyle = '#8899EE'; k1.fillText('● = placed by hand', 6, 14);
+        }
+
+        // 2. procedural: terrain from a seed, new seed every 2.4 s
+        let seed = 0x3F2A, seedT = 0;
+        function draw2() {
+            bg(k2);
+            const r = rng(seed), pts = [], top = [];
+            let a = 90, b = 18;
+            for (let u = 0; u <= W; u += 10) { a += (r() - 0.5) * 22; a = Math.max(62, Math.min(110, a)); b += (r() - 0.5) * 16; b = Math.max(0, Math.min(40, b)); pts.push(a); top.push(b); }
+            k2.fillStyle = '#123a2c';
+            k2.beginPath(); k2.moveTo(0, H); pts.forEach((y, i) => k2.lineTo(i * 10, y)); k2.lineTo(W, H); k2.fill();
+            k2.beginPath(); k2.moveTo(0, 0); top.forEach((y, i) => k2.lineTo(i * 10, y)); k2.lineTo(W, 0); k2.fill();
+            for (let i = 0; i < 4; i++) { const ex = 60 + r() * 180, ey = 30 + r() * 30; if (BUG.complete) k2.drawImage(BUG, ex, ey, 16, 16); }
+            k2.font = 'bold 11px "JetBrains Mono", monospace'; k2.fillStyle = '#00FFAA';
+            k2.fillText('seed 0x' + seed.toString(16).toUpperCase().padStart(4, '0'), 6, 14);
+        }
+
+        // 3. blueprints: 4 slots filled from a deck of hand-made chunks
+        const CHUNKS = [
+            { n: 'corridor', c: '#FFB000', d: (x, ox) => { x.fillRect(ox, 0, 60, 26); x.fillRect(ox, 94, 60, 26); } },
+            { n: 'turrets',  c: '#FF7755', d: (x, ox) => { x.fillRect(ox, 100, 60, 20); for (let i = 0; i < 3; i++) x.fillRect(ox + 8 + i * 18, 90, 8, 10); } },
+            { n: 'asteroids', c: '#AAB6FF', d: (x, ox) => { [[14, 30], [40, 60], [22, 86], [48, 22]].forEach(([a, b]) => { x.beginPath(); x.arc(ox + a, b, 7, 0, 7); x.fill(); }); } },
+            { n: 'narrow',   c: '#FF00CC', d: (x, ox) => { x.fillRect(ox, 0, 60, 44); x.fillRect(ox, 78, 60, 42); } },
+            { n: 'open',     c: '#00FFAA', d: (x, ox) => { x.fillRect(ox, 110, 60, 10); } },
+        ];
+        const slots = [0, 2, 1, 4], fresh = [0, 0, 0, 0];
+        let chunkT = 0, nextSlot = 0;
+        const r3 = rng(7);
+        function draw3() {
+            bg(k3);
+            slots.forEach((ci, i) => {
+                const ox = 8 + i * 62, ch = CHUNKS[ci];
+                k3.save(); k3.beginPath(); k3.rect(ox, 0, 60, H); k3.clip();
+                const drop = Math.max(0, fresh[i]) * 120;
+                k3.translate(0, -drop);
+                k3.fillStyle = ch.c + '55'; ch.d(k3, ox);
+                k3.strokeStyle = ch.c; k3.lineWidth = 1.5; k3.strokeRect(ox + 0.5, 0.5, 59, H - 1);
+                k3.fillStyle = ch.c; k3.font = '9px "JetBrains Mono", monospace'; k3.fillText(ch.n, ox + 4, 62);
+                k3.restore();
+            });
+        }
+
+        // 4. galactic map: nodes, a squad hopping between them
+        const nodes = [[30, 90], [70, 40], [120, 75], [165, 30], [205, 80], [235, 40]];
+        const links = [[0, 1], [0, 2], [1, 3], [2, 3], [2, 4], [3, 5], [4, 5]];
+        const path = [0, 2, 3, 5, 4, 2, 1, 0];
+        function draw4() {
+            k4.fillStyle = '#05050d'; k4.fillRect(0, 0, W, H);
+            for (let i = 0; i < 40; i++) { k4.fillStyle = '#2a2a55'; k4.fillRect((i * 67.3) % W, (i * 29.9) % H, 1, 1); }
+            k4.strokeStyle = '#3a3a6a'; k4.lineWidth = 1;
+            links.forEach(([a, b]) => { k4.beginPath(); k4.moveTo(...nodes[a]); k4.lineTo(...nodes[b]); k4.stroke(); });
+            const lib = [100, 64, 22, 8, 45, 0];
+            nodes.forEach(([x, y], i) => {
+                k4.fillStyle = lib[i] === 100 ? '#00FFAA' : lib[i] > 0 ? '#FFB000' : '#FF4400';
+                k4.beginPath(); k4.arc(x, y, 7, 0, 7); k4.fill();
+                k4.fillStyle = '#9a9aae'; k4.font = '9px "JetBrains Mono", monospace'; k4.fillText(lib[i] + '%', x - 9, y + 18);
+            });
+            const seg = (t * 0.6) % (path.length - 1), i = Math.floor(seg), f = seg - i;
+            const [ax, ay] = nodes[path[i]], [bx, by] = nodes[path[i + 1]];
+            const e = f < 0.5 ? 0 : (f - 0.5) * 2;                  // wait on the planet, then jump
+            const sx = ax + (bx - ax) * e, sy = ay + (by - ay) * e;
+            if (e > 0 && e < 1) { k4.strokeStyle = '#ffffffaa'; k4.lineWidth = 2; k4.beginPath(); k4.moveTo(ax + (bx - ax) * Math.max(0, e - 0.35), ay + (by - ay) * Math.max(0, e - 0.35)); k4.lineTo(sx, sy); k4.stroke(); }
+            k4.fillStyle = '#fff'; k4.beginPath(); k4.arc(sx, sy, 3, 0, 7); k4.fill();
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) {
+                t += dt;
+                seedT += dt; if (seedT > 2.4) { seedT = 0; seed = (Math.random() * 0xFFFF) | 0; }
+                chunkT += dt;
+                if (chunkT > 1.3) { chunkT = 0; slots[nextSlot] = (r3() * CHUNKS.length) | 0; fresh[nextSlot] = 1; nextSlot = (nextSlot + 1) % 4; }
+                for (let i = 0; i < 4; i++) fresh[i] = Math.max(0, fresh[i] - dt * 3);
+            }
+            draw1(); draw2(); draw3(); draw4();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

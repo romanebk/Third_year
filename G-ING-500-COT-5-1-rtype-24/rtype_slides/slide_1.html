@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>R-Type Kick-off — Cover</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cover-mascot { display: flex; align-items: center; gap: 0.4vw; width: auto; height: auto; }
+        .cover-mascot img { image-rendering: pixelated; }
+        .cover-mascot img:first-child { width: 12vw; }
+        .cover-mascot img:last-child  { width: 6vw; }
+    </style>
+</head>
+<body>
+    <section class="slide slide-cover">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="cover-content">
+            <div class="cover-eyebrow">Epitech Afrique — Kick-off</div>
+            <h1 class="cover-title">
+                R-Type:<br>
+                A Game Engine That Roars<span class="cursor"></span>
+            </h1>
+            <p class="cover-subtitle">
+                Advanced C++ — Networked Game Development
+            </p>
+        </div>
+
+        <div class="cover-mascot">
+            <img src="assets/player_cyan.png" alt="R-9 ship">
+            <img src="assets/force.png" alt="Force orb">
+        </div>
+    </section>
+
+    <script>
+        document.fonts.ready.then(() => {
+            document.querySelector('.logo-epitech').addEventListener('click', () => {
+                window.print();
+            });
+        });
+    </script>
+</body>
+</html>

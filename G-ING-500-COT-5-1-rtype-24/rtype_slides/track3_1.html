@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Two Audiences</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-aud {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 6vh 5vw 4vh 5vw; gap: 2.6vh;
+        }
+        .head { display: flex; flex-direction: column; gap: 1vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4.2vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.7vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6vw; position: relative; z-index: 1; }
+        .aud { border-radius: 10px; padding: 2.2vh 1.6vw; display: flex; flex-direction: column; gap: 1.4vh; }
+        .a-play { background: #0d0d0d; color: #cdd6f4; }
+        .a-des  { background: #fff; border: 2px solid #D0D8F0; color: #333; }
+
+        .an { display: flex; justify-content: space-between; align-items: center; }
+        .an b { font-family: "Space Grotesk", sans-serif; font-size: 2.1vw; }
+        .a-play .an b { color: #fff; }
+        .a-des .an b { color: var(--epi-dark-blue); }
+        .an span { font-family: "JetBrains Mono", monospace; font-size: 0.85vw; letter-spacing: 0.1em; text-transform: uppercase; }
+        .a-play .an span { color: #FFB000; }
+        .a-des .an span { color: #00885F; }
+
+        .q { font-size: 1.3vw; font-style: italic; }
+        .a-play .q { color: #fff; }
+        .a-des .q { color: var(--epi-dark-blue); }
+
+        .sprites { display: flex; align-items: flex-end; gap: 1vw; height: 7vh; }
+        .sprites img { image-rendering: pixelated; height: 100%; }
+        .sprites .sm { height: 55%; }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 0.5vw; }
+        .tags span { font-family: "JetBrains Mono", monospace; font-size: 0.95vw; padding: 0.5vh 0.7vw; border-radius: 5px; }
+        .a-play .tags span { background: #1a1a2a; border: 1px solid #3a3a6a; }
+        .a-des .tags span { background: #F0F2F8; border: 1px solid #D0D8F0; color: #1A1ACC; }
+
+        .files { display: flex; gap: 0.6vw; height: 7vh; align-items: center; font-family: "JetBrains Mono", monospace; font-size: 0.9vw; }
+        .files .file { border: 1.5px solid #D0D8F0; border-radius: 6px; padding: 1vh 0.8vw; background: #F7F8FC; color: #1A1ACC; }
+        .files .arr { color: #6B82D6; font-weight: 700; }
+        .files .ok { color: #00885F; font-weight: 700; }
+
+        .rule {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; gap: 1.6vw;
+            border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 1.4vh 1.2vw;
+            font-size: 1.2vw; color: #333; line-height: 1.4;
+        }
+        .rule b { color: #cc3300; }
+        .rule .vs { font-family: "JetBrains Mono", monospace; font-size: 1vw; white-space: nowrap; }
+        .rule .vs .no { color: #999; text-decoration: line-through; }
+        .rule .vs .yes { color: #00885F; font-weight: 700; }
+
+        .slide-aud .deco-block-1, .slide-aud .deco-block-2 { background: #D0D8F0; }
+        .slide-aud .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-aud">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #3</div>
+            <div class="title">Two Audiences<span class="cursor"></span></div>
+            <div class="subtitle">You build a game for <b>players</b> — and a workshop for <b>game designers</b>.</div>
+        </div>
+
+        <div class="cols">
+            <div class="aud a-play">
+                <div class="an"><b>Players</b><span>content</span></div>
+                <div class="q">"Is it fun?"</div>
+                <div class="sprites">
+                    <img src="assets/player_cyan.png" class="sm" alt="">
+                    <img src="assets/force.png" class="sm" alt="">
+                    <img src="assets/patapata.png" alt="">
+                    <img src="assets/bug.png" alt="">
+                    <img src="assets/crab.png" alt="">
+                    <img src="assets/dobkeratops.png" alt="" style="height:130%">
+                </div>
+                <div class="tags"><span>monsters</span><span>weapons · the Force</span><span>levels</span><span>bosses</span><span>game rules</span><span>sound</span></div>
+            </div>
+
+            <div class="aud a-des">
+                <div class="an"><b>Game designers</b><span>tools</span></div>
+                <div class="q">"Can I add a level without touching C++?"</div>
+                <div class="files">
+                    <span class="file">level_3.yaml</span><span class="file">boss.lua</span>
+                    <span class="arr">→</span><span>restart the game</span><span class="arr">→</span><span class="ok">it's in ✓</span>
+                </div>
+                <div class="tags"><span>data files</span><span>scripting (Lua)</span><span>plugins</span><span>editors</span><span>tutorials · how-tos</span></div>
+            </div>
+        </div>
+
+        <div class="rule">
+            <div><b>Graded on quality, not quantity.</b> A system that adds content easily is worth as much as the content itself.</div>
+            <div class="vs"><span class="no">5 hard-coded levels</span><br><span class="yes">2 levels + the tool to make more</span></div>
+        </div>
+    </section>
+</body>
+</html>

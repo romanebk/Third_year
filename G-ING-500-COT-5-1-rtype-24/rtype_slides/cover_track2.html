@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Advanced Networking</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .track-num {
+            position: absolute;
+            right: 5vw;
+            bottom: -6vh;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 34vw;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.07);
+            user-select: none;
+        }
+        .cover-mascot { display: flex; align-items: center; gap: 0.6vw; width: auto; height: auto; }
+        .cover-mascot img { image-rendering: pixelated; }
+        .wire {
+            position: relative;
+            width: 10vw;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0 8px, transparent 8px 14px);
+        }
+        .pkt {
+            position: absolute;
+            top: -0.5vw;
+            width: 1vw; height: 1vw;
+            border-radius: 2px;
+            background: #00FFAA;
+            animation: fly 1.6s linear infinite;
+        }
+        .pkt.b { animation-delay: 0.8s; }
+        @keyframes fly { from { left: 0; } to { left: 9vw; } }
+        .chapter {
+            margin-top: 3vh;
+            display: flex; gap: 0.8vw; flex-wrap: wrap;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .chapter span { border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px; padding: 0.4vh 0.7vw; }
+    </style>
+</head>
+<body>
+    <section class="slide slide-cover">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+        <div class="track-num">#2</div>
+
+        <div class="cover-content">
+            <div class="cover-eyebrow">R-Type — Track #2</div>
+            <h1 class="cover-title">
+                Advanced<br>
+                Networking<span class="cursor"></span>
+            </h1>
+            <p class="cover-subtitle">Building a reliable network game</p>
+            <div class="chapter"><span>binary protocol</span><span>serialization</span><span>what to send</span><span>lag &amp; loss</span><span>prediction</span></div>
+        </div>
+
+        <div class="cover-mascot">
+            <img src="assets/player_cyan.png" alt="" style="width:6vw">
+            <div class="wire"><span class="pkt"></span><span class="pkt b"></span></div>
+            <img src="assets/player_magenta.png" alt="" style="width:6vw; transform: scaleX(-1)">
+        </div>
+    </section>
+</body>
+</html>

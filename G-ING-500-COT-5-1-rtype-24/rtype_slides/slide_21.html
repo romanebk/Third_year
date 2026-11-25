@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 21 — Editor</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-ed {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4.5vh 4vw 3.5vh 4vw;
+            gap: 1.6vh;
+        }
+
+        .head { display: flex; align-items: baseline; gap: 1.6vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 1.6vw; height: 0.5vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.3vw; color: #555; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        /* ---------- the mock editor window ---------- */
+        .ed {
+            position: relative; z-index: 1;
+            background: #1b1b24;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.8vw;
+            color: #cdd6f4;
+            display: grid;
+            grid-template-columns: 17% 1fr 23%;
+            grid-template-rows: auto 1fr 20%;
+            height: 60vh;
+            box-shadow: 0 6px 30px rgba(13, 13, 13, 0.25);
+        }
+
+        .bar {
+            grid-column: 1 / -1;
+            display: flex; align-items: center; gap: 0.6vw;
+            padding: 0.7vh 0.8vw;
+            background: #0d0d0d;
+            border-bottom: 1px solid #2a2a3a;
+        }
+        .bar .menu { color: #9a9aae; margin-right: 0.8vw; }
+        .bar .scene-name { color: #fff; font-weight: 700; }
+        .bar .dirty { color: #FFB000; }
+        .bar .play { margin: 0 auto; display: flex; gap: 0.3vw; }
+        .bar .play span { padding: 0.3vh 0.8vw; border-radius: 4px; background: #2a2a3a; color: #cdd6f4; }
+        .bar .play span.go { background: #00C080; color: #0d0d0d; font-weight: 700; }
+        .bar .save { padding: 0.3vh 0.8vw; border-radius: 4px; background: #1A1ACC; color: #fff; font-weight: 700; }
+
+        .pane { border-right: 1px solid #2a2a3a; display: flex; flex-direction: column; min-height: 0; }
+        .pane-h { padding: 0.6vh 0.7vw; font-size: 0.7vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; border-bottom: 1px solid #2a2a3a; background: #15151d; }
+        .pane-b { padding: 0.6vh 0.5vw; overflow: hidden; flex: 1; }
+
+        /* hierarchy */
+        .row { padding: 0.45vh 0.4vw; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 0.4vw; white-space: nowrap; }
+        .row:hover { background: #2a2a3a; }
+        .row.sel { background: #1A1ACC; color: #fff; }
+        .row img { height: 0.9vw; image-rendering: pixelated; }
+        .row .tw { color: #555; }
+        .row.scene-row { color: #fff; font-weight: 700; cursor: default; }
+        .row.scene-row:hover { background: none; }
+
+        /* viewport */
+        .view { position: relative; background: #0d0d0d; overflow: hidden; border-right: 1px solid #2a2a3a; }
+        .view::before {
+            content: ""; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(#ffffff08 1px, transparent 1px),
+                linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+            background-size: 2.5vw 2.5vw;
+        }
+        .view .ent { position: absolute; transform: translate(-50%, -50%); cursor: pointer; }
+        .view .ent img { image-rendering: pixelated; display: block; }
+        .view .ent.sel { outline: 1.5px dashed #00FFAA; outline-offset: 4px; }
+        .view .boss-box { width: 5vw; height: 7vw; border: 1.5px solid #FF7755; border-radius: 8px; background: #FF775515; display: flex; align-items: center; justify-content: center; color: #FF7755; font-size: 0.7vw; }
+        .view .turret { width: 1.4vw; height: 1.4vw; border-radius: 50%; background: #FF7755; }
+        .gizmo { position: absolute; pointer-events: none; }
+        .gizmo .gx { position: absolute; height: 2px; width: 3vw; background: #FF4466; left: 0; top: 0; }
+        .gizmo .gy { position: absolute; width: 2px; height: 3vw; background: #00FFAA; left: 0; top: -3vw; }
+        .view .coords { position: absolute; right: 0.6vw; bottom: 0.6vh; color: #666; font-size: 0.7vw; }
+
+        /* inspector */
+        .insp { border-right: none; }
+        .ins-title { display: flex; align-items: center; gap: 0.5vw; font-weight: 700; color: #fff; font-size: 0.95vw; margin-bottom: 0.6vh; }
+        .ins-title img { height: 1.2vw; image-rendering: pixelated; }
+        .ins-sub { color: #888; font-size: 0.7vw; margin-bottom: 0.8vh; }
+        .ins-sub b { color: #FF00CC; font-weight: 500; }
+        .comp { border: 1px solid #2a2a3a; border-radius: 4px; margin-bottom: 0.6vh; }
+        .comp-h { padding: 0.35vh 0.5vw; background: #22222e; color: #AAB6FF; font-weight: 700; display: flex; justify-content: space-between; }
+        .comp-h span { color: #555; }
+        .field { display: flex; align-items: center; gap: 0.4vw; padding: 0.35vh 0.5vw; }
+        .field label { color: #888; width: 3.5vw; }
+        .field .v { flex: 1; background: #0d0d0d; border: 1px solid #2a2a3a; border-radius: 3px; padding: 0.15vh 0.4vw; color: #fff; }
+        .field .v.ov { border-color: #FFB000; color: #FFB000; font-weight: 700; }
+        .add { text-align: center; padding: 0.5vh; border: 1px dashed #3a3a6a; border-radius: 4px; color: #8899EE; }
+
+        /* assets */
+        .assets { grid-column: 1 / -1; border-top: 1px solid #2a2a3a; display: flex; flex-direction: column; }
+        .assets .pane-b { display: flex; gap: 0.7vw; align-items: flex-start; padding: 0.9vh 0.8vw; }
+        .asset { width: 5.2vw; display: flex; flex-direction: column; align-items: center; gap: 0.4vh; font-size: 0.68vw; color: #9a9aae; }
+        .asset .th { width: 4vw; height: 3.2vw; border-radius: 4px; background: #0d0d0d; border: 1px solid #2a2a3a; display: flex; align-items: center; justify-content: center; }
+        .asset .th img { max-width: 70%; max-height: 70%; image-rendering: pixelated; }
+        .asset .th.pf { border-color: #FF00CC88; }
+        .asset .th.yml { color: #FF7755; font-weight: 700; font-size: 0.75vw; }
+        .asset .th.snd { color: #00FFAA; font-size: 1vw; }
+        .assets .sep { width: 1px; align-self: stretch; background: #2a2a3a; }
+        .assets .grp { font-size: 0.65vw; color: #6B82D6; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.12em; text-transform: uppercase; }
+
+        .foot { position: relative; z-index: 1; display: flex; gap: 2vw; font-size: 1.1vw; color: #333; }
+        .foot b { color: var(--epi-dark-blue); }
+        .foot .hint { margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 0.85vw; color: #999; }
+
+        .slide-ed .deco-block-1, .slide-ed .deco-block-2 { background: #D0D8F0; }
+        .slide-ed .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-ed">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #1</div>
+                <div class="title">A GUI Editor<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Same engine, same scene files — <b>edited visually</b>.</div>
+        </div>
+
+        <div class="ed">
+            <div class="bar">
+                <span class="menu">File  Edit  Entity  View</span>
+                <span class="scene-name">scenes/level1.yaml</span><span class="dirty">●</span>
+                <span class="play"><span class="go">▶ Play</span><span>❚❚</span><span>■</span></span>
+                <span class="save">Save</span>
+            </div>
+
+            <div class="pane">
+                <div class="pane-h">Hierarchy</div>
+                <div class="pane-b" id="hier"></div>
+            </div>
+
+            <div class="view" id="view">
+                <div class="gizmo" id="gizmo"><span class="gx"></span><span class="gy"></span></div>
+                <span class="coords" id="coords"></span>
+            </div>
+
+            <div class="pane insp">
+                <div class="pane-h">Inspector</div>
+                <div class="pane-b" id="insp"></div>
+            </div>
+
+            <div class="assets">
+                <div class="pane-h">Assets</div>
+                <div class="pane-b">
+                    <span class="grp">prefabs</span>
+                    <div class="asset"><div class="th pf"><img src="assets/player_cyan.png" alt=""></div>player</div>
+                    <div class="asset"><div class="th pf"><img src="assets/bydos.png" alt=""></div>bydos</div>
+                    <div class="asset"><div class="th pf"><img src="assets/force.png" alt=""></div>force</div>
+                    <div class="asset"><div class="th pf" style="color:#FF7755">◎</div>boss</div>
+                    <span class="sep"></span>
+                    <span class="grp">scenes</span>
+                    <div class="asset"><div class="th yml">.yaml</div>level1</div>
+                    <div class="asset"><div class="th yml">.yaml</div>boss</div>
+                    <span class="sep"></span>
+                    <span class="grp">audio</span>
+                    <div class="asset"><div class="th snd">♪</div>stage1.ogg</div>
+                    <div class="asset"><div class="th snd">♪</div>shot.wav</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <span><b>Drag</b> a prefab in · <b>click</b> to select · <b>edit</b> fields · <b>Save</b> = write the .yaml</span>
+            <span class="hint">← click an entity</span>
+        </div>
+    </section>
+
+    <script>
+        // x, y in % of the viewport
+        const ENTS = [
+            { id: '#0', name: 'Player', icon: 'assets/player_cyan.png', w: 5, x: 16, y: 55, depth: 1, uuid: 'a1f3', prefab: 'player',
+              comps: { Position: { x: 40, y: 90 }, Sprite: { texture: 'player.png' }, Health: { hp: 3 }, Input: {} } },
+            { id: '#1', name: 'Force', icon: 'assets/force.png', w: 2.2, x: 27, y: 55, depth: 2, uuid: '77b0', prefab: 'force', parent: 'Player',
+              comps: { Position: { x: 26, y: 0 }, Parent: { entity: 'a1f3' }, Sprite: { texture: 'force.png' } } },
+            { id: '#2', name: 'Bydos', icon: 'assets/bydos.png', w: 2.2, x: 60, y: 40, depth: 1, uuid: '9c2e', prefab: 'bydos',
+              comps: { Position: { x: 360, y: 120 }, Velocity: { dx: '-4', dy: 0, _ov: 'dx' }, Collider: { w: 21, h: 24 }, Health: { hp: 1 } } },
+            { id: '#3', name: 'Boss', box: true, x: 86, y: 50, depth: 1, uuid: 'e40a', prefab: 'boss',
+              comps: { Position: { x: 900, y: 80 }, Health: { hp: 40 }, Collider: { w: 64, h: 90 } } },
+            { id: '#4', name: 'Turret', turret: true, x: 80, y: 30, depth: 2, uuid: 'c9d1', prefab: 'turret', parent: 'Boss',
+              comps: { Position: { x: -20, y: -30 }, Parent: { entity: 'e40a' } } },
+            { id: '#5', name: 'Turret', turret: true, x: 80, y: 70, depth: 2, uuid: '3f8e', prefab: 'turret', parent: 'Boss',
+              comps: { Position: { x: -20, y: 30 }, Parent: { entity: 'e40a' } } },
+        ];
+
+        const hier = document.getElementById('hier');
+        const view = document.getElementById('view');
+        const insp = document.getElementById('insp');
+        const gizmo = document.getElementById('gizmo');
+        const coords = document.getElementById('coords');
+
+        hier.innerHTML = '<div class="row scene-row">▾ Level 1</div>';
+        const rows = ENTS.map((e, i) => {
+            const r = document.createElement('div');
+            r.className = 'row';
+            r.style.paddingLeft = (e.depth * 0.9) + 'vw';
+            r.innerHTML = (e.depth === 2 ? '<span class="tw">└</span>' : '') +
+                (e.icon ? `<img src="${e.icon}" alt="">` : '') + `${e.name}`;
+            r.onclick = () => select(i);
+            hier.appendChild(r);
+            return r;
+        });
+
+        const dots = ENTS.map((e, i) => {
+            const d = document.createElement('div');
+            d.className = 'ent';
+            d.style.left = e.x + '%';
+            d.style.top = e.y + '%';
+            if (e.icon) d.innerHTML = `<img src="${e.icon}" style="width:${e.w}vw" alt="">`;
+            else if (e.box) d.innerHTML = '<div class="boss-box">boss</div>';
+            else d.innerHTML = '<div class="turret"></div>';
+            d.onclick = () => select(i);
+            view.appendChild(d);
+            return d;
+        });
+
+        function select(i) {
+            const e = ENTS[i];
+            rows.forEach((r, j) => r.classList.toggle('sel', j === i));
+            dots.forEach((d, j) => d.classList.toggle('sel', j === i));
+            gizmo.style.left = e.x + '%';
+            gizmo.style.top = e.y + '%';
+            coords.textContent = `${e.name} ${e.id} · x ${e.comps.Position.x}  y ${e.comps.Position.y}`;
+
+            let html = `<div class="ins-title">${e.icon ? `<img src="${e.icon}" alt="">` : ''}${e.name} <span style="color:#6B82D6;font-weight:500">${e.id}</span></div>`;
+            html += `<div class="ins-sub">uuid ${e.uuid} · prefab <b>${e.prefab}</b>${e.parent ? ' · parent ' + e.parent : ''}</div>`;
+            for (const [c, fields] of Object.entries(e.comps)) {
+                html += `<div class="comp"><div class="comp-h">${c}<span>⋮</span></div>`;
+                for (const [k, v] of Object.entries(fields)) {
+                    if (k === '_ov') continue;
+                    const ov = fields._ov === k ? ' ov' : '';
+                    html += `<div class="field"><label>${k}</label><span class="v${ov}">${v}</span></div>`;
+                }
+                html += '</div>';
+            }
+            html += '<div class="add">+ Add component</div>';
+            insp.innerHTML = html;
+        }
+
+        select(2);   // Bydos with its overridden dx
+    </script>
+</body>
+</html>

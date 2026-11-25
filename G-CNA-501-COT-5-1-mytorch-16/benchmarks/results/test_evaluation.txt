@@ -1,0 +1,43 @@
+# Évaluation des trois réseaux sur le jeu de test (72 303 positions)
+# Prédictions avec test-time augmentation : moyenne des 4 symétries exactes de
+# l'échiquier (identité, miroir, inversion des couleurs, les deux), soit 4 passes
+# avant par position. Commande :
+#   ./my_torch_analyzer --predict <reseau>.nn split/test.txt
+#   ./scripts/evaluate.py predictions_<modele>.txt split/test.txt
+
+$ ./scripts/evaluate.py predictions_basic.txt split/test.txt
+espace: 3 classes de base
+positions: 72303
+accuracy: 0.8726
+Check            precision=0.8187 recall=0.8367 f1=0.8276 support=24930
+Checkmate        precision=0.8407 recall=0.8444 f1=0.8425 support=17373
+Nothing          precision=0.9383 recall=0.9189 f1=0.9285 support=30000
+macro_f1: 0.8662
+
+$ ./scripts/evaluate.py predictions_medium.txt split/test.txt
+espace: 3 classes de base
+positions: 72303
+accuracy: 0.9305
+Check            precision=0.9193 recall=0.8866 f1=0.9027 support=24930
+Checkmate        precision=0.8665 recall=0.9377 f1=0.9007 support=17373
+Nothing          precision=0.9804 recall=0.9629 f1=0.9716 support=30000
+macro_f1: 0.9250
+
+$ ./scripts/evaluate.py predictions_full.txt split/test.txt
+espace: 3 classes de base
+positions: 72303
+accuracy: 0.9300
+Check            precision=0.9024 recall=0.9043 f1=0.9034 support=24930
+Checkmate        precision=0.8895 recall=0.9089 f1=0.8991 support=17373
+Nothing          precision=0.9777 recall=0.9636 f1=0.9706 support=30000
+macro_f1: 0.9244
+
+espace: natif du réseau (5 classes)
+positions: 72303
+accuracy: 0.9300
+Check Black      precision=0.9064 recall=0.9041 f1=0.9052 support=11402
+Check White      precision=0.8991 recall=0.9046 f1=0.9018 support=13528
+Checkmate Black  precision=0.8932 recall=0.9113 f1=0.9021 support=8036
+Checkmate White  precision=0.8864 recall=0.9068 f1=0.8965 support=9337
+Nothing          precision=0.9777 recall=0.9636 f1=0.9706 support=30000
+macro_f1: 0.9153

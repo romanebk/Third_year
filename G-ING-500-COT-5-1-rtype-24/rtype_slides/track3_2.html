@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Monsters</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-mon { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .mon-left {
+            position: relative; z-index: 1; width: 56%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.2vh;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+        canvas { width: 100%; aspect-ratio: 640 / 420; border-radius: 10px; background: #05050d; display: block; image-rendering: pixelated; }
+        .cap { font-family: "JetBrains Mono", monospace; font-size: 0.85vw; color: #666; }
+        .cap b { color: var(--epi-dark-blue); }
+
+        .mon-right {
+            position: relative; z-index: 1; width: 44%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.8vh;
+            padding: 5vh 4.5vw 5vh 1.2vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .code {
+            background: #0d0d0d; border-radius: 8px; padding: 1.4vh 1vw;
+            font-family: "JetBrains Mono", monospace; font-size: 0.88vw; line-height: 1.6; color: #cdd6f4;
+        }
+        .code div { white-space: pre; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; }
+
+        .points { display: flex; flex-direction: column; gap: 1vh; }
+        .pt { font-size: 1.1vw; color: #333; line-height: 1.35; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+
+        .slide-mon .deco-block-1, .slide-mon .deco-block-2 { background: #D0D8F0; }
+        .slide-mon .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-mon">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="mon-left">
+            <canvas id="cv" width="640" height="420"></canvas>
+            <div class="cap">5 monsters · <b>5 patterns</b> · 1 movement system</div>
+        </div>
+
+        <div class="mon-right">
+            <div class="eyebrow">Epitech Afrique — Track #3</div>
+            <div class="title">Monsters<span class="cursor"></span></div>
+            <div class="subtitle">A monster is <b>a pattern + a weapon + a sprite</b>.</div>
+
+            <div class="code">
+                <div><span class="cm"># prefabs/bug.yaml — a designer writes this, not C++</span></div>
+                <div><span class="k">Sprite</span>:   { sheet: <span class="s">bug.png</span>, frames: <span class="v">8</span> }</div>
+                <div><span class="k">Health</span>:   { hp: <span class="v">1</span> }</div>
+                <div><span class="k">Movement</span>: { pattern: <span class="s">sine</span>, speed: <span class="v">120</span>, amplitude: <span class="v">60</span> }</div>
+                <div><span class="k">Weapon</span>:   { shot: <span class="s">aimed</span>, every: <span class="v">2.0</span> }</div>
+                <div><span class="k">Drop</span>:     { powerup: <span class="v">10%</span> }</div>
+            </div>
+
+            <div class="points">
+                <div class="pt">One <b>movement system</b> reads <b>pattern</b> and moves everything that has it.</div>
+                <div class="pt">New monster = <b>new file</b>, not a new class. Mix patterns and weapons: few pieces, many monsters.</div>
+                <div class="pt">The subject's examples: the <b>snake</b> of level 2, <b>ground turrets</b>.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 640, H = 420, GROUND = H - 34;
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const S = { ship: img('player_cyan.png'), bydo: img('bydos.png'), bug: img('bug.png'), pata: img('patapata.png'), crab: img('crab.png'), orb: img('orb.png') };
+
+        const stars = Array.from({ length: 70 }, () => ({ x: Math.random() * W, y: Math.random() * GROUND, s: Math.random() < 0.3 ? 2 : 1, v: 20 + Math.random() * 40 }));
+        let t = 0;
+        const ship = { x: 70, y: 200 };
+        let shots = [];
+
+        // each monster: spawn time offset, lifetime loop
+        const LOOP = 7;
+        const mons = [
+            { name: 'straight',              col: '#AAB6FF', off: 2.4, pos: (u) => ({ x: W + 30 - u * 150, y: 60 }), spr: 'bydo', w: 42, h: 36 },
+            { name: 'sine wave',             col: '#FFB000', off: 0.6, pos: (u) => ({ x: W + 30 - u * 120, y: 150 + 45 * Math.sin(u * 3.2) }), spr: 'bug', w: 38, h: 38 },
+            { name: 'snake · follow leader', col: '#00FFAA', off: 1.2, snake: true },
+            { name: 'chaser · steers to you', col: '#FF00CC', off: 0.3, chase: true, spr: 'pata', w: 40, h: 40 },
+            { name: 'ground turret · aimed', col: '#FF7755', off: 0.0, turret: true, spr: 'crab', w: 44, h: 38 },
+        ];
+        let chaser = null, turretCd = 0;
+
+        function snakeHead(u) { return { x: W + 30 - u * 130, y: 262 + 38 * Math.sin(u * 4.2) }; }
+
+        function update(dt) {
+            t += dt;
+            stars.forEach(s => { s.x -= s.v * dt; if (s.x < 0) { s.x = W; s.y = Math.random() * GROUND; } });
+            ship.y = 210 + 110 * Math.sin(t * 0.55);
+
+
+            // chaser
+            const uc = ((t - 4.0) % LOOP + LOOP) % LOOP;
+            if (!chaser || uc < dt * 2) chaser = { x: W + 30, y: 330, vy: 0 };
+            chaser.x -= 115 * dt;
+            chaser.vy += Math.sign(ship.y - chaser.y) * 260 * dt;
+            chaser.vy = Math.max(-110, Math.min(110, chaser.vy));
+            chaser.y += chaser.vy * dt;
+
+            // turret shoots aimed bullets
+            const ut = (t % LOOP);
+            const tx = W + 30 - ut * 95, ty = GROUND - 16;
+            turretCd -= dt;
+            if (turretCd <= 0 && tx < W - 20 && tx > 140) {
+                turretCd = 1.1;
+                const dx = ship.x - tx, dy = ship.y - ty, d = Math.hypot(dx, dy);
+                shots.push({ x: tx, y: ty - 14, vx: dx / d * 210, vy: dy / d * 210 });
+            }
+            shots.forEach(b => { b.x += b.vx * dt; b.y += b.vy * dt; });
+            shots = shots.filter(b => b.x > -10 && b.y > -10 && b.y < H);
+        }
+
+        function label(text, x, y, col) {
+            ctx.font = '12px "JetBrains Mono", monospace';
+            const w = ctx.measureText(text).width + 10;
+            x = Math.max(4, Math.min(W - w - 4, x - w / 2));
+            ctx.fillStyle = '#05050dcc'; ctx.fillRect(x, y - 13, w, 17);
+            ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y - 12.5, w - 1, 16);
+            ctx.fillStyle = col; ctx.fillText(text, x + 5, y);
+        }
+        function spr(n, x, y, w, h) { const i = S[n]; if (i.complete) ctx.drawImage(i, x - w / 2, y - h / 2, w, h); }
+
+        function draw() {
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            stars.forEach(s => { ctx.fillStyle = s.s > 1 ? '#cdd6f4' : '#6B82D6'; ctx.fillRect(s.x, s.y, s.s, s.s); });
+            // ground
+            ctx.fillStyle = '#2a2014'; ctx.fillRect(0, GROUND, W, H - GROUND);
+            ctx.fillStyle = '#4a3a22';
+            for (let i = 0; i < 24; i++) { const gx = ((i * 40 - t * 95) % (W + 40) + W + 40) % (W + 40) - 20; ctx.fillRect(gx, GROUND, 18, 4); }
+
+            spr('ship', ship.x, ship.y, 66, 34);
+
+            const u0 = ((t - mons[0].off) % LOOP + LOOP) % LOOP;
+            let p = mons[0].pos(u0); spr('bydo', p.x, p.y, 42, 36); label(mons[0].name, p.x, p.y - 26, mons[0].col);
+
+            const u1 = ((t - mons[1].off) % LOOP + LOOP) % LOOP;
+            p = mons[1].pos(u1); spr('bug', p.x, p.y, 38, 38); label(mons[1].name, p.x, p.y - 26, mons[1].col);
+
+            // snake: each segment is where the head was 0.2 s earlier
+            const us = ((t - 1.2) % LOOP + LOOP) % LOOP;
+            for (let k = 7; k >= 0; k--) {
+                const q = snakeHead(Math.max(0, us - k * 0.2));
+                spr('orb', q.x, q.y, k === 0 ? 30 : 24, k === 0 ? 28 : 22);
+            }
+            const hd = snakeHead(us);
+            label(mons[2].name, hd.x + 30, hd.y - 28, mons[2].col);
+
+            spr('pata', chaser.x, chaser.y, 40, 40); label(mons[3].name, chaser.x, chaser.y - 28, mons[3].col);
+            ctx.strokeStyle = '#FF00CC55'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(chaser.x, chaser.y); ctx.lineTo(ship.x, ship.y); ctx.stroke(); ctx.setLineDash([]);
+
+            const ut = t % LOOP, tx = W + 30 - ut * 95;
+            spr('crab', tx, GROUND - 16, 44, 38); label(mons[4].name, tx, GROUND - 42, mons[4].col);
+            shots.forEach(b => { ctx.fillStyle = '#FF7755'; ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, 7); ctx.fill(); });
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

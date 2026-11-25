@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Ship Systems</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-sys { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .sys-left {
+            position: relative; z-index: 1; width: 61%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.1vh;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        canvas { width: 100%; aspect-ratio: 660 / 360; border-radius: 10px; background: #05050d; display: block; }
+
+        .ctl { display: flex; gap: 0.45vw; align-items: center; flex-wrap: wrap; font-family: "JetBrains Mono", monospace; }
+        .ctl .lbl { font-size: 0.72vw; color: #6B82D6; letter-spacing: 0.1em; margin-right: 0.2vw; }
+        .ctl button {
+            font-family: inherit; font-size: 0.78vw; font-weight: 700; letter-spacing: 0.05em;
+            padding: 0.7vh 0.6vw; border-radius: 5px; cursor: pointer;
+            border: 1.5px solid #D0D8F0; background: #fff; color: #6B82D6;
+        }
+        .ctl button.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .ctl .thr button.on { background: #00C080; border-color: #00C080; }
+        .ctl .thr { display: flex; gap: 2px; }
+        .ctl .thr button { padding: 0.7vh 0.45vw; }
+        .ctl .sep { width: 1px; height: 3vh; background: #D0D8F0; margin: 0 0.3vw; }
+        .ctl button.emp { border-color: #FF00CC; color: #FF00CC; border-style: dashed; margin-left: auto; }
+
+        .sys-right {
+            position: relative; z-index: 1; width: 39%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 5vh 4vw 5vh 1vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.6vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 0.85vh; }
+        .pt { font-size: 1vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .box { font-size: 0.95vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; border-left: 4px solid #00C080; background: #00FFAA14; }
+        .box b { color: #00885F; }
+
+        .slide-sys .deco-block-1, .slide-sys .deco-block-2 { background: #D0D8F0; }
+        .slide-sys .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-sys">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="sys-left">
+            <canvas id="cv" width="660" height="360"></canvas>
+            <div class="ctl">
+                <span class="lbl">THROTTLE</span>
+                <span class="thr" id="thr"><button>0</button><button>25</button><button>50</button><button>75</button><button>100</button></span>
+                <span class="sep"></span>
+                <button data-k="shield">SHIELD</button>
+                <button data-k="laser">LASER</button>
+                <button data-k="missiles">MISSILES</button>
+                <button data-k="repair">REPAIR</button>
+                <button class="emp" id="emp">⚡ FIRE QUASAR (−35)</button>
+            </div>
+        </div>
+
+        <div class="sys-right">
+            <div class="eyebrow">Epitech Afrique — Track #3 · Mechanics</div>
+            <div class="title">Ship Systems<span class="cursor"></span></div>
+            <div class="subtitle">Energy is <b>the real health bar</b>.</div>
+
+            <div class="points">
+                <div class="pt">The <b>reactor</b> makes energy. Every system <b>spends</b> it: engines by throttle, shield per hit, laser per shot, repair to heal.</div>
+                <div class="pt"><b>Missiles use ammo</b>, not energy. That's why you carry both.</div>
+                <div class="pt">Energy at 0 → <b>blackout</b>: everything shuts down, the ship <b>drifts</b>, the reactor reboots.</div>
+                <div class="pt">The <b>Quasar</b> kills, but costs 35 energy a shot. <b>Spam it</b> and you black out yourself. Then the reactor regenerates.</div>
+                <div class="pt"><b>Subsystems have their own HP</b>: hit the engines, lose thrust.</div>
+            </div>
+
+            <div class="box"><b>All numbers live in components</b> (<code>Energy</code>, <code>Hull</code>, <code>Engines</code>) simulated by the room. Balancing = editing a file.</div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 660, H = 360, AW = 450;            // arena width; the power panel is on the right
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SHIP = img('player_cyan.png'), FOE = img('bydos.png');
+
+        // ---------- balance (would be a data file) ----------
+        const REACTOR = 26;                           // energy / s
+        const COST = { engines: 0.22, shieldIdle: 3, shieldHit: 9, laserShot: 3.2, repair: 11, sensors: 1.5 };
+
+        // ---------- state ----------
+        const sys = { shield: true, laser: false, missiles: false, repair: false };
+        let throttle = 50;
+        const ship = { x: 150, y: 180, vx: 0, vy: 0, rot: 0, spin: 0 };
+        let energy = 100, hull = 100, engines = 100, ammo = 8, blackout = 0, reboot = 0;
+        let t = 0, laserT = 0, misT = 0, shots = [], mis = [], ebul = [], fx = [], shieldFlash = 0, drawNow = {};
+        const foes = [{ x: 390, y: 110, hp: 100, fl: 0, cd: 1 }, { x: 405, y: 250, hp: 100, fl: 0, cd: 1.6 }];
+        const stars = Array.from({ length: 60 }, () => ({ x: Math.random() * AW, y: Math.random() * H, v: 15 + Math.random() * 40 }));
+
+        // ---------- controls ----------
+        const thrBtns = [...document.querySelectorAll('#thr button')];
+        const sysBtns = [...document.querySelectorAll('.ctl button[data-k]')];
+        function ui() {
+            thrBtns.forEach(b => b.classList.toggle('on', +b.textContent === throttle));
+            sysBtns.forEach(b => b.classList.toggle('on', sys[b.dataset.k]));
+        }
+        thrBtns.forEach(b => b.addEventListener('click', () => { throttle = +b.textContent; ui(); }));
+        sysBtns.forEach(b => b.addEventListener('click', () => { sys[b.dataset.k] = !sys[b.dataset.k]; ui(); }));
+        // quasar: charge 0.8 s, then a killing beam paid with our own energy
+        let qCharge = 0, beam = 0;
+        document.getElementById('emp').addEventListener('click', () => { if (online() && qCharge <= 0 && beam <= 0) qCharge = 0.8; });
+        ui();
+
+        function startBlackout(d) {
+            blackout = d; reboot = 0;
+            ship.spin = (Math.random() < 0.5 ? -1 : 1) * (0.8 + Math.random());
+            if (Math.hypot(ship.vx, ship.vy) < 20) { ship.vx += 25; ship.vy += (Math.random() - 0.5) * 40; }
+        }
+        const online = () => blackout <= 0;
+
+        function update(dt) {
+            t += dt;
+            stars.forEach(s => { s.x -= s.v * dt; if (s.x < 0) { s.x = AW; s.y = Math.random() * H; } });
+            drawNow = { engines: 0, shield: 0, laser: 0, repair: 0, sensors: 0 };
+
+            if (online()) {
+                // reactor
+                energy += REACTOR * dt;
+                drawNow.sensors = COST.sensors; energy -= COST.sensors * dt;
+                // engines: follow an autopilot path, speed limited by throttle and engine health
+                const maxV = 190 * (throttle / 100) * (0.35 + 0.65 * engines / 100);
+                const tx = 150 + 90 * Math.sin(t * 0.7), ty = 180 + 120 * Math.sin(t * 1.1);
+                const dx = tx - ship.x, dy = ty - ship.y, d = Math.hypot(dx, dy) || 1;
+                const want = Math.min(maxV, d * 2.5);
+                ship.vx += (dx / d * want - ship.vx) * Math.min(1, 4 * dt);
+                ship.vy += (dy / d * want - ship.vy) * Math.min(1, 4 * dt);
+                ship.rot += (0 - ship.rot) * Math.min(1, 5 * dt);
+                drawNow.engines = COST.engines * throttle; energy -= drawNow.engines * dt;
+                if (sys.shield) { drawNow.shield = COST.shieldIdle; energy -= COST.shieldIdle * dt; }
+                if (sys.repair && (hull < 100 || engines < 100)) {
+                    drawNow.repair = COST.repair; energy -= COST.repair * dt;
+                    hull = Math.min(100, hull + 6 * dt); engines = Math.min(100, engines + 5 * dt);
+                }
+                laserT -= dt;
+                if (sys.laser && laserT <= 0) { laserT = 0.22; energy -= COST.laserShot; shots.push({ x: ship.x + 30, y: ship.y }); }
+                if (sys.laser) drawNow.laser = COST.laserShot / 0.22;
+                misT -= dt;
+                if (sys.missiles && ammo > 0 && misT <= 0) { misT = 0.9; ammo--; const tg = foes[ammo % 2]; mis.push({ x: ship.x + 20, y: ship.y, vx: 80, vy: (Math.random() - 0.5) * 100, tg }); }
+                if (qCharge > 0) { qCharge -= dt; if (qCharge <= 0) { energy -= 35; beam = 0.3; foes.forEach(f => { if (Math.abs(f.y - ship.y) < 30) { f.fl = 0.3; fx.push({ kind: 'boom', x: f.x, y: f.y, t: 0 }); fx.push({ kind: 'dmg', x: f.x, y: f.y, t: 0 }); } }); } }
+                if (energy <= 0) { energy = 0; startBlackout(3); }
+                energy = Math.min(100, energy);
+            } else {
+                // blackout: no control, the ship keeps its momentum and spins
+                blackout -= dt;
+                ship.rot += ship.spin * dt;
+                ship.vx *= 0.995; ship.vy *= 0.995;
+                if (blackout <= 0) { energy = 12; ship.spin = 0; }
+            }
+            ship.x += ship.vx * dt; ship.y += ship.vy * dt;
+            if (ship.x < 30 || ship.x > AW - 60) { ship.vx *= -0.6; ship.x = Math.max(30, Math.min(AW - 60, ship.x)); }
+            if (ship.y < 20 || ship.y > H - 20) { ship.vy *= -0.6; ship.y = Math.max(20, Math.min(H - 20, ship.y)); }
+
+            // enemies shoot at the ship
+            foes.forEach(f => {
+                f.y += Math.sin(t * 1.3 + f.x) * 30 * dt; f.fl -= dt;
+                f.cd -= dt;
+                if (f.cd <= 0) { f.cd = 1.1 + Math.random() * 0.6; const dx = ship.x - f.x, dy = ship.y - f.y, d = Math.hypot(dx, dy); ebul.push({ x: f.x - 14, y: f.y, vx: dx / d * 230, vy: dy / d * 230 }); }
+            });
+            ebul.forEach(b => { b.x += b.vx * dt; b.y += b.vy * dt; });
+            ebul = ebul.filter(b => {
+                if (Math.hypot(b.x - ship.x, b.y - ship.y) < 24) {
+                    if (online() && sys.shield && energy > COST.shieldHit) { energy -= COST.shieldHit; shieldFlash = 0.15; }
+                    else {
+                        hull = Math.max(0, hull - 7);
+                        if (Math.random() < 0.4) engines = Math.max(0, engines - 14);
+                        fx.push({ kind: 'hit', x: ship.x, y: ship.y, t: 0 });
+                        if (hull <= 0) { hull = 100; engines = 100; ammo = 8; fx.push({ kind: 'dead', x: ship.x, y: ship.y, t: 0 }); }
+                    }
+                    return false;
+                }
+                return b.x > -10 && b.x < AW + 10 && b.y > -10 && b.y < H + 10;
+            });
+            shots.forEach(s => s.x += 480 * dt);
+            shots = shots.filter(s => { for (const f of foes) if (Math.abs(s.x - f.x) < 18 && Math.abs(s.y - f.y) < 18) { f.fl = 0.06; return false; } return s.x < AW; });
+            mis.forEach(m => { const dx = m.tg.x - m.x, dy = m.tg.y - m.y, d = Math.hypot(dx, dy); m.vx += dx / d * 600 * dt; m.vy += dy / d * 600 * dt; const s = Math.hypot(m.vx, m.vy); if (s > 260) { m.vx *= 260 / s; m.vy *= 260 / s; } m.x += m.vx * dt; m.y += m.vy * dt; if (d < 14) { m.dead = true; m.tg.fl = 0.12; fx.push({ kind: 'boom', x: m.x, y: m.y, t: 0 }); } });
+            mis = mis.filter(m => !m.dead);
+            fx.forEach(f => f.t += dt); fx = fx.filter(f => f.t < (f.kind === 'dmg' ? 0.8 : f.kind === 'dead' ? 1.2 : 0.35));
+            shieldFlash = Math.max(0, shieldFlash - dt);
+            beam = Math.max(0, beam - dt);
+            if (!online()) qCharge = 0;
+        }
+
+        function barH(x, y, w, v, col, label, val) {
+            ctx.font = '10px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#8899EE'; ctx.fillText(label, x, y - 3);
+            ctx.fillStyle = '#9a9aae'; const s = String(val); ctx.fillText(s, x + w - ctx.measureText(s).width, y - 3);
+            ctx.fillStyle = '#1a1a2a'; ctx.fillRect(x, y, w, 8);
+            ctx.fillStyle = col; ctx.fillRect(x, y, w * Math.max(0, Math.min(1, v)), 8);
+        }
+
+        function draw() {
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            ctx.save(); ctx.beginPath(); ctx.rect(0, 0, AW, H); ctx.clip();
+            stars.forEach(s => { ctx.fillStyle = '#2a2a55'; ctx.fillRect(s.x, s.y, 1.5, 1.5); });
+
+            foes.forEach(f => { if (!FOE.complete) return; ctx.drawImage(FOE, f.x - 18, f.y - 17, 36, 34); if (f.fl > 0) { ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(FOE, f.x - 18, f.y - 17, 36, 34); ctx.globalCompositeOperation = 'source-over'; } });
+            ctx.fillStyle = '#AAB6FF'; shots.forEach(s => ctx.fillRect(s.x - 6, s.y - 1.5, 12, 3));
+            mis.forEach(m => { ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.atan2(m.vy, m.vx)); ctx.fillStyle = '#FFB000'; ctx.fillRect(-5, -2, 10, 4); ctx.fillStyle = 'rgba(255,120,60,0.6)'; ctx.fillRect(-12, -1, 7, 2); ctx.restore(); });
+            ctx.fillStyle = '#FF7755'; ebul.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, 7); ctx.fill(); });
+
+            // ship
+            if (SHIP.complete) {
+                ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.rot);
+                if (!online()) ctx.filter = 'grayscale(1) brightness(0.55)';
+                ctx.drawImage(SHIP, -33, -17, 66, 34);
+                ctx.restore();
+            }
+            // engine flame scales with throttle
+            if (online() && throttle > 0) { const L = 6 + throttle / 100 * 18 * (0.5 + 0.5 * engines / 100); ctx.fillStyle = 'rgba(0,200,255,0.7)'; ctx.beginPath(); ctx.moveTo(ship.x - 33, ship.y - 4); ctx.lineTo(ship.x - 33 - L * (0.8 + 0.2 * Math.random()), ship.y); ctx.lineTo(ship.x - 33, ship.y + 4); ctx.fill(); }
+            // engine smoke when damaged
+            if (engines < 60) { ctx.fillStyle = 'rgba(150,150,150,0.35)'; for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.arc(ship.x - 36 - k * 9 - (t * 40 % 9), ship.y - 6 - k * 3, 3 + k, 0, 7); ctx.fill(); } }
+            // quasar charge + beam
+            if (qCharge > 0) { const k = 1 - qCharge / 0.8, r = 4 + k * 12; const g = ctx.createRadialGradient(ship.x + 38, ship.y, 0, ship.x + 38, ship.y, r); g.addColorStop(0, '#fff'); g.addColorStop(0.5, '#8899EE'); g.addColorStop(1, 'rgba(26,26,204,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ship.x + 38, ship.y, r, 0, 7); ctx.fill(); }
+            if (beam > 0) { ctx.fillStyle = 'rgba(136,153,238,0.5)'; ctx.fillRect(ship.x + 34, ship.y - 9, AW, 18); ctx.fillStyle = '#fff'; ctx.fillRect(ship.x + 34, ship.y - 3, AW, 6); }
+            // shield bubble
+            if (online() && sys.shield && energy > COST.shieldHit) {
+                ctx.strokeStyle = shieldFlash > 0 ? '#ffffff' : 'rgba(102,130,255,0.75)'; ctx.lineWidth = shieldFlash > 0 ? 3 : 1.5;
+                ctx.beginPath(); ctx.ellipse(ship.x, ship.y, 44, 30, 0, 0, 7); ctx.stroke(); ctx.fillStyle = 'rgba(26,26,204,0.12)'; ctx.fill(); ctx.lineWidth = 1;
+            }
+            fx.forEach(f => {
+                if (f.kind === 'dmg') { ctx.font = 'bold 13px "JetBrains Mono", monospace'; ctx.fillStyle = `rgba(255,176,0,${1 - f.t / 0.8})`; ctx.fillText('-250', f.x - 14, f.y - 24 - f.t * 20); }
+                if (f.kind === 'hit') { ctx.fillStyle = `rgba(255,120,60,${1 - f.t / 0.35})`; ctx.beginPath(); ctx.arc(f.x, f.y, 8 + f.t * 40, 0, 7); ctx.fill(); }
+                if (f.kind === 'boom') { ctx.fillStyle = `rgba(255,200,80,${1 - f.t / 0.35})`; ctx.beginPath(); ctx.arc(f.x, f.y, 6 + f.t * 50, 0, 7); ctx.fill(); }
+                if (f.kind === 'dead') { ctx.font = 'bold 16px "JetBrains Mono", monospace'; ctx.fillStyle = `rgba(255,68,0,${1 - f.t / 1.2})`; ctx.fillText('HULL DESTROYED — respawn', 90, 40); }
+            });
+            if (!online()) {
+                ctx.font = 'bold 15px "JetBrains Mono", monospace'; ctx.fillStyle = (t * 3 | 0) % 2 ? '#FF00CC' : '#FF7755';
+                ctx.fillText('BLACKOUT · DRIFTING', 20, 26);
+                ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#9a9aae';
+                ctx.fillText('reactor reboot in ' + Math.max(0, blackout).toFixed(1) + ' s', 20, 44);
+            }
+            ctx.restore();
+
+            // ---------- power panel ----------
+            const px = AW + 14, pw = W - AW - 28;
+            ctx.fillStyle = '#0d0d18'; ctx.fillRect(AW, 0, W - AW, H);
+            ctx.strokeStyle = '#2a2a4a'; ctx.beginPath(); ctx.moveTo(AW + 0.5, 0); ctx.lineTo(AW + 0.5, H); ctx.stroke();
+            ctx.font = 'bold 11px "JetBrains Mono", monospace'; ctx.fillStyle = online() ? '#00FFAA' : '#FF00CC';
+            ctx.fillText(online() ? 'REACTOR  +' + REACTOR + '/s' : 'REACTOR  OFFLINE', px, 22);
+
+            barH(px, 44, pw, energy / 100, energy < 25 ? '#FF7755' : '#6B82D6', 'ENERGY', Math.round(energy));
+            barH(px, 76, pw, hull / 100, hull < 35 ? '#FF4400' : '#00FFAA', 'HULL', Math.round(hull));
+            barH(px, 108, pw, engines / 100, engines < 50 ? '#FFB000' : '#00C080', 'ENGINES (integrity)', Math.round(engines) + '%');
+
+            ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = '#6B82D6'; ctx.fillText('POWER DRAW  /s', px, 146);
+            const rows = [['engines', 'ENGINES ' + throttle + '%'], ['shield', 'SHIELD'], ['laser', 'LASER'], ['repair', 'REPAIR'], ['sensors', 'SENSORS']];
+            let total = 0;
+            rows.forEach(([k, name], i) => {
+                const y = 164 + i * 22, v = online() ? drawNow[k] : 0; total += v;
+                ctx.fillStyle = v > 0 ? '#cdd6f4' : '#3a3a6a'; ctx.fillText(name, px, y + 8);
+                const n = Math.min(8, Math.ceil(v / 3));
+                for (let s = 0; s < 8; s++) { ctx.fillStyle = s < n ? (k === 'repair' ? '#00FFAA' : k === 'shield' ? '#6B82D6' : '#FFB000') : '#1a1a2a'; ctx.fillRect(px + 100 + s * 10, y, 8, 10); }
+            });
+            const net = (online() ? REACTOR : 0) - total;
+            ctx.fillStyle = net >= 0 ? '#00FFAA' : '#FF7755';
+            ctx.font = 'bold 11px "JetBrains Mono", monospace';
+            ctx.fillText('NET  ' + (net >= 0 ? '+' : '') + net.toFixed(0) + ' /s', px, 290);
+            ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = '#FFB000';
+            ctx.fillText('MISSILES  ' + '▮'.repeat(ammo) + '▯'.repeat(8 - ammo), px, 318);
+            ctx.fillStyle = '#6B82D6'; ctx.fillText('ammo · not energy', px, 334);
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Rules &amp; Modes</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-rm { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .rm-left {
+            position: relative; z-index: 1; width: 60%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        .ui { width: 100%; background: #0d0d0d; border-radius: 10px; overflow: hidden; font-family: "JetBrains Mono", monospace; color: #cdd6f4; }
+        .top { display: flex; justify-content: space-between; align-items: baseline; padding: 1.3vh 1.2vw; border-bottom: 1px solid #2a2a4a; }
+        .logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.4vw; color: #fff; }
+        .logo span { color: #FF4400; }
+        .logo i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 0.75vw; color: #8899EE; margin-left: 0.5vw; letter-spacing: 0.1em; }
+        .top small { font-size: 0.72vw; color: #6B82D6; }
+
+        .body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+        .form { padding: 1.3vh 1.2vw; display: flex; flex-direction: column; gap: 1.2vh; border-right: 1px solid #2a2a4a; }
+        .row { display: flex; flex-direction: column; gap: 0.5vh; }
+        .row .lb { font-size: 0.66vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; }
+        .opts { display: flex; gap: 0.3vw; flex-wrap: wrap; }
+        .opts span { font-size: 0.74vw; font-weight: 700; padding: 0.55vh 0.6vw; border-radius: 4px; border: 1px solid #2a2a4a; color: #9a9aae; cursor: pointer; user-select: none; }
+        .opts span:hover { border-color: #6B82D6; }
+        .opts span.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .opts.danger span.on { background: #FF4400; border-color: #FF4400; }
+
+        .out { min-width: 0; padding: 1.3vh 1vw; display: flex; flex-direction: column; gap: 1vh; }
+        .yaml { overflow: hidden; font-size: 0.76vw; line-height: 1.55; background: #05050d; border-radius: 6px; padding: 1vh 0.8vw; }
+        .yaml div { white-space: pre; }
+        .yaml .chg { background: #00FFAA22; border-radius: 3px; transition: background 0.6s; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; }
+        .eff { font-size: 0.72vw; display: grid; grid-template-columns: auto 1fr auto; gap: 0.3vh 0.6vw; align-items: center; }
+        .eff .n { color: #9a9aae; }
+        .eff .b { height: 0.8vh; background: #1a1a2a; border-radius: 2px; overflow: hidden; }
+        .eff .b i { display: block; height: 100%; background: #FFB000; transition: width 0.3s; }
+        .eff .x { color: #FFB000; text-align: right; }
+        .win { font-size: 0.72vw; color: #00FFAA; min-height: 2.4vh; }
+        .win b { color: #fff; }
+
+        .rm-right {
+            position: relative; z-index: 1; width: 40%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 5vh 4.2vw 5vh 1vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.6vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        .points { display: flex; flex-direction: column; gap: 0.85vh; }
+        .pt { font-size: 1vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.86vw; color: #1A1ACC; }
+        .box { font-size: 0.95vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; border-left: 4px solid var(--epi-orange); background: #FF440010; }
+        .box b { color: #cc3300; }
+
+        .slide-rm .deco-block-1, .slide-rm .deco-block-2 { background: #D0D8F0; }
+        .slide-rm .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-rm">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="rm-left">
+            <div class="ui">
+                <div class="top"><div class="logo">R<span>·</span>TYPE<i>CREATE ROOM</i></div><small>the CREATE button of the lobby</small></div>
+                <div class="body">
+                    <div class="form" id="form"></div>
+                    <div class="out">
+                        <div class="yaml" id="yaml"></div>
+                        <div class="eff" id="eff"></div>
+                        <div class="win" id="win"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rm-right">
+            <div class="eyebrow">Epitech Afrique — Track #3</div>
+            <div class="title">Rules &amp; Modes<span class="cursor"></span></div>
+            <div class="subtitle">Same game, <b>different rules</b>, chosen per room.</div>
+
+            <div class="points">
+                <div class="pt">The room <b>loads its rules</b> at creation: a small file, like everything else.</div>
+                <div class="pt">Each rule is <b>checked by a system</b>: friendly fire lives in the collision system, lives in the respawn system.</div>
+                <div class="pt"><b>Difficulty scales numbers</b>, not code: enemy HP, bullet speed, spawn rate.</div>
+                <div class="pt"><b>Modes change the goal</b>: co-op reaches the boss, versus compares scores, PvP shoots each other.</div>
+            </div>
+
+            <div class="box"><b>A game design question:</b> which combinations are fun? Play them. Some rules are only fun with others. Show the rules in the room list.</div>
+        </div>
+    </section>
+
+    <script>
+        const RULES = [
+            { k: 'mode',          lb: 'mode',          o: ['co-op', 'versus', 'pvp'] },
+            { k: 'difficulty',    lb: 'difficulty',    o: ['easy', 'normal', 'hard', 'nightmare'], i: 1 },
+            { k: 'friendly_fire', lb: 'friendly fire', o: ['off', 'on'], danger: true },
+            { k: 'lives',         lb: 'lives',         o: ['1', '3', '5', '∞'], i: 1 },
+            { k: 'bonuses',       lb: 'bonuses',       o: ['all', 'no force', 'none'] },
+            { k: 'max_players',   lb: 'max players',   o: ['2', '3', '4'], i: 2 },
+        ];
+        const cur = {}; RULES.forEach(r => cur[r.k] = r.i || 0);
+        let changed = null;
+        const DIFF = { easy: [0.6, 0.8, 0.7], normal: [1, 1, 1], hard: [1.5, 1.25, 1.3], nightmare: [2.5, 1.6, 1.8] };
+        const WIN = {
+            'co-op': 'win: <b>reach and kill the boss together</b> · score is shared',
+            'versus': 'win: <b>best score when the boss dies</b> · same level, every player for themselves',
+            'pvp': 'win: <b>last team standing</b> · players are targets, monsters optional',
+        };
+        const $ = id => document.getElementById(id);
+
+        function render() {
+            const form = $('form'); form.innerHTML = '';
+            RULES.forEach(r => {
+                const row = document.createElement('div'); row.className = 'row';
+                row.innerHTML = `<span class="lb">${r.lb}</span><div class="opts${r.danger ? ' danger' : ''}">` + r.o.map((o, i) => `<span data-k="${r.k}" data-i="${i}" class="${cur[r.k] === i ? 'on' : ''}">${o.toUpperCase()}</span>`).join('') + '</div>';
+                form.appendChild(row);
+            });
+            form.querySelectorAll('.opts span').forEach(s => s.addEventListener('click', () => { cur[s.dataset.k] = +s.dataset.i; changed = s.dataset.k; render(); }));
+
+            const v = k => RULES.find(r => r.k === k).o[cur[k]];
+            const line = (k, val, cmt) => `<div class="${changed === k ? 'chg' : ''}"><span class="k">${k}</span>: ${val}${cmt ? '   <span class="cm"># ' + cmt + '</span>' : ''}</div>`;
+            const str = x => `<span class="s">${x}</span>`, num = x => `<span class="v">${x}</span>`;
+            $('yaml').innerHTML =
+                '<div><span class="cm"># rooms/r4/rules.yaml — sent by the lobby</span></div>' +
+                line('mode', str(v('mode'))) +
+                line('difficulty', str(v('difficulty')), 'scales the numbers') +
+                line('friendly_fire', num(v('friendly_fire') === 'on' ? 'true' : 'false'), v('friendly_fire') === 'on' ? 'collision system hits allies' : '') +
+                line('lives', num(v('lives') === '∞' ? '-1' : v('lives')), v('lives') === '∞' ? 'unlimited' : '') +
+                line('bonuses', str(v('bonuses').replace(' ', '_'))) +
+                line('max_players', num(v('max_players')));
+            if (v('mode') === 'pvp' && v('friendly_fire') === 'off') $('yaml').innerHTML += '<div><span class="cm"># pvp: teams still hit each other</span></div>';
+
+            const d = DIFF[v('difficulty')];
+            $('eff').innerHTML = [['enemy HP', d[0]], ['bullet speed', d[1]], ['spawn rate', d[2]]].map(([n, x]) =>
+                `<span class="n">${n}</span><span class="b"><i style="width:${Math.min(100, x / 2.5 * 100)}%"></i></span><span class="x">×${x}</span>`).join('');
+            $('win').innerHTML = WIN[v('mode')];
+            if (changed) setTimeout(() => document.querySelectorAll('.chg').forEach(e => e.style.background = 'transparent'), 700);
+        }
+        render();
+    </script>
+</body>
+</html>

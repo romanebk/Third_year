@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 03 — UDP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        :root { --proto: #00FFAA; --proto-text: #00AA77; }
+
+        .slide-net {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 7vh 5vw 5vh 5vw;
+            gap: 3.5vh;
+        }
+
+        .net-head { display: flex; flex-direction: column; gap: 1.2vh; position: relative; z-index: 1; }
+
+        .net-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .net-title-row { display: flex; align-items: baseline; gap: 2vw; }
+
+        .net-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+
+        .net-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .net-fullname {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 600;
+            font-size: 2.4vw;
+            color: #333;
+        }
+        .net-fullname b { color: var(--proto-text); font-weight: 700; }
+
+        .net-tag { font-size: 1.7vw; color: #555; }
+
+        /* ---------- animated stage ---------- */
+        .stage {
+            position: relative;
+            z-index: 1;
+            background: #0d0d0d;
+            border-radius: 10px;
+            padding: 3vh 1.8vw;
+            display: flex;
+            align-items: stretch;
+            gap: 1.5vw;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+        }
+
+        .ep {
+            width: 15vw;
+            flex-shrink: 0;
+            border: 1.5px solid #3a3a6a;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1vh;
+            padding: 2vh 0;
+            background: #15152a;
+        }
+        .ep-role { font-size: 1.1vw; letter-spacing: 0.15em; text-transform: uppercase; color: #8899EE; }
+        .ep-addr { font-size: 1.4vw; font-weight: 700; color: #fff; }
+
+        .lane { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2vh; }
+
+        .track {
+            position: relative;
+            height: 4vw;
+            background:
+                linear-gradient(90deg, #333 50%, transparent 50%) center / 14px 2px repeat-x;
+        }
+
+        .pkt {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin-top: -1.5vw;
+            min-width: 3vw;
+            height: 3vw;
+            padding: 0 0.6vw;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3vw;
+            font-weight: 700;
+            color: #0d0d0d;
+            white-space: nowrap;
+        }
+        .pkt.data { background: var(--proto); }
+        .pkt.boom { background: none; color: #FF4400; font-size: 2vw; }
+
+        .note {
+            font-size: 1.35vw;
+            color: #888;
+            height: 2.2vw;
+            line-height: 2.2vw;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .note.good { color: #00FFAA; }
+        .note.bad  { color: #FF7755; }
+
+        .recv { display: flex; justify-content: center; align-items: center; gap: 0.8vw; font-size: 1vw; color: #6B82D6; }
+        .recv > span { display: flex; gap: 0.5vw; min-height: 2.4vw; min-width: 12vw; }
+        .slot {
+            width: 2.4vw; height: 2.4vw;
+            border-radius: 4px;
+            border: 1px solid #2a2a2a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1vw; font-weight: 700; color: transparent;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .slot.ok   { background: var(--proto); color: #0d0d0d; border-color: var(--proto); }
+
+        /* ---------- text under the stage ---------- */
+        .uses {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3vw;
+            font-size: 1.5vw;
+            color: #333;
+            line-height: 1.35;
+        }
+        .uses b { color: var(--epi-dark-blue); }
+
+        .net-rule {
+            position: relative;
+            z-index: 1;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            color: #333;
+            border-left: 4px solid var(--epi-orange);
+            padding: 0.6vh 1vw;
+            background: #FF440010;
+        }
+        .net-rule b { color: #cc3300; }
+
+        .slide-net .deco-block-1,
+        .slide-net .deco-block-2 { background: #D0D8F0; }
+        .slide-net .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-net">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="net-head">
+            <div class="net-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="net-title-row">
+                <div class="net-title">UDP<span class="cursor"></span></div>
+                <div class="net-fullname"><b>U</b>ser <b>D</b>atagram <b>P</b>rotocol</div>
+            </div>
+            <div class="net-tag">Fast. Lossy. Fine.</div>
+        </div>
+
+        <div class="stage">
+            <div class="ep">
+                <div class="ep-role">client</div>
+                <div class="ep-addr">10.0.0.2:50412</div>
+            </div>
+
+            <div class="lane">
+                <div class="track" id="track"></div>
+                <div class="note" id="note"></div>
+                <div class="recv">received <span id="recv"></span></div>
+            </div>
+
+            <div class="ep">
+                <div class="ep-role">server</div>
+                <div class="ep-addr">10.0.0.1:4242</div>
+            </div>
+        </div>
+
+        <div class="uses">
+            <div>No connection, no numbering, no resend. A lost packet? <b>The next one already has newer positions.</b> Need order or loss detection? Put your own sequence number in your protocol.</div>
+            <div>Use it for <b>everything in-game</b>: movements, spawns, shots, deaths.</div>
+        </div>
+
+        <div class="net-rule">Subject: <b>ALL in-game communication MUST use UDP.</b></div>
+
+    </section>
+
+    <script>
+        const TRAVEL = 2400;   // ms for a packet to cross the wire
+        const GAP    = 1100;   // ms between two sends
+
+        const track = document.getElementById('track');
+        const noteEl = document.getElementById('note');
+        const note = (text, kind = '') => { noteEl.textContent = text; noteEl.className = 'note ' + kind; };
+
+        // Fly a packet client → server. loseAt (0..1): it vanishes at that point. Resolves true if delivered.
+        function fly(label, { loseAt = null } = {}) {
+            return new Promise(resolve => {
+                const el = document.createElement('div');
+                el.className = 'pkt data';
+                el.textContent = label;
+                track.appendChild(el);
+                const end = track.clientWidth - el.offsetWidth;
+                const stop = loseAt === null ? end : end * loseAt;
+                const dur = loseAt === null ? TRAVEL : TRAVEL * loseAt;
+                el.animate(
+                    [{ transform: 'translateX(0px)' }, { transform: `translateX(${stop}px)` }],
+                    { duration: dur, easing: 'linear', fill: 'forwards' }
+                ).finished.then(() => {
+                    if (loseAt === null) { el.remove(); resolve(true); return; }
+                    el.className = 'pkt boom';
+                    el.textContent = '✕';
+                    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1500, fill: 'forwards' })
+                      .finished.then(() => { el.remove(); resolve(false); });
+                });
+            });
+        }
+
+        // UDP has no sequence numbers: the server just appends whatever datagram shows up.
+        function makeInbox() {
+            const box = document.getElementById('recv');
+            box.innerHTML = '';
+            return n => {
+                const s = document.createElement('span');
+                s.className = 'slot ok';
+                s.textContent = n;
+                box.appendChild(s);
+            };
+        }
+
+        async function run() {
+            const receive = makeInbox();
+            note('No handshake — the client just sends.');
+            const trips = [];
+            for (let i = 1; i <= 5; i++) {
+                const lost = i === 3;
+                trips.push(fly(i, { loseAt: lost ? 0.45 : null }).then(ok => {
+                    if (!ok) { note('Packet 3 is lost on the way…', 'bad'); return; }
+                    receive(i);
+                    if (i === 4) note('4 lands right after 2. The server never knew 3 existed.', 'good');
+                }));
+                await sleep(GAP);
+            }
+            await Promise.all(trips);
+            note('Nobody waited. The game kept going.', 'good');
+        }
+
+        (async function loop() {
+            if (document.fonts) await document.fonts.ready;
+            for (;;) {
+                await run();
+                await sleep(5000);
+            }
+        })();
+    </script>
+</body>
+</html>

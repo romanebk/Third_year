@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — The Lobby's Job</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-lj { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .lj-left {
+            position: relative; z-index: 1;
+            width: 56%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+
+        .panel {
+            width: 100%;
+            background: #0d0d0d;
+            border-radius: 10px;
+            padding: 2.4vh 1.6vw;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+            display: flex; flex-direction: column; gap: 1.2vh;
+        }
+        .panel-head { display: flex; align-items: center; gap: 1vw; margin-bottom: 0.6vh; }
+        .L {
+            font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 2.6vw;
+            width: 4.4vw; height: 4.4vw; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            background: #0d0d0d; border: 2px solid #8899EE; color: #fff;
+        }
+        .panel-head .t { font-size: 1.1vw; font-weight: 700; color: #fff; }
+        .panel-head .t small { display: block; font-size: 0.8vw; font-weight: 500; color: #8899EE; }
+
+        .job {
+            display: grid;
+            grid-template-columns: 9.5vw 1fr;
+            align-items: center;
+            gap: 1vw;
+            padding: 1vh 0.8vw;
+            border-radius: 6px;
+            background: #15152a;
+            border-left: 3px solid var(--c);
+        }
+        .job .jn { font-size: 1vw; font-weight: 700; color: var(--c); }
+        .job .jd { font-size: 0.9vw; color: #cdd6f4; line-height: 1.35; }
+        .job .jd i { font-style: normal; color: #9a9aae; }
+
+        .no {
+            margin-top: 0.4vh;
+            display: flex; align-items: center; gap: 0.8vw;
+            font-size: 0.9vw; color: #9a9aae;
+        }
+        .no span { padding: 0.4vh 0.7vw; border: 1.5px dashed #555; border-radius: 4px; color: #888; text-decoration: line-through; }
+
+        .lj-right {
+            position: relative; z-index: 1;
+            width: 44%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.2vw;
+            gap: 2.2vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.7vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .bins { display: flex; flex-direction: column; gap: 1vh; }
+        .bin { display: flex; align-items: center; gap: 1vw; }
+        .bin code {
+            font-family: "JetBrains Mono", monospace; font-size: 1vw; font-weight: 700;
+            padding: 0.6vh 0.8vw; border-radius: 5px; min-width: 12vw; text-align: center;
+        }
+        .b-srv code  { background: #0d0d0d; color: #fff; border: 2px solid #8899EE; }
+        .b-room code { background: #1A1ACC; color: #fff; }
+        .b-cli code  { background: #fff; color: #1A1ACC; border: 1.5px solid #D0D8F0; }
+        .bin span { font-size: 1.2vw; color: #333; }
+        .bin span b { color: var(--epi-dark-blue); }
+
+        .rule {
+            font-size: 1.15vw; color: #333; line-height: 1.35;
+            border-left: 4px solid #0d0d0d; background: #0d0d0d0d; padding: 1vh 1vw;
+        }
+        .rule b { color: #0d0d0d; }
+
+        .slide-lj .deco-block-1, .slide-lj .deco-block-2 { background: #D0D8F0; }
+        .slide-lj .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lj">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="lj-left">
+            <div class="panel">
+                <div class="panel-head">
+                    <span class="L">L</span>
+                    <span class="t">Lobby<small>r-type_server — the master</small></span>
+                </div>
+
+                <div class="job" style="--c:#8899EE"><span class="jn">Accounts</span><span class="jd">login, nickname, who's online <i>— TCP is fine</i></span></div>
+                <div class="job" style="--c:#AAB6FF"><span class="jn">Room list</span><span class="jd">name, mode, public/private, players, uptime <i>— slide 7</i></span></div>
+                <div class="job" style="--c:#FF00CC"><span class="jn">Matchmaking</span><span class="jd">quick join, private codes, full rooms</span></div>
+                <div class="job" style="--c:#FFB000"><span class="jn">Spawning</span><span class="jd">starts an <b>r-type_room</b> process per game</span></div>
+                <div class="job" style="--c:#00FFAA"><span class="jn">Watching</span><span class="jd">heartbeats, crashes, empty rooms → cleanup</span></div>
+
+                <div class="no">never: <span>physics</span><span>collisions</span><span>game loop</span><span>engine</span></div>
+            </div>
+        </div>
+
+        <div class="lj-right">
+            <div class="eyebrow">Epitech Afrique — Track #2</div>
+            <div class="title">The Lobby's Job<span class="cursor"></span></div>
+            <div class="subtitle">It runs <b>no game</b>. It runs the <b>games</b>.</div>
+
+            <div class="bins">
+                <div class="bin b-srv"><code>r-type_server</code><span>the lobby, <b>one</b> per machine</span></div>
+                <div class="bin b-room"><code>r-type_room</code><span><b>one process</b> per game</span></div>
+                <div class="bin b-cli"><code>r-type_client</code><span>one per player</span></div>
+            </div>
+
+            <div class="rule"><b>Orchestration only.</b> If the lobby needs to know where a missile is, something is in the wrong process.</div>
+        </div>
+    </section>
+</body>
+</html>

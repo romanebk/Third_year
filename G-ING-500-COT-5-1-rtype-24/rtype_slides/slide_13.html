@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 13 — Engine Blocks</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-blk { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .blk-left {
+            position: relative; z-index: 1;
+            width: 60%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4vh 1.5vw 4vh 4vw;
+            gap: 1.4vh;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        /* build tabs — click to filter */
+        .build-tabs { display: flex; gap: 0.6vw; font-size: 0.95vw; align-items: center; }
+        .tab {
+            padding: 0.6vh 1vw;
+            border-radius: 6px;
+            border: 1.5px solid #D0D8F0;
+            color: #999;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .tab:hover { border-color: #8899EE; color: #3344BB; }
+        .tab.on.all    { background: #0d0d0d; border-color: #0d0d0d; color: #fff; }
+        .tab.on.room   { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .tab.on.client { background: #00C080; border-color: #00C080; color: #fff; }
+        .tab-hint { font-size: 0.75vw; color: #aaa; margin-left: 0.4vw; }
+
+        .stack { display: flex; flex-direction: column; gap: 0.8vh; }
+        .layer-tag { font-size: 0.75vw; color: #6B82D6; letter-spacing: 0.12em; text-transform: uppercase; display: flex; justify-content: space-between; }
+        .layer-tag i { font-style: normal; text-transform: none; letter-spacing: 0; color: #999; }
+        .row { display: flex; gap: 0.6vw; }
+
+        .off { opacity: 0.15; filter: grayscale(1); }
+        [data-in] { transition: opacity 0.3s, filter 0.3s; }
+
+        .star {
+            display: inline-block;
+            font-size: 0.6vw; font-weight: 700; letter-spacing: 0.08em;
+            padding: 0.15vh 0.35vw; border-radius: 3px;
+            background: #FF4400; color: #fff;
+            vertical-align: middle;
+            margin-right: 0.3vw;
+        }
+
+        /* game */
+        .game {
+            background: #fff; border: 2px solid #8899EE; color: #1A1ACC;
+            border-radius: 8px; padding: 1.1vh 0.9vw;
+            display: flex; align-items: center; gap: 0.8vw;
+        }
+        .game .name { font-size: 1.05vw; font-weight: 700; white-space: nowrap; }
+        .game img { height: 1.3vw; image-rendering: pixelated; }
+        .game .desc { font-size: 0.8vw; color: #3344BB; }
+
+        /* systems: functions, outside the registry */
+        .sys {
+            flex: 1;
+            text-align: center;
+            font-size: 0.85vw; font-weight: 700;
+            padding: 1vh 0;
+            border-radius: 6px;
+            background: #00C080; color: #fff;
+        }
+
+        /* ecs: scenes manager → scenes → registries (pure data) */
+        .ecs { background: #1A1ACC; border-radius: 8px; padding: 1.1vh 0.9vw; color: #fff; display: flex; flex-direction: column; gap: 0.8vh; }
+        .ecs .name { font-size: 1.05vw; font-weight: 700; }
+        .ecs .name small { font-size: 0.75vw; font-weight: 500; color: #AAB6FF; margin-left: 0.5vw; }
+        .scenes { display: flex; gap: 0.6vw; }
+        .scene {
+            flex: 1;
+            border-radius: 6px;
+            border: 1.5px solid #6B82D6;
+            padding: 0.7vh 0.6vw;
+            display: flex; flex-direction: column; gap: 0.5vh;
+            background: #15158f;
+        }
+        .scene.active { border-color: #00FFAA; box-shadow: 0 0 0 1px #00FFAA inset; }
+        .scene .sn { font-size: 0.8vw; font-weight: 700; display: flex; justify-content: space-between; }
+        .scene .sn em { font-style: normal; font-size: 0.6vw; color: #AAB6FF; }
+        .scene .sn em.side-c { color: #00FFAA; }
+        .split { width: 2px; background: #6B82D6; border-radius: 1px; }
+        .reg { display: flex; gap: 0.3vw; font-size: 0.65vw; }
+        .reg span { flex: 1; text-align: center; padding: 0.4vh 0; border-radius: 3px; }
+        .reg .re { background: #0d0d0d; }
+        .reg .rc { background: #8899EE; }
+        .reg .fill { color: #00FFAA; border: 1px dashed #00FFAA88; }
+
+        /* plugins: optional, swappable */
+        .plug {
+            flex: 1;
+            background: #fff;
+            border: 1.5px dashed #8899EE;
+            border-radius: 8px;
+            padding: 0.9vh 0.7vw;
+            color: #1A1ACC;
+            display: flex; flex-direction: column; gap: 0.3vh;
+        }
+        .plug .name { font-size: 0.95vw; font-weight: 700; }
+        .plug .desc { font-size: 0.72vw; color: #3344BB; opacity: 0.85; }
+
+        /* core: modules the engine can't run without */
+        .core { background: #0d0d0d; border-radius: 8px; padding: 1.1vh 0.9vw; color: #fff; display: flex; flex-direction: column; gap: 0.7vh; }
+        .core .name { font-size: 1.05vw; font-weight: 700; }
+        .core .name small { font-size: 0.75vw; font-weight: 500; color: #8899EE; margin-left: 0.5vw; }
+        .mods { display: flex; gap: 0.45vw; flex-wrap: wrap; }
+        .mods span { font-size: 0.78vw; padding: 0.45vh 0.55vw; border: 1px solid #3a3a6a; border-radius: 4px; color: #cdd6f4; }
+
+        /* right column */
+        .blk-right {
+            position: relative; z-index: 1;
+            width: 40%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.5vw;
+            gap: 2.2vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+
+        .terms { display: flex; flex-direction: column; gap: 1.3vh; }
+        .term { display: flex; gap: 0.9vw; align-items: flex-start; }
+        .chip {
+            font-family: "JetBrains Mono", monospace; font-size: 0.8vw; font-weight: 700;
+            min-width: 6.4vw; text-align: center;
+            padding: 0.5vh 0; border-radius: 5px; flex-shrink: 0;
+        }
+        .c-mod  { background: #0d0d0d; color: #fff; }
+        .c-plug { background: #fff; color: #1A1ACC; border: 1.5px dashed #8899EE; }
+        .c-scn  { background: #1A1ACC; color: #fff; }
+        .c-reg  { background: #8899EE; color: #fff; }
+        .c-sys  { background: #00C080; color: #fff; }
+        .term-text { font-size: 1.15vw; color: #333; line-height: 1.3; }
+        .term-text b { color: var(--epi-dark-blue); }
+
+        .rule {
+            font-size: 1.1vw; color: #333; line-height: 1.35;
+            border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 1vh 1vw;
+        }
+        .rule b { color: #cc3300; }
+
+        .slide-blk .deco-block-1, .slide-blk .deco-block-2 { background: #D0D8F0; }
+        .slide-blk .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-blk">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="blk-left">
+            <div class="build-tabs">
+                <span class="tab all on" data-build="all">whole engine</span>
+                <span class="tab room" data-build="room">room build</span>
+                <span class="tab client" data-build="client">client build</span>
+                <span class="tab-hint">← click</span>
+            </div>
+
+            <div class="stack">
+                <div class="layer-tag">game</div>
+                <div class="game" data-in="room client">
+                    <span class="name"><span class="star">MUST</span>R-Type — Game Logic</span>
+                    <img src="assets/player_cyan.png" alt=""><img src="assets/bydos.png" alt=""><img src="assets/force.png" alt="">
+                    <span class="desc">its own components &amp; systems: Bydos AI, Force, levels, score</span>
+                </div>
+
+                <div class="layer-tag">systems <i>functions — live outside the registry</i></div>
+                <div class="row">
+                    <span class="sys" data-in="client">Input</span>
+                    <span class="sys" data-in="room client">Movement</span>
+                    <span class="sys" data-in="room">Collision</span>
+                    <span class="sys" data-in="room client">NetSync</span>
+                    <span class="sys" data-in="client">Render</span>
+                    <span class="sys" data-in="client">Audio</span>
+                </div>
+
+                <div class="layer-tag">ecs <i>run on the active scene's registry</i></div>
+                <div class="ecs" data-in="room client">
+                    <span class="name">Scenes manager <small>one registry per scene — pure data</small></span>
+                    <div class="scenes">
+                        <div class="scene" data-in="client">
+                            <span class="sn">Menu <em class="side-c">client</em></span>
+                            <div class="reg"><span class="re">entities</span><span class="rc">comps</span></div>
+                        </div>
+                        <div class="scene" data-in="client">
+                            <span class="sn">Loading <em class="side-c">client</em></span>
+                            <div class="reg"><span class="fill">↓ room's map</span></div>
+                        </div>
+                        <div class="scene active" data-in="client">
+                            <span class="sn">Game <em class="side-c">client</em></span>
+                            <div class="reg"><span class="fill">filled by the room</span></div>
+                        </div>
+                        <span class="split"></span>
+                        <div class="scene active" data-in="room">
+                            <span class="sn">Level 1 <em>room</em></span>
+                            <div class="reg"><span class="re">entities</span><span class="rc">comps</span></div>
+                        </div>
+                        <div class="scene" data-in="room">
+                            <span class="sn">Boss <em>room</em></span>
+                            <div class="reg"><span class="re">entities</span><span class="rc">comps</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer-tag">plugins <i>optional, swappable — like Blender add-ons</i></div>
+                <div class="row">
+                    <div class="plug" data-in="client"><span class="name"><span class="star">MUST</span>Graphics</span><span class="desc">SFML · raylib · SDL</span></div>
+                    <div class="plug" data-in="client"><span class="name">Audio</span><span class="desc">SFML audio · miniaudio</span></div>
+                    <div class="plug" data-in="room client"><span class="name"><span class="star">MUST</span>Network</span><span class="desc">asio · raw sockets</span></div>
+                    <div class="plug" data-in="room client"><span class="name">Scripting</span><span class="desc">Lua for levels</span></div>
+                </div>
+
+                <div class="layer-tag">core <i>modules — the engine can't run without them</i></div>
+                <div class="core" data-in="room client">
+                    <span class="name">Core</span>
+                    <div class="mods"><span>game loop</span><span>clock / dt</span><span>events (mediator)</span><span>assets</span><span>plugin loader</span><span>logger</span><span>config</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="blk-right">
+            <div class="eyebrow">Epitech Afrique — Engine</div>
+            <div class="title">Block by Block<span class="cursor"></span></div>
+
+            <div class="terms">
+                <div class="term"><span class="chip c-mod">module</span><span class="term-text">Lives in the <b>Core</b>. The engine <b>can't run without it</b>.</span></div>
+                <div class="term"><span class="chip c-plug">plugin</span><span class="term-text"><b>Optional, swappable</b> — SFML today, raylib tomorrow. Remember Arcade.</span></div>
+                <div class="term"><span class="chip c-scn">scene</span><span class="term-text">Menu, level, boss… the <b>scenes manager</b> switches. The client has <b>no levels</b>: one Game scene, filled with the <b>room's map</b>.</span></div>
+                <div class="term"><span class="chip c-reg">registry</span><span class="term-text">One per scene. <b>Pure data</b>: entities + components.</span></div>
+                <div class="term"><span class="chip c-sys">system</span><span class="term-text">A function. Lives <b>outside</b> the registry, runs on it.</span></div>
+            </div>
+
+            <div class="rule">Subject: <b>visible &amp; decoupled</b> Rendering, Network, Game Logic. Rendering needs a Position and a Sprite — <b>not your Health</b>.</div>
+        </div>
+    </section>
+
+    <script>
+        const tabs = [...document.querySelectorAll('.tab')];
+        const parts = [...document.querySelectorAll('[data-in]')];
+
+        function show(build) {
+            tabs.forEach(t => t.classList.toggle('on', t.dataset.build === build));
+            parts.forEach(p => p.classList.toggle('off', build !== 'all' && !p.dataset.in.split(' ').includes(build)));
+        }
+
+        tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.build)));
+    </script>
+</body>
+</html>

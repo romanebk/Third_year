@@ -1,0 +1,6 @@
+real\predicted,Nothing,Check White,Check Black,Checkmate White,Checkmate Black
+Nothing,22877,675,426,88,61
+Check White,466,9385,0,889,0
+Check Black,603,0,7893,0,765
+Checkmate White,92,923,0,6457,0
+Checkmate Black,113,1,617,0,5510

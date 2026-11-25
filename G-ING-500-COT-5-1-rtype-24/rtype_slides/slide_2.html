@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 02 — The Project</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-proj {
+            background: var(--epi-light);
+            display: flex;
+            align-items: stretch;
+        }
+
+        .proj-left {
+            position: relative;
+            z-index: 1;
+            width: 52%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vh 3vw;
+        }
+
+        .screen {
+            position: relative;
+            background: #0d0d0d;
+            border-radius: 10px;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+        }
+
+        .screen svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .screen image { image-rendering: pixelated; }
+
+        /* slow horizontal scrolling starfield */
+        .stars { animation: scroll 24s linear infinite; }
+        .stars-far { animation-duration: 48s; }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-160px); }
+        }
+
+        .hud {
+            position: absolute;
+            left: 1.2vw; right: 1.2vw; top: 1.4vh;
+            display: flex;
+            justify-content: space-between;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.9vw;
+            color: #cdd6f4;
+        }
+        .hud .p1 { color: #5FE8FF; }
+        .hud .p2 { color: #FF00CC; }
+        .hud .p3 { color: #66DD44; }
+        .hud .p4 { color: #FF4466; }
+
+        .proj-right {
+            position: relative;
+            z-index: 1;
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 5vw 5vh 2vw;
+            gap: 3vh;
+        }
+
+        .proj-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .proj-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+
+        .proj-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .proj-subtitle {
+            font-size: 2vw;
+            line-height: 1.25;
+            color: #333;
+        }
+        .proj-subtitle b { color: var(--epi-dark-blue); }
+
+        .proj-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8vh;
+        }
+
+        .proj-item {
+            display: flex;
+            align-items: center;
+            gap: 1.3vw;
+        }
+
+        .badge {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.6vh 1vw;
+            border-radius: 5px;
+            min-width: 9vw;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .badge-server { background: #FF440022; color: #cc3300; border: 1.5px solid #FF440088; }
+        .badge-client { background: #00FFAA22; color: #00AA77; border: 1.5px solid #00FFAA88; }
+        .badge-engine { background: #8899EE22; color: #3344BB; border: 1.5px solid #8899EE88; }
+        .badge-cpp    { background: #FF00CC18; color: #B0008E; border: 1.5px solid #FF00CC77; }
+
+        .proj-desc {
+            font-size: 1.45vw;
+            line-height: 1.3;
+            color: #333;
+        }
+
+        .slide-proj .deco-block-1,
+        .slide-proj .deco-block-2 { background: #D0D8F0; }
+        .slide-proj .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-proj">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="proj-left">
+            <div class="screen">
+                <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                    <!-- far stars (two copies side by side for a seamless loop) -->
+                    <g class="stars stars-far" fill="#555">
+                        <circle cx="12" cy="30" r="0.6"/><circle cx="58" cy="140" r="0.6"/><circle cx="97" cy="80" r="0.6"/>
+                        <circle cx="131" cy="175" r="0.6"/><circle cx="150" cy="22" r="0.6"/>
+                        <circle cx="172" cy="30" r="0.6"/><circle cx="218" cy="140" r="0.6"/><circle cx="257" cy="80" r="0.6"/>
+                        <circle cx="291" cy="175" r="0.6"/><circle cx="310" cy="22" r="0.6"/>
+                        <circle cx="332" cy="30" r="0.6"/><circle cx="378" cy="140" r="0.6"/><circle cx="417" cy="80" r="0.6"/>
+                        <circle cx="451" cy="175" r="0.6"/><circle cx="470" cy="22" r="0.6"/>
+                    </g>
+                    <!-- near stars -->
+                    <g class="stars" fill="#cdd6f4">
+                        <circle cx="30" cy="60" r="1"/><circle cx="75" cy="110" r="0.8"/><circle cx="120" cy="40" r="1"/>
+                        <circle cx="145" cy="160" r="0.8"/>
+                        <circle cx="190" cy="60" r="1"/><circle cx="235" cy="110" r="0.8"/><circle cx="280" cy="40" r="1"/>
+                        <circle cx="305" cy="160" r="0.8"/>
+                        <circle cx="350" cy="60" r="1"/><circle cx="395" cy="110" r="0.8"/><circle cx="440" cy="40" r="1"/>
+                        <circle cx="465" cy="160" r="0.8"/>
+                    </g>
+                    <!-- planet -->
+                    <circle cx="265" cy="165" r="22" fill="#1A1ACC" opacity="0.35"/>
+
+                    <!-- 4 players, distinct colors (sheet 42) -->
+                    <image href="assets/player_cyan.png"    x="28" y="49"  width="32" height="12"/>
+                    <image href="assets/player_magenta.png" x="44" y="84"  width="32" height="12"/>
+                    <image href="assets/player_green.png"   x="24" y="114" width="32" height="12"/>
+                    <image href="assets/player_red.png"     x="48" y="144" width="32" height="12"/>
+                    <image href="assets/force.png"          x="62" y="49"  width="16" height="12"/>
+
+                    <!-- player missiles -->
+                    <g fill="#5FE8FF"><rect x="84" y="54" width="8" height="1.5"/><rect x="112" y="54" width="8" height="1.5"/></g>
+                    <g fill="#FF00CC"><rect x="85" y="89" width="8" height="1.5"/></g>
+                    <g fill="#FF4466"><rect x="95" y="149" width="8" height="1.5"/></g>
+
+                    <!-- Bydos (sheet 5) -->
+                    <image href="assets/bydos.png" x="222" y="42"  width="21" height="24"/>
+                    <image href="assets/bydos.png" x="245" y="82"  width="21" height="24"/>
+                    <image href="assets/bydos.png" x="208" y="118" width="21" height="24"/>
+                    <image href="assets/bydos.png" x="282" y="58"  width="21" height="24"/>
+                    <!-- enemy shots -->
+                    <g fill="#FFB000"><circle cx="200" cy="58" r="1.4"/><circle cx="180" cy="100" r="1.4"/></g>
+                </svg>
+                <div class="hud">
+                    <span class="p1">P1 01200</span>
+                    <span class="p2">P2 00850</span>
+                    <span class="p3">P3 00400</span>
+                    <span class="p4">P4 01575</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="proj-right">
+            <div class="proj-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="proj-title">The Project<span class="cursor"></span></div>
+            <div class="proj-subtitle">Remake the 1987 arcade shoot'em up —<br><b>online, up to 4 players</b>.</div>
+            <div class="proj-items">
+                <div class="proj-item">
+                    <span class="badge badge-server">Server</span>
+                    <span class="proj-desc">Multi-threaded, runs the game, <b>has the final word</b>.</span>
+                </div>
+                <div class="proj-item">
+                    <span class="badge badge-client">Client</span>
+                    <span class="proj-desc">Draws the game, sends the player's inputs.</span>
+                </div>
+                <div class="proj-item">
+                    <span class="badge badge-engine">Engine</span>
+                    <span class="proj-desc"><b>Your own</b> — no Unity, no Godot, no Unreal.</span>
+                </div>
+                <div class="proj-item">
+                    <span class="badge badge-cpp">C++</span>
+                    <span class="proj-desc">Build tool + package manager, docs in English.</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</body>
+</html>

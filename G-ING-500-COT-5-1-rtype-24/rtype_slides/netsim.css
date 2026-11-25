@@ -1,0 +1,129 @@
+/* Network simulator (netsim.js) */
+.ns { position: relative; font-family: "JetBrains Mono", monospace; color: #cdd6f4; }
+
+.ns-screens { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9vw; }
+
+.ns-col {
+    background: #0d0d0d;
+    border-radius: 10px;
+    padding: 1vh 0.8vw 1.1vh;
+    display: flex; flex-direction: column; gap: 0.8vh;
+    border: 2px solid transparent;
+}
+.ns-col.c0 { border-color: #5FE8FF55; }
+.ns-col.c1 { border-color: #FF00CC55; }
+.ns-col.srv { border-color: #FFB00055; }
+
+.ns-h { display: flex; justify-content: space-between; align-items: baseline; font-size: 1vw; font-weight: 700; }
+.ns-h small { font-size: 0.72vw; font-weight: 500; color: #9a9aae; }
+.c0 .ns-h span { color: #5FE8FF; }
+.c1 .ns-h span { color: #FF66DD; }
+.srv .ns-h span { color: #FFB000; }
+
+.ns canvas { width: 100%; aspect-ratio: 4 / 3; display: block; border-radius: 6px; background: #101020; }
+
+/* key help */
+.ns-keys { font-size: 0.72vw; color: #9a9aae; display: flex; align-items: center; gap: 0.25vw; flex-wrap: wrap; min-height: 1.6vw; }
+.ns-keys kbd {
+    font-family: inherit; font-size: 0.7vw; font-weight: 700; color: #fff;
+    background: #22222e; border: 1px solid #4a4a6a; border-bottom-width: 2px;
+    border-radius: 3px; padding: 0 0.3vw; min-width: 1vw; text-align: center;
+}
+.ns-keys kbd + kbd { margin-left: -0.1vw; }
+
+/* canvas + input log, side by side */
+.ns-view { display: grid; grid-template-columns: 1fr 34%; gap: 0.4vw; align-items: stretch; }
+.ns-log {
+    background: #0d0d0d;
+    border: 1px solid #2a2a4a; border-radius: 4px;
+    padding: 0.4vw 0.45vw;
+    font-size: 0.66vw; line-height: 1.45;
+    overflow: hidden;
+    min-width: 0;
+}
+.ns-log .lh { color: #8899EE; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.2vw; }
+.ns-log div { white-space: nowrap; }
+.ns-log i { font-style: normal; color: #6B82D6; }
+.ns-log .p0 { color: #5FE8FF; }
+.ns-log .p1 { color: #FF66DD; }
+.ns-log .fly { color: #fff; font-weight: 700; }
+.ns-log .part { color: #cdd6f4; }
+.ns-log .acked { color: #555; }
+.ns-log .acked i { color: #444; }
+.ns-log .idle { font-weight: 400; }
+.ns-log u { text-decoration: none; color: #888; font-weight: 400; }
+
+.ns-row { display: flex; align-items: center; gap: 0.6vw; font-size: 0.8vw; }
+.ns-row label { color: #9a9aae; min-width: 5.6vw; line-height: 1.1; }
+.ns-row label small { display: block; font-size: 0.62vw; color: #666; }
+.ns-rtt { margin-left: auto; color: #FFB000; font-size: 0.72vw; }
+.ns-row input[type=number] {
+    width: 5.5vw;
+    font-family: inherit; font-size: 0.9vw; font-weight: 700;
+    color: #fff; background: #15152a;
+    border: 1.5px solid #3a3a6a; border-radius: 4px;
+    padding: 0.3vh 0.4vw;
+}
+.ns-row input[type=number]:focus { outline: none; border-color: #8899EE; }
+.ns-row .unit { color: #9a9aae; }
+
+.ns-toggles { display: flex; gap: 0.5vw; }
+.ns-tog {
+    flex: 1;
+    font-family: inherit;
+    padding: 0.5vh 0.5vw; border-radius: 5px; cursor: pointer;
+    border: 1.5px solid #FF440088; background: #FF440014; color: #FF7755;
+    display: grid; grid-template-columns: 1fr auto; text-align: left; gap: 0 0.4vw;
+}
+.ns-tog .tn { font-size: 0.78vw; font-weight: 700; }
+.ns-tog .ts { font-size: 0.72vw; font-weight: 700; padding: 0 0.3vw; border-radius: 3px; background: #FF4400; color: #fff; }
+.ns-tog .th { grid-column: 1 / -1; font-size: 0.62vw; color: #9a9aae; }
+.ns-tog.on { border-color: #00C080; background: #00C08022; color: #00FFAA; }
+.ns-tog.on .ts { background: #00C080; color: #0d0d0d; }
+
+.ns-stats { font-size: 0.75vw; color: #9a9aae; min-height: 1.2vw; white-space: nowrap; overflow: hidden; }
+.ns-stats b { color: #fff; }
+
+.ns-focus {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(13, 13, 13, 0.55);
+    border-radius: 10px;
+    font-size: 1.4vw; font-weight: 700; color: #fff;
+    cursor: pointer;
+}
+.ns-focus.hide { display: none; }
+.ns-focus span { background: var(--epi-blue, #2020FF); padding: 1.2vh 1.6vw; border-radius: 8px; }
+
+/* legend */
+.ns-legend {
+    margin-top: 1vh;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35vh 1.2vw;
+    background: #0d0d0d; border-radius: 8px; padding: 0.9vh 1vw;
+    font-size: 0.72vw; color: #9a9aae;
+}
+.ns-legend span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ns-legend b { color: #fff; margin-right: 0.3vw; }
+.ns-legend b.dash { color: #8899EE; }
+.ns-legend em { font-style: normal; }
+.ns-legend em.fly { color: #fff; font-weight: 700; }
+.ns-legend em.ack { color: #666; }
+
+/* network fields: latency · jitter · loss */
+.ns-fields { display: flex; align-items: flex-end; gap: 0.5vw; font-size: 0.72vw; color: #9a9aae; }
+.ns-fields label { display: flex; flex-direction: column; gap: 0.2vh; }
+.ns-fields label > span:first-child { line-height: 1.1; }
+.ns-fields label small { font-size: 0.6vw; color: #666; }
+.ns-fields input[type=number] {
+    width: 3.8vw;
+    font-family: inherit; font-size: 0.85vw; font-weight: 700;
+    color: #fff; background: #15152a;
+    border: 1.5px solid #3a3a6a; border-radius: 4px;
+    padding: 0.2vh 0.3vw;
+}
+.ns-fields input[type=number]:focus { outline: none; border-color: #8899EE; }
+.ns-fields .ns-rtt { align-self: center; }
+
+/* cable button: green when connected, red when cut */
+.ns-dc { flex: 0.8; }
+.ns-dc:not(.on) { border-color: #FF4400; background: #FF440030; color: #FF7755; }

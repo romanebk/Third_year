@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>R-Type — Kick-off</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #111;
+      font-family: "Inter", system-ui, sans-serif;
+    }
+
+    #viewer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: calc(100vh - 44px);
+      overflow: hidden;
+    }
+
+    #viewer iframe {
+      width: 1280px;
+      height: 720px;
+      border: none;
+      display: block;
+      transform-origin: top left;
+    }
+
+    #nav {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 44px;
+      background: #1a1a2e;
+      border-top: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      gap: 16px;
+    }
+
+    #progress-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: #2a2a4a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      background: #2020FF;
+      border-radius: 4px;
+      transition: width 0.2s ease;
+    }
+
+    #arrows { display: flex; gap: 6px; }
+
+    #counter {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #d0d4f0;
+      white-space: nowrap;
+    }
+
+    #nav button {
+      background: none;
+      border: 1px solid #3a3a6a;
+      border-radius: 6px;
+      padding: 3px 14px;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.3;
+      color: #e6e8ff;
+      border-color: #5a5a9a;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+      white-space: nowrap;
+    }
+    #nav button:hover { background: #2020FF; color: #fff; border-color: #2020FF; }
+    #nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+    #nav button:disabled:hover { background: none; color: #e6e8ff; border-color: #5a5a9a; }
+
+  </style>
+</head>
+<body>
+
+  <div id="viewer">
+    <iframe id="frame" src="slide_1.html" allow="autoplay; fullscreen"></iframe>
+  </div>
+
+  <div id="nav">
+    <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+    <span id="counter">1 / 1</span>
+    <div id="arrows">
+      <button id="btn-prev" onclick="go(-1)" disabled title="Previous (←)">❮</button>
+      <button id="btn-next" onclick="go(1)" title="Next (→)">❯</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = [
+      'slide_1.html',
+      'slide_2.html',
+      'slide_3.html',
+      'slide_4.html',
+      'slide_5.html',
+      'slide_6.html',
+      'slide_7.html',
+      'cover_track1.html',
+      'slide_8.html',
+      'slide_9.html',
+      'slide_10.html',
+      'slide_11.html',
+      'slide_12.html',
+      'slide_12b.html',
+      'slide_12c.html',
+      'slide_13.html',
+      'slide_14.html',
+      'slide_15.html',
+      'slide_16.html',
+      'slide_17.html',
+      'slide_18.html',
+      'slide_19.html',
+      'slide_20.html',
+      'slide_21.html',
+      'slide_22.html',
+      'cover_track2.html',
+      'track2_1.html',
+      'track2_2.html',
+      'track2_3.html',
+      'track2_4.html',
+      'track2_5.html',
+      'track2_6.html',
+      'lab_prediction.html',
+      'track2_7.html',
+      'lab_snapshots.html',
+      'track2_9.html',
+      'track2_10.html',
+      'track2_8.html',
+      'track2_11.html',
+      'cover_track3.html',
+      'track3_1.html',
+      'track3_2.html',
+      'track3_3.html',
+      'track3_3b.html',
+      'track3_3c.html',
+      'track3_4.html',
+      'track3_4b.html',
+      'track3_9.html',
+      'track3_10.html',
+      'track3_11.html',
+      'track3_5.html',
+      'track3_6.html',
+      'track3_7.html',
+      'track3_8.html',
+      'track3_12.html',
+      'ending.html',
+      // <- add slides here
+    ];
+
+    let cur = 0;
+
+    function scale() {
+      const viewer = document.getElementById('viewer');
+      const frame  = document.getElementById('frame');
+      const s = viewer.clientWidth / 1280;
+      frame.style.transform = `scale(${s})`;
+      frame.style.marginLeft = `${(viewer.clientWidth  - 1280 * s) / 2}px`;
+      frame.style.marginTop  = `${(viewer.clientHeight - 720  * s) / 2}px`;
+    }
+
+    function go(dir) {
+      cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+      document.getElementById('frame').src = slides[cur];
+      document.getElementById('counter').textContent = `${cur + 1} / ${slides.length}`;
+      document.getElementById('btn-prev').disabled = cur === 0;
+      document.getElementById('btn-next').disabled = cur === slides.length - 1;
+      document.getElementById('progress-bar').style.width = `${((cur + 1) / slides.length) * 100}%`;
+      location.hash = cur;
+    }
+
+    window.addEventListener('resize', scale);
+    window.addEventListener('message', e => {
+      if (e.data && e.data.nav) { go(e.data.nav); window.focus(); }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') go(1);
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'p' || e.key === 'P') document.getElementById('frame').contentWindow.postMessage('toggle-pause', '*');
+      if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    scale();
+    const saved = parseInt(location.hash.replace('#', '')) || 0;
+    cur = Math.min(saved, slides.length - 1);
+    go(0);
+  </script>
+
+</body>
+</html>

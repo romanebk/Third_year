@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Galactic War</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-gw { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .gw-left {
+            position: relative; z-index: 1; width: 60%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.1vh;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        canvas { width: 100%; aspect-ratio: 640 / 380; border-radius: 10px 10px 0 0; background: #03030a; display: block; }
+        canvas.pick { cursor: crosshair; }
+
+        .panel {
+            background: #0d0d0d; border-radius: 0 0 10px 10px; border-top: 1px solid #2a2a4a;
+            padding: 1.1vh 1vw; display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 1vw; align-items: center;
+            font-family: "JetBrains Mono", monospace; color: #cdd6f4; font-size: 0.8vw;
+        }
+        .pn { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.3vw; color: #fff; }
+        .pn small { font-family: "JetBrains Mono", monospace; font-size: 0.7vw; color: #8899EE; font-weight: 500; margin-left: 0.4vw; letter-spacing: 0.08em; text-transform: uppercase; }
+        .ms { color: #FFB000; margin-top: 0.3vh; }
+        .bar { height: 1vh; background: #2a1010; border-radius: 3px; overflow: hidden; margin: 0.4vh 0; }
+        .bar i { display: block; height: 100%; background: #00FFAA; width: 0; }
+        .lb { display: flex; justify-content: space-between; color: #9a9aae; font-size: 0.72vw; }
+        .lb b { color: #00FFAA; }
+        #act {
+            font-family: inherit; font-weight: 700; font-size: 0.95vw; letter-spacing: 0.1em;
+            padding: 1.2vh 1.2vw; border-radius: 6px; border: none; cursor: pointer; min-width: 9vw;
+            background: #FFB000; color: #0d0d0d;
+        }
+        #act.map { background: #1A1ACC; color: #fff; }
+        #act:disabled { background: #2a2a4a; color: #6B82D6; cursor: default; }
+        .st { font-family: "JetBrains Mono", monospace; font-size: 0.78vw; color: #6B82D6; min-height: 1.4vh; }
+        .st b { color: #00B8D4; }
+
+        .gw-right {
+            position: relative; z-index: 1; width: 40%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 5vh 4.2vw 5vh 1vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.7vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 0.85vh; }
+        .pt { font-size: 1vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+
+        .box { font-size: 0.96vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; }
+        .net { border-left: 4px solid #00C080; background: #00FFAA14; }
+        .net b { color: #00885F; }
+        .ref { font-family: "JetBrains Mono", monospace; font-size: 0.78vw; color: #888; }
+        .ref b { color: #555; }
+
+        .slide-gw .deco-block-1, .slide-gw .deco-block-2 { background: #D0D8F0; }
+        .slide-gw .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-gw">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="gw-left">
+            <div>
+                <canvas id="cv" width="640" height="380"></canvas>
+                <div class="panel">
+                    <div>
+                        <div class="pn" id="pn">—<small id="ps"></small></div>
+                        <div class="ms" id="pm">click a planet</div>
+                    </div>
+                    <div>
+                        <div class="lb"><span>liberation</span><b id="pl">—</b></div>
+                        <div class="bar"><i id="pb"></i></div>
+                        <div class="lb"><span id="pq">—</span><span id="pp"></span></div>
+                    </div>
+                    <button id="act" disabled>DEPLOY</button>
+                </div>
+            </div>
+            <div class="st" id="st">Squad <b>NOVA-7</b> · in orbit of Earth · pick a planet on the map</div>
+        </div>
+
+        <div class="gw-right">
+            <div class="eyebrow">Epitech Afrique — Track #3 · UX</div>
+            <div class="title">Galactic War<span class="cursor"></span></div>
+            <div class="subtitle">Pick a planet. <b>Everyone moves the front.</b></div>
+
+            <div class="points">
+                <div class="pt"><b>The map is the mission select.</b> The squad picks a sector and a planet, not a room in a list.</div>
+                <div class="pt"><b>One map for every player.</b> Missions won push the liberation. The whole server fights the same war.</div>
+                <div class="pt"><b>The jump is a loading screen.</b> While the ship is in FTL, the room is spawned and the handoff happens.</div>
+                <div class="pt"><b>In the sector, you see who's there.</b> A squad joins: it warps in. It leaves: it warps out.</div>
+            </div>
+
+            <div class="box net"><b>Lobby-side, not room-side.</b> The map is slow data: planet ids and percentages, stored in the DB. "Squad X joined Kepler-9" is a presence event: the client plays the warp.</div>
+            <div class="ref">inspired by <b>Helldivers 2</b> · sounds: <b>assets/sfx/</b></div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv');
+        let ctx = cv.getContext('2d');
+        // the scenery is drawn on its own canvas, shapes only: its pixels stay readable even from file://
+        // (a canvas that received a sprite image is 'tainted' there, and getImageData would throw)
+        const bgc = document.createElement('canvas'); bgc.width = 640; bgc.height = 380;
+        const bctx = bgc.getContext('2d');
+        let PASS = 'ship';          // 'bg' scenery · 'fx' space distortion · 'ship' sprites and text
+        const W = 640, H = 380;
+        const $ = id => document.getElementById(id);
+
+        // ---------- sounds ----------
+        const SFX = {};
+        for (const n of ['warp_in', 'warp_out']) {
+            SFX[n] = 'assets/sfx/' + n + '.mp3';                                          // your own ship: the original
+            for (const v of ['092', '100', '108']) SFX[n + '_far_' + v] = 'assets/sfx/' + n + '_far_' + v + '.mp3';
+        }
+        // music: cuts of the Helldivers 2 main theme
+        //   music_reveal_* four sector reveals, one picked per jump; 'hit' = where the reveal lands, in seconds into the clip
+        for (const n of ['music_reveal_a', 'music_reveal_b', 'music_reveal_c', 'music_reveal_d', 'music_reveal_e']) SFX[n] = 'assets/sfx/' + n + '.mp3';
+        const REVEALS = [
+            { n: 'music_reveal_a', hit: 0.45 },    // 0:08–0:23
+            { n: 'music_reveal_b', hit: 0.40 },    // 0:35–0:48
+            { n: 'music_reveal_c', hit: 3.45 },    // 1:07–1:24, brings its own build: starts on DEPLOY
+            { n: 'music_reveal_d', hit: 0.40 },    // 1:25–1:38, the quiet one
+            { n: 'music_reveal_e', hit: 3.45 },    // 1:48.50–end: starts on DEPLOY, the 1:51.95 "I've arrived" accent lands on the warp in
+        ];
+        let music = null, lastReveal = -1, reveal = null;
+        function playMusic(name, vol, loop = false) {
+            stopMusic();
+            if (paused) return;
+            const a = new Audio(SFX[name]); a.volume = vol; a.loop = loop;
+            a.play().catch(() => {});
+            music = a;
+        }
+        function stopMusic(fade = 0.6) {
+            const a = music; if (!a) return; music = null;
+            const v0 = a.volume, t0 = performance.now();
+            const id = setInterval(() => { const k = (performance.now() - t0) / 1000 / fade; a.volume = Math.max(0, v0 * (1 - k)); if (k >= 1) { clearInterval(id); a.pause(); } }, 40);
+        }
+
+        // other squads: distant variants (low-passed, -9 dB, tail trimmed), played 0.92× / 1× / 1.08× so two warps never sound identical
+        const FAR = [{ v: '092', rate: 0.92 }, { v: '100', rate: 1.00 }, { v: '108', rate: 1.08 }];
+        // plain <audio>: works from file:// too (routing it through Web Audio would be silenced as cross-origin there)
+        const voices = new Set();
+        function play(name, vol = 1, far = false) {
+            if (paused) return;
+            if (far && voices.size >= 3) return;                                           // never stack more than 3 warps: they would clip
+            const a = new Audio(SFX[name]); a.volume = vol;
+            voices.add(a); a.addEventListener('ended', () => voices.delete(a));
+            a.play().catch(e => { voices.delete(a); console.warn('sound blocked:', e.message); });
+        }
+
+        // ---------- the war (would come from the lobby / DB) ----------
+        const SECTORS = [
+            { n: 'HOME SECTOR', x: 110, y: 200, r: 95,  c: '#1A1ACC' },
+            { n: 'ORION REACH', x: 300, y: 100, r: 105, c: '#00C080' },
+            { n: 'KESSEL DEEP', x: 300, y: 300, r: 95,  c: '#FFB000' },
+            { n: 'BYDO RIM',    x: 520, y: 190, r: 120, c: '#FF4400' },
+        ];
+        const P = [
+            { n: 'Earth',       s: 0, x: 95,  y: 200, lib: 100, home: true, m: 'home — resupply, rest',           near: 'station', hue: '#3a6ad6' },
+            { n: 'Luna Gate',   s: 0, x: 160, y: 140, lib: 100, m: 'patrol the gate',                     near: 'station', hue: '#9a9aae' },
+            { n: 'Kepler-9',    s: 1, x: 255, y: 70,  lib: 64,  m: 'defend the relay',                    near: 'armada',  hue: '#2aa37a' },
+            { n: 'Vega Prime',  s: 1, x: 345, y: 120, lib: 38,  m: 'escort the convoy',                   near: 'station', hue: '#c9a227' },
+            { n: 'Arcturus',    s: 1, x: 330, y: 45,  lib: 81,  m: 'clear the asteroid belt',             near: 'armada',  hue: '#b86b3a' },
+            { n: 'Kessel',      s: 2, x: 270, y: 290, lib: 22,  m: 'destroy the turrets',                 near: 'armada',  hue: '#8a5a2a' },
+            { n: 'Tarsis',      s: 2, x: 350, y: 320, lib: 47,  m: 'rescue the miners',                   near: 'station', hue: '#c96a3a' },
+            { n: 'Xenos',       s: 3, x: 470, y: 120, lib: 12,  m: 'destroy the Bydo nest',               near: 'armada',  hue: '#a33a6a' },
+            { n: 'Gomander',    s: 3, x: 560, y: 250, lib: 5,   m: 'survive the swarm',                   near: 'armada',  hue: '#7a2a2a' },
+            { n: 'Dobkeratops', s: 3, x: 585, y: 140, lib: 0,   m: 'BOSS — kill Dobkeratops', boss: true, near: 'armada',  hue: '#cc4a2a' },
+        ];
+        const LINKS = [[0, 1], [1, 2], [1, 5], [2, 4], [2, 3], [3, 7], [5, 6], [6, 8], [3, 6], [7, 9], [8, 9], [4, 7]];
+        const COLORS = ['#FF00CC', '#00C080', '#FF7755', '#8899EE'];
+        const NAMES = ['VIPER', 'KZ-4', 'ORCA', 'LUMEN', 'DUSK', 'RAVEN', 'ASH-2', 'BOLT', 'MANTA', 'ECHO', 'SABLE', 'PIKE', 'NYX', 'ODIN', 'ZETA', 'GRIM'];
+        const squads = NAMES.map((n, i) => ({ n, c: COLORS[i % COLORS.length], p: [0, 2, 2, 3, 5, 7, 7, 9, 2, 4, 6, 8, 0, 3, 7, 1][i] }));
+        const me = { n: 'NOVA-7', p: 0 };
+
+        // ---------- view state ----------
+        let view = 'map';          // map → jump → sector → (map…)
+        let sel = null, t = 0, jump = null, locals = [], nextEvent = 3;
+        const stars = Array.from({ length: 170 }, () => ({ x: Math.random() * W, y: Math.random() * H, b: Math.random(), z: 0.3 + Math.random() }));
+
+        const setStatus = html => { $('st').innerHTML = html; };
+        function select(i) {
+            sel = i; const p = P[i];
+            $('pn').childNodes[0].nodeValue = p.n; $('ps').textContent = SECTORS[p.s].n;
+            $('pm').textContent = 'mission: ' + p.m;
+            refreshPanel();
+        }
+        function refreshPanel() {
+            const i = view === 'map' ? sel : (jump ? jump.to : me.p);
+            if (i === null || i < 0) return;
+            const p = P[i];
+            $('pl').textContent = p.lib >= 100 ? 'LIBERATED' : p.lib.toFixed(1) + '%';
+            $('pb').style.width = p.lib + '%';
+            const n = squads.filter(s => s.p === i).length + (me.p === i ? 1 : 0);
+            $('pq').textContent = n + (n === 1 ? ' squad' : ' squads') + ' here';
+            $('pp').textContent = p.boss ? '⚠ boss' : '';
+            const b = $('act');
+            if (view === 'map') { b.textContent = 'DEPLOY'; b.className = ''; b.disabled = sel === null || sel === me.p; }
+            else if (view === 'sector') { b.textContent = 'GALACTIC MAP'; b.className = 'map'; b.disabled = false; }
+            else { b.textContent = 'IN FTL…'; b.className = ''; b.disabled = true; }
+        }
+        function showMap() {
+            view = 'map'; cv.classList.add('pick');
+            select(sel !== null ? sel : me.p);
+            setStatus('Squad <b>NOVA-7</b> · in orbit of ' + P[me.p].n + ' · pick a planet, then DEPLOY · click ' + P[me.p].n + ' to go back');
+        }
+        // other squads anywhere in the sector, at a random depth z (0.35 far … 1 near): size, loudness and shake follow it
+        const MAX_LOCALS = 7;
+        let lastLeft = null;
+        function spot() {
+            for (let tries = 0; tries < 60; tries++) {
+                const x = 230 + Math.random() * 370, y = 40 + Math.random() * 300;
+                if (Math.hypot(x - 150, y - 200) < 110) continue;                                  // not on top of us
+                if (locals.some(l => Math.hypot(l.x - x, l.y - y) < 80)) continue;                 // not on top of each other
+                if (lastLeft && Math.hypot(lastLeft.x - x, lastLeft.y - y) < 140) continue;       // not where someone just left
+                return { x, y };
+            }
+            return { x: 230 + Math.random() * 370, y: 40 + Math.random() * 300 };
+        }
+        const park = s => { const { x, y } = spot(), z = 0.35 + Math.random() * 0.65; return { s, x, y, z, sc: 0.45 + 0.6 * z, st: 'idle', t: 0, ph: Math.random() * 6 }; };
+        const fillSector = i => { locals = []; squads.filter(s => s.p === i).slice(0, MAX_LOCALS).forEach(s => locals.push(park(s))); };
+
+        function deploy() {
+            if (sel === null || sel === me.p) return;
+            jump = { from: me.p, to: sel, t: 0 };
+            view = 'jump'; cv.classList.remove('pick');
+            if (!locals.length) fillSector(me.p);
+            refreshPanel();
+            play('warp_out', 0.4);                                                                  // its own 1.1 s build-up is the charge
+            // pick a reveal, never the same twice in a row
+            let r;
+            if (P[sel].home) r = REVEALS.findIndex(v => v.n === 'music_reveal_e');                  // coming home to Earth: always e
+            else do { r = (Math.random() * REVEALS.length) | 0; } while (r === lastReveal && REVEALS.length > 1);
+            lastReveal = r; reveal = REVEALS[r];
+            stopMusic(0.8);
+            if (reveal.hit >= J.arrive) playMusic(reveal.n, 0.6);                                     // long lead-in: starts now
+            setStatus('Squad <b>NOVA-7</b> · <span style="color:#FFB000">FTL jump → ' + P[sel].n + '</span>');
+        }
+        $('act').addEventListener('click', () => { if (view === 'map') deploy(); else if (view === 'sector') showMap(); });
+        cv.addEventListener('click', e => {
+            if (view !== 'map') return;
+            const r = cv.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+            let best = -1, bd = 26;
+            P.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = i; } });
+            if (best < 0) return;
+            if (best === me.p) backToOrbit(); else select(best);
+        });
+        // back to the sector you are in, no jump
+        function backToOrbit() {
+            if (!locals.length) fillSector(me.p);
+            view = 'sector'; cv.classList.remove('pick'); select(me.p);
+            setStatus('Squad <b>NOVA-7</b> · back in orbit of ' + P[me.p].n);
+        }
+
+        // ---------- the sounds drive the animation ----------
+        // loudness every 20 ms, measured from the files (RMS, normalised). Spectrum cues:
+        // warp_out: tension builds 0–1.05 s (pitch rising) · high-freq CRACK at 1.10 s = release · boom 1.15–1.45 · rumble thumps 1.65 / 1.9 / 2.15
+        // warp_in:  whoosh 0.20 s · CRACK at 0.30 s = arrival · boom 0.35 · wobble pulses every ~0.2 s until ~1.4 s
+        const ENV_OUT = [0.02,0.02,0.02,0.02,0.04,0.05,0.08,0.10,0.11,0.12,0.12,0.12,0.13,0.14,0.15,0.16,0.15,0.16,0.20,0.20,0.16,0.15,0.15,0.12,0.11,0.13,0.15,0.14,0.15,0.18,0.19,0.16,0.15,0.19,0.20,0.21,0.23,0.20,0.19,0.20,0.20,0.20,0.19,0.18,0.22,0.25,0.24,0.24,0.31,0.43,0.53,0.64,0.71,0.67,0.63,0.72,0.93,1.00,0.93,0.94,0.95,0.89,0.83,0.76,0.76,0.89,0.97,0.82,0.70,0.66,0.64,0.65,0.50,0.39,0.46,0.50,0.46,0.40,0.29,0.28,0.43,0.57,0.63,0.66,0.66,0.60,0.54,0.49,0.36,0.23,0.21,0.28,0.42,0.52,0.54,0.54,0.57,0.56,0.45,0.34,0.28,0.23,0.20,0.24,0.30,0.31,0.33,0.38,0.40,0.35,0.28,0.19,0.14,0.12,0.10,0.09,0.09,0.09,0.09,0.07];
+        const ENV_IN = [0.01,0.03,0.05,0.06,0.07,0.08,0.11,0.13,0.16,0.16,0.23,0.50,0.75,0.75,0.64,0.60,0.74,0.93,1.00,0.97,0.94,0.90,0.84,0.78,0.76,0.82,0.80,0.72,0.60,0.42,0.36,0.38,0.31,0.25,0.39,0.61,0.71,0.69,0.69,0.65,0.50,0.34,0.23,0.25,0.39,0.55,0.66,0.66,0.64,0.58,0.46,0.36,0.28,0.28,0.40,0.48,0.47,0.46,0.42,0.34,0.24,0.18,0.19,0.21,0.19,0.16,0.13,0.11,0.11,0.12,0.08,0.05,0.04,0.04,0.03];
+        const env = (E, s) => { const i = s / 0.02; if (i < 0 || i >= E.length - 1) return 0; const k = i | 0; return E[k] + (E[k + 1] - E[k]) * (i - k); };
+        const OUT_SNAP = 1.10, OUT_LEN = 2.4, IN_SNAP = 0.30, IN_LEN = 1.5;
+        const shakeOut = s => s < OUT_SNAP ? 0.15 * env(ENV_OUT, s) : env(ENV_OUT, s);
+        const shakeIn = s => s < IN_SNAP ? 0.2 * env(ENV_IN, s) : env(ENV_IN, s);
+
+        // ---------- jump timeline (s) ----------
+        // warp_out starts on DEPLOY (cinema bars slide in) · release at 1.10 · fade to black 0.5 s
+        // 1 s of black = the travel (title card of the destination; the room loads meanwhile) · fade in on sector B 0.5 s
+        // warp_in starts 0.30 s before the fade-in ends, so its crack lands exactly then · bars slide out at the end
+        const J = { depart: 0, gone: OUT_SNAP + 0.35 };
+        J.black = J.gone + 0.5; J.fadeIn = J.black + 1.0; J.arrive = J.fadeIn + 0.5;
+        J.inStart = J.arrive - IN_SNAP; J.done = J.inStart + IN_LEN + 0.4;
+
+        function update(dt) {
+            t += dt;
+            P.forEach((p, i) => {
+                if (p.home) return;
+                const n = squads.filter(s => s.p === i).length + (me.p === i && view === 'sector' ? 1 : 0);
+                p.lib = Math.max(0, Math.min(100, p.lib + (n ? n * 0.25 : -0.1) * dt));
+            });
+
+            if (view === 'jump') {
+                const j = jump, before = j.t; j.t += dt;
+                const cross = k => before < k && j.t >= k;
+                if (cross(J.black)) { me.p = -1; fillSector(j.to); setStatus('Squad <b>NOVA-7</b> · <span style="color:#FFB000">in FTL → ' + P[j.to].n + '</span> · <span style="color:#6B82D6">lobby spawns room r4, handoff…</span>'); }
+                if (reveal && reveal.hit < J.arrive && cross(J.arrive - reveal.hit)) playMusic(reveal.n, 0.6);   // its hit lands on the arrival
+                if (cross(J.inStart)) play('warp_in', 0.4);
+                if (cross(J.arrive)) me.p = j.to;
+                if (cross(J.done)) {
+                    view = 'sector'; jump = null; select(me.p);
+                    setStatus('Squad <b>NOVA-7</b> · in orbit of ' + P[me.p].n + ' · ' + locals.length + ' other squads here · mission ready');
+                }
+            }
+
+            if (view === 'sector') {
+                locals.forEach(l => {
+                    l.t += dt * (l.rate || 1);                                   // l.t = time in the sound, which plays at l.rate
+                    if (l.st === 'out' && l.t > OUT_LEN) l.dead = true; if (l.st === 'in' && l.t > IN_LEN) l.st = 'idle';
+                });
+                locals = locals.filter(l => !l.dead);
+                nextEvent -= dt;
+                if (nextEvent <= 0) {
+                    nextEvent = 5.5 + Math.random() * 4;
+                    const idle = locals.filter(l => l.st === 'idle');
+                    const room = locals.length < MAX_LOCALS;
+                    if (idle.length > 2 && (Math.random() < 0.5 || !room)) {
+                        const l = idle[(Math.random() * idle.length) | 0];
+                        const dests = [2, 3, 5, 7, 8, 9].filter(i => i !== me.p), dest = dests[(Math.random() * dests.length) | 0];
+                        const f = FAR[(Math.random() * FAR.length) | 0];
+                        l.st = 'out'; l.t = 0; l.rate = f.rate; l.s.p = dest; lastLeft = { x: l.x, y: l.y };
+                        play('warp_out_far_' + f.v, 0.25 + 0.75 * l.z, true);
+                        setStatus('Squad <b>NOVA-7</b> · <span style="color:#FF7755">' + l.s.n + ' left the sector → ' + P[dest].n + '</span>');
+                    } else if (room) {
+                        const away = squads.filter(s => s.p !== me.p), s = away[(Math.random() * away.length) | 0];
+                        s.p = me.p;
+                        const f = FAR[(Math.random() * FAR.length) | 0];
+                        const l = park(s); l.st = 'in'; l.t = 0; l.rate = f.rate; locals.push(l);
+                        play('warp_in_far_' + f.v, 0.25 + 0.75 * l.z, true);
+                        setStatus('Squad <b>NOVA-7</b> · <span style="color:#00C080">' + s.n + ' joined the sector</span>');
+                    }
+                }
+            }
+            if ((t % 0.5) < dt) refreshPanel();
+
+            // camera shake = loudness of the warps playing right now
+            let sh = 0;
+            if (view === 'jump' && jump) {
+                const T = jump.t;
+                if (T >= J.depart && T < J.depart + OUT_LEN) sh = Math.max(sh, shakeOut(T - J.depart));
+                if (T >= J.inStart && T < J.done) sh = Math.max(sh, shakeIn(T - J.inStart));
+            }
+            locals.forEach(l => { if (l.st === 'out') sh = Math.max(sh, 0.55 * l.z * shakeOut(l.t)); if (l.st === 'in') sh = Math.max(sh, 0.55 * l.z * shakeIn(l.t)); });
+            shake = sh;
+        }
+
+        // ---------- drawing ----------
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SPR = { '#00FFFF': img('player_cyan.png'), '#FF00CC': img('player_magenta.png'), '#00C080': img('player_green.png'), '#FF7755': img('player_red.png'), '#8899EE': img('player_blue.png') };
+        ctx.imageSmoothingEnabled = false;
+
+        // camera jolt (HD2: the whole view kicks when a ship leaves or arrives), set from the sound envelopes
+        let shake = 0;
+
+        // an R-Type ship, nose to the right
+        let ALPHA = 1;                  // scene opacity, for the fade between sectors
+        function ship(x, y, sc, col, glow = 0, stretch = 1, alpha = 1) {
+            if (PASS !== 'ship') return;
+            alpha *= ALPHA;
+            const im = SPR[col], w = 50 * sc, h = 26 * sc;
+            if (!im || !im.complete) return;
+            ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.scale(stretch, 1);
+            ctx.drawImage(im, -w / 2, -h / 2, w, h);
+            ctx.restore();
+        }
+        function tag(x, y, text, col) { if (PASS === 'fx') return; ctx.globalAlpha = ALPHA; ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillStyle = col; ctx.fillText(text, x - ctx.measureText(text).width / 2, y); ctx.globalAlpha = 1; }
+
+        // Alcubierre drive: no light at all. Space itself bends: compressed in front of the ship, stretched behind it.
+        // Each pixel near the ship samples the scenery from a displaced position.
+        let SHX = 0, SHY = 0;                                   // current camera-shake offset (putImageData ignores transforms)
+        function distort(cx, cy, R, bubble, ringR = 0, ringA = 0) {
+            if (PASS !== 'fx') return;
+            cx = Math.round(cx); cy = Math.round(cy);
+            const ext = Math.max(R, ringR + 30);
+            const x0 = Math.max(0, cx - 2 * ext | 0), y0 = Math.max(0, cy - ext | 0), x1 = Math.min(W, cx + 2 * ext | 0), y1 = Math.min(H, cy + ext | 0);
+            const w = x1 - x0, h = y1 - y0; if (w <= 2 || h <= 2) return;
+            const S = bctx.getImageData(x0, y0, w, h).data, out = ctx.createImageData(w, h), D = out.data;
+            const shell = R * 0.55, sw = 2 * (R * 0.22) ** 2;
+            for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+                const dx = x0 + x - cx, dy = y0 + y - cy;
+                let sx = dx, sy = dy;
+                if (bubble) {
+                    const r = Math.hypot(dx / 2, dy), g = Math.exp(-((r - shell) ** 2) / sw);
+                    sx = dx * (1 + bubble * g * Math.sign(dx) * Math.min(1, Math.abs(dx) / (R * 0.3)));   // front: sample farther = squeezed · back: sample closer = stretched
+                    sy = dy * (1 - 0.35 * bubble * g);
+                }
+                if (ringA) {
+                    const rr = Math.hypot(dx, dy * 1.6) || 1, g = Math.exp(-((rr - ringR) ** 2) / 200);
+                    sx += dx / rr * ringA * g; sy += dy / rr * ringA * g;                                 // a ripple of bent space, no light
+                }
+                let px = Math.round(cx + sx - x0), py = Math.round(cy + sy - y0);
+                px = px < 0 ? 0 : px >= w ? w - 1 : px; py = py < 0 ? 0 : py >= h ? h - 1 : py;
+                const i = (y * w + x) * 4, j = (py * w + px) * 4;
+                D[i] = S[j]; D[i + 1] = S[j + 1]; D[i + 2] = S[j + 2]; D[i + 3] = 255;
+            }
+            ctx.putImageData(out, x0 + SHX, y0 + SHY);
+        }
+
+        // HD2-style jump, like a rubber band, timed on the sounds (s = seconds since the sound started).
+        // OUT: pulled back while the tension builds · the last fraction of a second, space bends around it · CRACK: released, gone · a ripple of space
+        // IN:  space bends where it will appear · CRACK: it is there, overshoots · springs back, one bump per wobble pulse
+        const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+        function warpShip(x, y, sc, col, st, s) {
+            const R = 60 * sc;
+            if (st === 'out') {
+                if (s < OUT_SNAP) {
+                    const k = s / OUT_SNAP, e = k * k, px = x - 30 * sc * e;
+                    const q = clamp01((s - (OUT_SNAP - 0.35)) / 0.35);
+                    if (q > 0) distort(px, y, R, 0.55 * q * q);
+                    ship(px, y, sc, col, 0, 1 - 0.18 * e);
+                    return;
+                }
+                const d = s - OUT_SNAP, x0 = x - 30 * sc;
+                if (d < 0.07) { const f = d / 0.07, px = x0 + f * f * 700 * sc; distort(px, y, R, 0.55 * (1 - f)); ship(px, y, sc, col, 0, 1 + 5 * f, 1 - f); }
+                if (d < 0.7) distort(x0, y, 0, 0, d * 320 * sc, 7 * sc * env(ENV_OUT, s) * (1 - d / 0.7));
+            } else {
+                if (s < IN_SNAP) { const q = s / IN_SNAP; distort(x, y, R, 0.55 * q * q); return; }
+                const d = s - IN_SNAP;
+                const kick = Math.exp(-d * 2.6) * Math.cos(2 * Math.PI * d / 0.4) * 26 * sc;    // a bump every ~0.2 s, like the wobble in the sound
+                if (d < 0.25) distort(x + kick, y, R, 0.55 * (1 - d / 0.25));
+                if (d < 0.7) distort(x, y, 0, 0, d * 300 * sc, 7 * sc * env(ENV_IN, s) * (1 - d / 0.7));
+                ship(x + kick, y, sc, col, 0, 1 + 0.5 * Math.max(0, 1 - d / 0.08));
+            }
+        }
+
+        function drawMap() {
+            ctx.fillStyle = '#03030a'; ctx.fillRect(0, 0, W, H);
+            stars.forEach(s => { ctx.fillStyle = `rgba(200,210,255,${0.12 + 0.45 * s.b * (0.6 + 0.4 * Math.sin(t * 2 + s.x))})`; ctx.fillRect(s.x, s.y, 1.2, 1.2); });
+            SECTORS.forEach(s => {
+                const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r); g.addColorStop(0, s.c + '30'); g.addColorStop(1, s.c + '00');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
+                ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = s.c + 'cc';
+                ctx.fillText(s.n, s.x - ctx.measureText(s.n).width / 2, Math.max(16, s.y - s.r + 14));
+            });
+            ctx.strokeStyle = '#1a1a33'; ctx.lineWidth = 1;
+            LINKS.forEach(([a, b]) => { ctx.beginPath(); ctx.moveTo(P[a].x, P[a].y); ctx.lineTo(P[b].x, P[b].y); ctx.stroke(); });
+            P.forEach((p, i) => {
+                const r = p.home ? 11 : 8;
+                ctx.fillStyle = p.home ? '#1A1ACC' : '#15152a'; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#FF440088'; ctx.beginPath(); ctx.arc(p.x, p.y, r + 3, 0, 7); ctx.stroke();
+                ctx.strokeStyle = '#00FFAA'; ctx.beginPath(); ctx.arc(p.x, p.y, r + 3, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * p.lib / 100); ctx.stroke();
+                ctx.lineWidth = 1;
+                if (sel === i) { ctx.strokeStyle = '#FFB000'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.arc(p.x, p.y, r + 10, t, t + 6.28); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1; }
+                ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = p.lib >= 100 ? '#00FFAA' : p.boss ? '#FF4400' : '#8899EE';
+                ctx.fillText(p.n, p.x - ctx.measureText(p.n).width / 2, p.y + r + 16);
+                const n = squads.filter(s => s.p === i).length;
+                if (n) { ctx.fillStyle = '#9a9aae'; ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillText('▲' + n, p.x + r + 5, p.y - r); }
+                if (me.p === i) { ctx.fillStyle = '#00FFFF'; ctx.beginPath(); ctx.moveTo(p.x - 4, p.y - r - 12); ctx.lineTo(p.x + 4, p.y - r - 12); ctx.lineTo(p.x, p.y - r - 5); ctx.fill(); tag(p.x, p.y - r - 15, 'YOU', '#00FFFF'); }
+            });
+            ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = '#6B82D6';
+            ctx.fillText('GALACTIC MAP · ' + (squads.length + 1) + ' squads online · ▲ = squads in orbit', 10, H - 10);
+        }
+
+        function drawSpace(pi) {
+            const p = P[pi], scroll = t * 6;
+            ctx.fillStyle = '#03030a'; ctx.fillRect(0, 0, W, H);
+            stars.forEach(s => { const x = ((s.x - scroll * s.z) % W + W) % W; ctx.fillStyle = `rgba(200,210,255,${0.15 + 0.5 * s.b})`; ctx.fillRect(x, s.y, 1.3 * s.z, 1.3 * s.z); });
+            const g = ctx.createRadialGradient(500, 470, 40, 520, 520, 260);
+            g.addColorStop(0, p.hue); g.addColorStop(0.75, p.hue + '99'); g.addColorStop(1, p.hue + '00');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(520, 520, 240, 0, 7); ctx.fill();
+            ctx.strokeStyle = p.hue + 'aa'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(520, 520, 232, Math.PI * 1.05, Math.PI * 1.75); ctx.stroke(); ctx.lineWidth = 1;
+            if (p.near === 'station') {
+                ctx.save(); ctx.translate(560, 60); ctx.rotate(t * 0.05);
+                ctx.strokeStyle = '#4a5270'; ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(0, 0, 40, 12, 0, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
+                ctx.fillStyle = '#2c3248'; ctx.fillRect(-5, -26, 10, 52); ctx.fillRect(-22, -4, 44, 8);
+                ctx.fillStyle = (t * 2 | 0) % 2 ? '#FF4400' : '#552200'; ctx.fillRect(-2, -30, 4, 4);
+                ctx.restore(); tag(560, 104, 'ORBITAL STATION', '#55608a');
+            } else tag(530, 82, 'ALLIED ARMADA', '#55608a');
+            ctx.font = 'bold 12px "JetBrains Mono", monospace'; ctx.fillStyle = '#cdd6f4';
+            ctx.fillText(p.n.toUpperCase() + ' · ' + SECTORS[p.s].n, 12, H - 14);
+        }
+        function drawArmada(pi) { if (P[pi].near === 'armada') for (let k = 0; k < 5; k++) ship(470 + k * 30, 36 + (k % 2) * 18, 0.45, '#8899EE', 0, 1, 0.45); }
+        function drawLocals(list = locals) {
+            list.slice().sort((a, b) => a.z - b.z).forEach(l => {                                  // far ones first
+                const y = l.y + Math.sin(t * 0.9 + l.ph) * 3, ty = y - 22 * l.sc;
+                const a0 = ALPHA; ALPHA *= 0.55 + 0.45 * l.z;                                      // far = dimmer
+                if (l.st === 'idle') { ship(l.x, y, l.sc, l.s.c); tag(l.x, ty, l.s.n, l.s.c); }
+                else if (l.st === 'out') { warpShip(l.x, y, l.sc, l.s.c, 'out', l.t); if (l.t < OUT_SNAP) tag(l.x, ty, l.s.n + ' leaving', '#FF7755'); }
+                else { warpShip(l.x, y, l.sc, l.s.c, 'in', l.t); if (l.t > IN_SNAP + 0.2) tag(l.x, ty, l.s.n + ' arrived', '#00C080'); }
+                ALPHA = a0;
+            });
+        }
+        function me_(y, glow = 0) { ship(150, y, 1.3, '#00FFFF', glow); tag(150, y - 26, 'NOVA-7 (you)', '#00FFFF'); }
+        function banner(text, col) { if (PASS !== 'ship') return; ctx.font = 'bold 13px "JetBrains Mono", monospace'; ctx.fillStyle = col; ctx.fillText(text, 12, 24); }
+
+        // one frame of a space view: scenery → bent space → ships and text
+        function scene(bgFn, fgFn) {
+            const c = ctx; ctx = bctx; PASS = 'bg'; bgFn(); ctx = c;
+            ctx.fillStyle = '#03030a'; ctx.fillRect(0, 0, W, H);
+            ctx.drawImage(bgc, SHX, SHY);
+            PASS = 'fx'; fgFn();
+            PASS = 'ship'; ctx.save(); ctx.translate(SHX, SHY); fgFn(); ctx.restore();
+        }
+
+        function drawSector() {
+            scene(() => drawSpace(me.p), () => { drawArmada(me.p); drawLocals(); me_(200 + Math.sin(t * 0.8) * 3); });
+        }
+
+        const smooth = k => { k = clamp01(k); return k * k * (3 - 2 * k); };
+        function drawJump() {
+            const j = jump, T = j.t;
+            if (T < J.black) {
+                scene(() => drawSpace(j.from), () => { drawArmada(j.from); drawLocals(); warpShip(150, 200, 1.3, '#00FFFF', 'out', T); });
+                if (T > J.gone) { ctx.fillStyle = `rgba(0,0,0,${smooth((T - J.gone) / (J.black - J.gone))})`; ctx.fillRect(0, 0, W, H); }
+            } else if (T < J.fadeIn) {
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);                                  // the travel
+            } else {
+                scene(() => drawSpace(j.to), () => {
+                    drawArmada(j.to); drawLocals();
+                    const s_ = T - J.inStart;
+                    if (s_ >= 0 && s_ < IN_LEN) warpShip(150, 200, 1.3, '#00FFFF', 'in', s_); else if (s_ >= IN_LEN) me_(200);
+                });
+                if (T < J.arrive) { ctx.fillStyle = `rgba(0,0,0,${1 - smooth((T - J.fadeIn) / (J.arrive - J.fadeIn))})`; ctx.fillRect(0, 0, W, H); }
+            }
+            cinema(T, j);
+        }
+
+        // cinema bars + sector title card, drawn on top, not shaken
+        function cinema(T, j) {
+            const BAR = 44;
+            const inK = smooth(T / 0.5), outK = smooth((J.done - T) / 0.5), k = Math.min(inK, outK);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, W, BAR * k); ctx.fillRect(0, H - BAR * k, W, BAR * k);
+            // title card: fades in during the black, stays over the arrival, fades out with the bars
+            const ta = Math.min(smooth((T - J.black - 0.1) / 0.4), smooth((J.done - 0.3 - T) / 0.5));
+            if (ta > 0) {
+                const p = P[j.to];
+                ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center';
+                ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = SECTORS[p.s].c;
+                ctx.fillText(SECTORS[p.s].n.split('').join(' '), W / 2, H / 2 - 30);
+                ctx.font = 'bold 34px "Space Grotesk", sans-serif'; ctx.fillStyle = '#ffffff';
+                ctx.fillText(p.n.toUpperCase(), W / 2, H / 2 + 6);
+                ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#FFB000';
+                ctx.fillText('mission: ' + p.m, W / 2, H / 2 + 28);
+                if (T < J.arrive) { ctx.fillStyle = '#6B82D6'; ctx.fillText('lobby spawns room r4 · session token · handoff…', W / 2, H - 16); }
+                ctx.restore();
+            }
+        }
+
+        showMap();
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            if (view === 'map') { PASS = 'ship'; drawMap(); }
+            else {
+                const k = shake * shake * 16;
+                SHX = Math.round((Math.random() * 2 - 1) * k); SHY = Math.round((Math.random() * 2 - 1) * k);
+                if (view === 'jump') drawJump(); else drawSector();
+            }
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

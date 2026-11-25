@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 12b — A Better Entity</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-be { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .be-left {
+            position: relative; z-index: 1; width: 58%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        .panel { width: 100%; background: #0d0d0d; border-radius: 10px; padding: 2vh 1.4vw; font-family: "JetBrains Mono", monospace; color: #cdd6f4; display: flex; flex-direction: column; gap: 1.4vh; }
+        .code { font-size: 0.82vw; line-height: 1.55; }
+        .code div { white-space: pre; }
+        .kw { color: #FF7755; } .ty { color: #00FFAA; } .cm { color: #6a6a7a; } .s { color: #FFB000; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 0.35vw; align-items: center; }
+        .chips .lb { font-size: 0.68vw; color: #6B82D6; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.3vw; }
+        .chip { font-size: 0.74vw; font-weight: 700; padding: 0.45vh 0.6vw; border-radius: 1vw; border: 1px solid #3a3a6a; color: #9a9aae; cursor: pointer; user-select: none; }
+        .chip.on { background: #FFB000; border-color: #FFB000; color: #0d0d0d; }
+        .q { font-size: 0.8vw; color: #9a9aae; min-height: 2.2vh; }
+        .q b { color: #00FFAA; font-weight: 500; }
+        .q .n { color: #FFB000; }
+
+        .ents { display: flex; flex-direction: column; gap: 0.35vh; }
+        .e { display: grid; grid-template-columns: 2.2vw 5.2vw 8.5vw 1fr; gap: 0.6vw; align-items: center; padding: 0.4vh 0.5vw; border-radius: 5px; background: #15152a; border: 1px solid #22223a; font-size: 0.74vw; transition: opacity 0.2s, border-color 0.2s; }
+        .e img { height: 1.5vw; image-rendering: pixelated; justify-self: center; }
+        .e .uid { color: #6B82D6; }
+        .e .nm { color: #fff; font-weight: 700; white-space: nowrap; }
+        .e .nm i { font-style: normal; color: #6B82D6; font-weight: 500; }
+        .e .tg { display: flex; gap: 0.25vw; flex-wrap: wrap; }
+        .e .tg span { font-size: 0.64vw; color: #FFB000; border: 1px solid #FFB00055; border-radius: 1vw; padding: 0 0.4vw; }
+        .e.child .nm { padding-left: 1vw; }
+        .e.child .nm::before { content: "└ "; color: #6B82D6; }
+        .e.hit { border-color: #FFB000; }
+        .e.miss { opacity: 0.25; }
+
+        .be-right {
+            position: relative; z-index: 1; width: 42%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.6vh;
+            padding: 5vh 4.2vw 5vh 1vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.8vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        .points { display: flex; flex-direction: column; gap: 1vh; }
+        .pt { font-size: 1.05vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+        .box { font-size: 1vw; color: #333; line-height: 1.4; padding: 1vh 1vw; border-left: 4px solid #00C080; background: #00FFAA14; }
+        .box b { color: #00885F; }
+
+        .slide-be .deco-block-1, .slide-be .deco-block-2 { background: #D0D8F0; }
+        .slide-be .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-be">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="be-left">
+            <div class="panel">
+                <div class="code">
+                    <div><span class="kw">struct</span> <span class="ty">Entity</span> {          <span class="cm">// the handle systems pass around</span></div>
+                    <div>    uint32_t index;        <span class="cm">// slot in the storage: fast</span></div>
+                    <div>    uint32_t generation;   <span class="cm">// detects a dead, reused slot</span></div>
+                    <div>};</div>
+                    <div><span class="kw">struct</span> <span class="ty">EntityInfo</span> {      <span class="cm">// what the registry keeps next to it</span></div>
+                    <div>    <span class="ty">UUID</span>        uuid;     <span class="cm">// stable: files, saves, network</span></div>
+                    <div>    std::string name;     <span class="cm">// "Player 1", "Dobkeratops"</span></div>
+                    <div>    <span class="ty">Tags</span>        tags;     <span class="cm">// {"enemy", "flying"}</span></div>
+                    <div>    <span class="ty">Entity</span>      parent;   <span class="cm">// the Force belongs to its ship</span></div>
+                    <div>};</div>
+                </div>
+
+                <div class="chips" id="chips"><span class="lb">filter by tag</span></div>
+                <div class="q" id="q"></div>
+                <div class="ents" id="ents"></div>
+            </div>
+        </div>
+
+        <div class="be-right">
+            <div class="eyebrow">Epitech Afrique — Track #1 · ECS</div>
+            <div class="title">A Better Entity<span class="cursor"></span></div>
+            <div class="subtitle">Still <b>an id</b> for the systems. <b>A card</b> for everything else.</div>
+
+            <div class="points">
+                <div class="pt"><b>uuid</b>: the same on every run and every machine. The index is for memory, the uuid is for files and the network.</div>
+                <div class="pt"><b>name</b>: for you. Logs, the debugger, the editor's hierarchy.</div>
+                <div class="pt"><b>tags</b>: cheap labels. "All enemies", "everything flying": a system, a script or a mod asks by tag.</div>
+                <div class="pt"><b>parent</b>: a tree. The child follows its parent; destroy the parent, the children go too.</div>
+            </div>
+
+            <div class="box"><b>Click the tags:</b> this is how a system finds its entities without knowing them.</div>
+        </div>
+    </section>
+
+    <script>
+        const E = [
+            { id: '3f2a', n: 'Player 1',    t: ['player'],                     i: 'player_cyan.png' },
+            { id: '9c01', n: 'Force',       t: ['player', 'weapon'],           i: 'force.png', child: true },
+            { id: 'b7e4', n: 'Bug',         x: '#7', t: ['enemy', 'flying'],   i: 'bug.png' },
+            { id: '52d9', n: 'Bug',         x: '#8', t: ['enemy', 'flying'],   i: 'bug.png' },
+            { id: 'a13c', n: 'Crab',        x: '#2', t: ['enemy', 'ground'],   i: 'crab.png' },
+            { id: '71fe', n: 'Dobkeratops', t: ['enemy', 'boss'],              i: 'dobkeratops.png' },
+            { id: 'e0b5', n: 'Core',        t: ['enemy', 'weak_point'],        i: 'orb.png', child: true },
+            { id: '0d6a', n: 'Bydo',        x: '#3', t: ['enemy', 'flying', 'shooter'], i: 'bydos.png' },
+        ];
+        const TAGS = ['player', 'enemy', 'flying', 'ground', 'boss', 'weapon', 'shooter'];
+        const on = new Set(['enemy', 'flying']);
+        const $ = id => document.getElementById(id);
+        TAGS.forEach(tag => {
+            const c = document.createElement('span'); c.className = 'chip'; c.textContent = tag;
+            c.addEventListener('click', () => { on.has(tag) ? on.delete(tag) : on.add(tag); render(); });
+            $('chips').appendChild(c);
+        });
+        function render() {
+            [...document.querySelectorAll('.chip')].forEach(c => c.classList.toggle('on', on.has(c.textContent)));
+            $('ents').innerHTML = '';
+            let n = 0;
+            E.forEach(e => {
+                const hit = on.size > 0 && [...on].every(t => e.t.includes(t)); if (hit) n++;
+                const d = document.createElement('div');
+                d.className = 'e' + (e.child ? ' child' : '') + (on.size ? (hit ? ' hit' : ' miss') : '');
+                d.innerHTML = `<img src="assets/${e.i}"><span class="uid">${e.id}…</span><span class="nm">${e.n}${e.x ? ' <i>' + e.x + '</i>' : ''}</span><span class="tg">${e.t.map(x => '<span>' + x + '</span>').join('')}</span>`;
+                $('ents').appendChild(d);
+            });
+            $('q').innerHTML = on.size
+                ? `registry.<b>with_tags</b>({${[...on].map(t => '<span style="color:#FFB000">"' + t + '"</span>').join(', ')}}) → <span class="n">${n} entit${n === 1 ? 'y' : 'ies'}</span>`
+                : 'no filter: every entity';
+        }
+        render();
+    </script>
+</body>
+</html>

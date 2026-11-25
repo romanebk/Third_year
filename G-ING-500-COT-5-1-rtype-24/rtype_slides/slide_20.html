@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 20 — Scene Loader</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-sl { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .sl-left {
+            position: relative; z-index: 1;
+            width: 57%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+
+        .panel {
+            width: 100%;
+            background: #0d0d0d;
+            border-radius: 10px;
+            padding: 2.2vh 1.5vw;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 1.4vw;
+        }
+
+        .steps { display: flex; flex-direction: column; gap: 0.8vh; }
+        .step {
+            border: 1.5px solid #2a2a4a;
+            border-radius: 6px;
+            padding: 0.9vh 0.8vw;
+            display: flex; flex-direction: column; gap: 0.3vh;
+            transition: border-color 0.3s, background 0.3s, opacity 0.3s;
+            opacity: 0.45;
+        }
+        .step .sn { font-size: 1.05vw; font-weight: 700; color: #fff; display: flex; gap: 0.6vw; }
+        .step .sn i { font-style: normal; color: #6B82D6; }
+        .step .sd { font-size: 0.86vw; color: #9a9aae; line-height: 1.35; }
+        .step.on { opacity: 1; border-color: #FF4400; background: #FF440014; }
+        .step.done { opacity: 1; border-color: #00C080; }
+        .step.done .sn i { color: #00FFAA; }
+
+        .side { display: flex; flex-direction: column; gap: 1.4vh; }
+        .box-label { font-size: 0.72vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; }
+
+        .map { display: flex; flex-direction: column; gap: 0.4vh; min-height: 13vh; }
+        .map div { font-size: 0.85vw; display: flex; justify-content: space-between; padding: 0.4vh 0.5vw; border-radius: 4px; background: #15152a; }
+        .map .u { color: #FF7755; }
+        .map .i { color: #00FFAA; font-weight: 700; }
+        .map .lk { color: #888; font-size: 0.72vw; }
+
+        .bar { height: 1.2vh; border-radius: 1vh; background: #2a2a4a; overflow: hidden; }
+        .bar > div { height: 100%; width: 0; background: #00FFAA; transition: width 0.3s; }
+        .bar-note { font-size: 0.8vw; color: #9a9aae; }
+
+        .status { font-size: 0.9vw; min-height: 2.6vh; color: #00FFAA; }
+
+        .sl-right {
+            position: relative; z-index: 1;
+            width: 43%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.2vw;
+            gap: 2.2vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.7vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 1.3vh; }
+        .pt { font-size: 1.2vw; color: #333; line-height: 1.3; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 1vw; color: #1A1ACC; }
+
+        .net {
+            font-size: 1.15vw; color: #333; line-height: 1.35;
+            border-left: 4px solid #00C080; background: #00FFAA14; padding: 1vh 1vw;
+        }
+        .net b { color: #00885F; }
+
+        .slide-sl .deco-block-1, .slide-sl .deco-block-2 { background: #D0D8F0; }
+        .slide-sl .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-sl">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="sl-left">
+            <div class="panel">
+                <div class="steps">
+                    <div class="step" data-s="0"><span class="sn"><i>1</i>parse</span><span class="sd">level1.yaml → tree of nodes. Syntax error? report file:line.</span></div>
+                    <div class="step" data-s="1"><span class="sn"><i>2</i>resolve prefabs</span><span class="sd">prefab defaults + the scene's overrides, children expanded</span></div>
+                    <div class="step" data-s="2"><span class="sn"><i>3</i>create entities</span><span class="sd">registry spawns each one, uuid → index recorded</span></div>
+                    <div class="step" data-s="3"><span class="sn"><i>4</i>link parents</span><span class="sd">2nd pass: a parent may be declared after its child</span></div>
+                    <div class="step" data-s="4"><span class="sn"><i>5</i>request assets</span><span class="sd">textures, sounds → assets manager (cached, async)</span></div>
+                    <div class="step" data-s="5"><span class="sn"><i>6</i>ready</span><span class="sd">scenes manager swaps: loading screen → Level 1</span></div>
+                </div>
+
+                <div class="side">
+                    <span class="box-label">uuid → index</span>
+                    <div class="map" id="map"></div>
+                    <span class="box-label">assets</span>
+                    <div class="bar"><div id="bar"></div></div>
+                    <span class="bar-note" id="bar-note">0 / 6</span>
+                    <div class="status" id="status"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sl-right">
+            <div class="eyebrow">Epitech Afrique — Track #1</div>
+            <div class="title">Scene Loader<span class="cursor"></span></div>
+            <div class="subtitle">From a <b>.yaml</b> file to a <b>live registry</b>.</div>
+
+            <div class="points">
+                <div class="pt"><b>Two passes</b>: create everything, then link parents. Order in the file doesn't matter.</div>
+                <div class="pt">Bad file = <b>clear error</b>, never a crash: <code>level1.yaml:14 unknown prefab "bydoss"</code>.</div>
+                <div class="pt"><b>Unload</b> = destroy the scene's entities, release its assets.</div>
+            </div>
+
+            <div class="net">Online, <b>only the room loads the file</b>. It then streams the spawns to its clients — that's their loading screen.</div>
+        </div>
+    </section>
+
+    <script>
+        const steps = [...document.querySelectorAll('.step')];
+        const map = document.getElementById('map');
+        const bar = document.getElementById('bar');
+        const barNote = document.getElementById('bar-note');
+        const status = document.getElementById('status');
+        const ROWS = [['a1f3', '#0'], ['(force)', '#1'], ['9c2e', '#2'], ['e40a', '#3'], ['(turret)', '#4'], ['(turret)', '#5']];
+        const LINKS = ['root', 'a1f3', 'root', 'root', 'e40a', 'e40a'];
+
+        function at(i) {
+            steps.forEach((s, j) => {
+                s.classList.toggle('on', j === i);
+                s.classList.toggle('done', j < i);
+            });
+        }
+
+        async function run() {
+            map.innerHTML = '';
+            bar.style.width = '0';
+            barNote.textContent = '0 / 6';
+            status.textContent = '';
+
+            at(0); await sleep(1800);
+            at(1); await sleep(1800);
+
+            at(2);
+            const rows = [];
+            for (const [u, i] of ROWS) {
+                const d = document.createElement('div');
+                d.innerHTML = `<span class="u">${u}</span><span class="lk"></span><span class="i">${i}</span>`;
+                map.appendChild(d);
+                rows.push(d);
+                await sleep(380);
+            }
+            await sleep(600);
+
+            at(3);
+            for (let k = 0; k < rows.length; k++) {
+                rows[k].querySelector('.lk').textContent = '↑ ' + LINKS[k];
+                await sleep(330);
+            }
+            await sleep(600);
+
+            at(4);
+            for (let n = 1; n <= 6; n++) {
+                bar.style.width = (n / 6 * 100) + '%';
+                barNote.textContent = `${n} / 6  ${['player.png', 'force.png', 'bydos.png', 'boss.png', 'turret.png', 'stage1.ogg'][n - 1]}`;
+                await sleep(420);
+            }
+            await sleep(500);
+
+            at(5);
+            status.textContent = '✓ Level 1 live — 6 entities';
+            await sleep(3500);
+            steps.forEach(s => s.classList.remove('on', 'done'));
+            await sleep(600);
+        }
+
+        (async function loop() {
+            if (document.fonts) await document.fonts.ready;
+            for (;;) await run();
+        })();
+    </script>
+</body>
+</html>

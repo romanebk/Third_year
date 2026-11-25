@@ -1,0 +1,64 @@
+/* sequence diagram (seq.js) */
+.seq { font-family: "JetBrains Mono", monospace; color: #cdd6f4; display: flex; flex-direction: column; }
+
+.seq-head { display: grid; grid-template-columns: repeat(var(--lanes), 1fr); gap: 0.6vw; margin-bottom: 1vh; }
+.seq-lane {
+    text-align: center;
+    font-size: 0.95vw;
+    font-weight: 700;
+    padding: 0.8vh 0;
+    border-radius: 6px;
+    background: #15152a;
+    border: 1.5px solid #3a3a6a;
+    color: #fff;
+}
+.seq-lane small { display: block; font-size: 0.7vw; font-weight: 500; color: #8899EE; }
+
+.seq-body { position: relative; display: flex; flex-direction: column; gap: 0.2vh; }
+.seq-life { position: absolute; top: 0; bottom: 0; width: 2px; background: repeating-linear-gradient(#3a3a6a 0 6px, transparent 6px 11px); }
+
+.seq-row { position: relative; height: 4.6vh; opacity: 0; transform: translateY(0.6vh); transition: opacity 0.35s, transform 0.35s; }
+.seq-row.on { opacity: 1; transform: none; }
+
+.seq-arrow { position: absolute; top: 55%; height: 2px; background: var(--c); }
+.seq-arrow.udp { height: 2px; background: repeating-linear-gradient(90deg, var(--c) 0 7px, transparent 7px 11px); }
+.seq-arrow.proc { height: 3px; }
+.seq-arrow::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+}
+.seq-arrow.r::after { right: -1px; border-left: 9px solid var(--c); }
+.seq-arrow.l::after { left: -1px;  border-right: 9px solid var(--c); }
+
+.seq-label {
+    position: absolute;
+    bottom: 0.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.85vw;
+    color: var(--c);
+    font-weight: 700;
+    background: #0d0d0d;
+    padding: 0 0.4vw;
+}
+
+.seq-note {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    font-size: 0.85vw;
+    font-weight: 700;
+    padding: 0.3vh 0.6vw;
+    border-radius: 4px;
+    background: #0d0d0d;
+    border: 1.5px dashed currentColor;
+}
+
+.seq-legend { display: flex; gap: 1.2vw; margin-top: 1.2vh; font-size: 0.8vw; color: #9a9aae; }
+.seq-legend span::before { content: ""; display: inline-block; width: 1.6vw; height: 2px; margin-right: 0.4vw; vertical-align: middle; background: var(--c); }
+.seq-legend .udp::before { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px); }

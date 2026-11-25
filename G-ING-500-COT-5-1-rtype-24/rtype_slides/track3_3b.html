@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Arsenal</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-ars {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4.5vh 5vw 3vh 5vw; gap: 1.8vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 2vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9vw; position: relative; z-index: 1; }
+        .card {
+            background: #fff; border-radius: 8px; border-left: 4px solid var(--c);
+            padding: 1vh 0.8vw; display: grid; grid-template-columns: 42% 1fr; gap: 0.8vw; align-items: center;
+            box-shadow: 0 2px 8px rgba(26, 26, 204, 0.05);
+        }
+        canvas { width: 100%; aspect-ratio: 200 / 110; border-radius: 5px; background: #05050d; display: block; }
+        .txt { display: flex; flex-direction: column; gap: 0.4vh; }
+        .cn { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.25vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; gap: 0.4vw; }
+        .res { font-family: "JetBrains Mono", monospace; font-size: 0.62vw; font-weight: 700; letter-spacing: 0.08em; padding: 0.2vh 0.4vw; border-radius: 3px; white-space: nowrap; }
+        .en { background: #1A1ACC; color: #fff; }
+        .am { background: #FFB000; color: #0d0d0d; }
+        .li { background: #FF4400; color: #fff; }
+        .ai { background: #00C080; color: #fff; }
+        .cd { font-size: 0.85vw; color: #444; line-height: 1.3; }
+        .cd b { color: var(--epi-dark-blue); }
+
+        .bottom { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2vw; }
+        .code {
+            background: #0d0d0d; border-radius: 8px; padding: 1.1vh 1vw;
+            font-family: "JetBrains Mono", monospace; font-size: 0.8vw; line-height: 1.55; color: #cdd6f4;
+        }
+        .code div { white-space: pre; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; }
+        .side { display: flex; flex-direction: column; gap: 0.8vh; justify-content: center; }
+        .pt { font-size: 0.98vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+
+        .slide-ars .deco-block-1, .slide-ars .deco-block-2 { background: #D0D8F0; }
+        .slide-ars .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-ars">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #3 · Weapons</div>
+                <div class="title">Arsenal<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Beyond "shoot forward": <b>every weapon is a trade-off</b>. Think Helldivers 2.</div>
+        </div>
+
+        <div class="grid">
+            <div class="card" style="--c:#1A1ACC"><canvas id="w1" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Shield <span class="res en">ENERGY</span></span>
+                <span class="cd">Bubble eats hits. <b>Each hit drains energy</b>. Empty = gone.</span></div></div>
+            <div class="card" style="--c:#00C080"><canvas id="w2" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Poison <span class="res ai">STATUS</span></span>
+                <span class="cd">Damage <b>over time</b>, spreads to neighbours. A <code>Poisoned</code> component.</span></div></div>
+            <div class="card" style="--c:#FF4400"><canvas id="w3" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Hellbomb <span class="res li">YOUR LIFE</span></span>
+                <span class="cd"><b>Suicide attack</b>: ram it, huge blast, you die too. Then reinforce.</span></div></div>
+            <div class="card" style="--c:#8899EE"><canvas id="w4" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Quasar <span class="res en">ENERGY</span></span>
+                <span class="cd"><b>Charge, then a killing beam</b>. No ammo: it eats <b>your energy</b>. Spam it → you black out and drift.</span></div></div>
+            <div class="card" style="--c:#00FFAA"><canvas id="w5" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Drones <span class="res ai">AI</span></span>
+                <span class="cd">Helpers that <b>orbit</b> you: one shoots, one <b>repairs</b>. Their own little system.</span></div></div>
+            <div class="card" style="--c:#FFB000"><canvas id="w6" width="200" height="110"></canvas>
+                <div class="txt"><span class="cn">Missiles <span class="res am">AMMO</span></span>
+                <span class="cd"><b>Homing</b>, strong, but limited. Empty → find a resupply drop.</span></div></div>
+        </div>
+
+        <div class="bottom">
+            <div class="code">
+                <div><span class="cm"># weapons/quasar.yaml — same shape for every weapon</span></div>
+                <div><span class="k">cost</span>:  { <span class="k">energy</span>: <span class="v">35</span> }            <span class="cm"># or { ammo: 1 } · or { life: 1 }</span></div>
+                <div><span class="k">fire</span>:  { <span class="k">mode</span>: <span class="s">charge</span>, <span class="k">time</span>: <span class="v">3.0</span>, <span class="k">cooldown</span>: <span class="v">8</span> }</div>
+                <div><span class="k">hit</span>:   { <span class="k">damage</span>: <span class="v">250</span>, <span class="k">type</span>: <span class="s">energy</span>, <span class="k">pierce</span>: <span class="v">true</span> }</div>
+                <div><span class="k">apply</span>: [ ]                           <span class="cm"># poison, slow, burn…</span></div>
+            </div>
+            <div class="side">
+                <div class="pt">Pay with something: <b>energy</b>, <b>ammo</b>, or <b>your life</b>. That's the trade-off.</div>
+                <div class="pt">Effects are <b>components</b> added on hit: <code>Poisoned</code>, <code>Slowed</code>, <code>Burning</code>. Systems tick them.</div>
+                <div class="pt">Call-ins like HD2's stratagems: a <b>key combo</b> drops a weapon, a drone, a resupply.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const W = 200, H = 110;
+        const C = id => { const x = document.getElementById(id).getContext('2d'); x.imageSmoothingEnabled = false; return x; };
+        const c = [C('w1'), C('w2'), C('w3'), C('w4'), C('w5'), C('w6')];
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SHIP = img('player_cyan.png'), RED = img('player_red.png'), BYDO = img('bydos.png'), BUG = img('bug.png'), CRAB = img('crab.png'), PATA = img('patapata.png');
+        const spr = (x, i, px, py, w, h, rot) => { if (!i.complete) return; x.save(); x.translate(px, py); if (rot) x.rotate(rot); x.drawImage(i, -w / 2, -h / 2, w, h); x.restore(); };
+        const stars = Array.from({ length: 22 }, (_, i) => [(i * 37.3) % W, (i * 23.9) % H]);
+        const bg = x => { x.fillStyle = '#05050d'; x.fillRect(0, 0, W, H); x.fillStyle = '#2a2a55'; stars.forEach(([a, b]) => x.fillRect(a, b, 1.5, 1.5)); };
+        const bar = (x, v, col, label) => { x.fillStyle = '#1a1a2a'; x.fillRect(6, H - 12, 80, 6); x.fillStyle = col; x.fillRect(6, H - 12, 80 * Math.max(0, v), 6); x.font = '8px "JetBrains Mono", monospace'; x.fillStyle = col; x.fillText(label, 90, H - 6); };
+        const txt = (x, s, px, py, col, size) => { x.font = (size || 9) + 'px "JetBrains Mono", monospace'; x.fillStyle = col; x.fillText(s, px, py); };
+        let t = 0;
+
+        // 1 shield: incoming shots, bubble flashes, energy drains then regens
+        function d1(x) {
+            bg(x);
+            const T = t % 6, sy = 52;
+            spr(x, SHIP, 50, sy, 44, 22);
+            let e = T < 4 ? 1 - T * 0.24 : 0.04 + (T - 4) * 0.45;
+            const up = T < 4;
+            for (let k = 0; k < 4; k++) {
+                const bt = (T - k * 0.9);
+                if (bt > 0 && bt < 0.9 && up) { const bx = 190 - bt * 150; txt(x, '●', bx, sy + 4, '#FF7755', 10); }
+            }
+            if (up) {
+                const hit = (T % 0.9) > 0.8;
+                x.strokeStyle = hit ? '#ffffff' : 'rgba(102,130,255,0.8)'; x.lineWidth = hit ? 3 : 1.5;
+                x.beginPath(); x.ellipse(52, sy, 32, 22, 0, 0, 7); x.stroke();
+                x.fillStyle = 'rgba(26,26,204,0.15)'; x.fill();
+            } else txt(x, 'recharging', 100, sy + 3, '#6B82D6');
+            bar(x, e, '#6B82D6', 'ENERGY');
+        }
+
+        // 2 poison: cloud spreads between 3 enemies, -3 ticks
+        function d2(x) {
+            bg(x);
+            const T = t % 5, foes = [[70, 40], [120, 62], [165, 38]];
+            foes.forEach(([fx, fy], i) => {
+                const infected = T > i * 1.2;
+                spr(x, BUG, fx, fy, 26, 26);
+                if (infected) {
+                    x.fillStyle = 'rgba(0,255,120,0.28)'; x.beginPath(); x.arc(fx, fy, 16 + 3 * Math.sin(t * 5 + i), 0, 7); x.fill();
+                    const k = ((T - i * 1.2) % 0.7) / 0.7;
+                    txt(x, '-3', fx + 8, fy - 12 - k * 12, `rgba(0,255,170,${1 - k})`, 10);
+                }
+                if (i < 2 && T > i * 1.2 + 0.5 && T < i * 1.2 + 1.2) {
+                    const [nx, ny] = foes[i + 1], k = (T - i * 1.2 - 0.5) / 0.7;
+                    x.fillStyle = 'rgba(0,255,120,0.6)'; x.beginPath(); x.arc(fx + (nx - fx) * k, fy + (ny - fy) * k, 4, 0, 7); x.fill();
+                }
+            });
+            if (T < 0.6) txt(x, '☣ hit', 10, 20, '#00FFAA');
+        }
+
+        // 3 hellbomb: ship rams the big enemy, blast, reinforce
+        function d3(x) {
+            bg(x);
+            const T = t % 5;
+            if (T < 3.2) spr(x, CRAB, 160, 55, 48, 42);
+            if (T < 2) { const k = T / 2; spr(x, SHIP, 30 + 110 * k * k, 55, 40, 20); txt(x, 'HELLBOMB ARMED', 6, 14, '#FF7755'); if ((t * 6 | 0) % 2) { x.fillStyle = '#FF4400'; x.beginPath(); x.arc(30 + 110 * k * k + 16, 55, 3, 0, 7); x.fill(); } }
+            else if (T < 3.2) {
+                const k = (T - 2) / 1.2;
+                const g = x.createRadialGradient(150, 55, 0, 150, 55, 20 + k * 90);
+                g.addColorStop(0, `rgba(255,255,255,${1 - k})`); g.addColorStop(0.4, `rgba(255,176,0,${0.9 * (1 - k)})`); g.addColorStop(1, 'rgba(255,68,0,0)');
+                x.fillStyle = g; x.fillRect(0, 0, W, H);
+            } else {
+                txt(x, 'REINFORCING…', 6, 14, '#FFB000');
+                const k = Math.min(1, (T - 3.4) / 0.8);
+                if (k > 0) spr(x, SHIP, 30, -20 + 75 * k, 40, 20);
+                txt(x, 'lives 2', 150, H - 6, '#FF7755', 8);
+            }
+        }
+
+        // 4 quasar: charge, killing beam, costs the shooter's energy; the 3rd shot drains it → blackout, drift, reboot
+        function d4(x) {
+            bg(x);
+            const T = t % 9, sy = 55;
+            const shot = Math.min(3, Math.floor(T / 2));          // shots fired at 1.2, 3.2, 5.2
+            const within = T % 2;
+            const out = T > 5.4 && T < 8.2;                       // blackout after the 3rd shot
+            let e = 1 - Math.min(3, Math.floor((T + 0.8) / 2)) * 0.34;
+            if (T > 8.2) e = (T - 8.2) / 0.8 * 0.5;
+            // shooter
+            let px = 30, py = sy, rot = 0;
+            if (out) { const k = T - 5.4; px = 30 + k * 7; py = sy + k * 9; rot = k * 0.7; }
+            if (SHIP.complete) { x.save(); x.translate(px, py); x.rotate(rot); if (out) x.filter = 'grayscale(1) brightness(0.55)'; x.drawImage(SHIP, -20, -10, 40, 20); x.restore(); }
+            // target: a new enemy each shot, destroyed by the beam
+            if (!out && T < 5.4) {
+                if (within < 1.2) {
+                    spr(x, CRAB, 165, sy, 34, 30);
+                    const k = within / 1.2, r = 3 + k * 9;
+                    const g = x.createRadialGradient(56, sy, 0, 56, sy, r); g.addColorStop(0, '#fff'); g.addColorStop(0.5, '#8899EE'); g.addColorStop(1, 'rgba(26,26,204,0)');
+                    x.fillStyle = g; x.beginPath(); x.arc(56, sy, r, 0, 7); x.fill();
+                } else if (within < 1.5) {
+                    x.fillStyle = '#ffffff'; x.fillRect(52, sy - 3, 150, 6);
+                    x.fillStyle = 'rgba(136,153,238,0.5)'; x.fillRect(52, sy - 7, 150, 14);
+                    const k = (within - 1.2) / 0.3;
+                    x.fillStyle = `rgba(255,176,0,${1 - k})`; x.beginPath(); x.arc(165, sy, 8 + k * 22, 0, 7); x.fill();
+                    txt(x, '-250', 150, sy - 20, '#FFB000');
+                }
+            }
+            if (out) { txt(x, 'ENERGY 0 · DRIFTING', 70, 16, '#FF00CC'); }
+            else if (T > 8.2) txt(x, 'rebooting…', 110, 16, '#00FFAA');
+            else txt(x, 'shots ' + shot + '/3', 140, 16, '#8899EE', 8);
+            bar(x, e, e < 0.3 ? '#FF7755' : '#6B82D6', 'YOUR ENERGY');
+        }
+
+        // 5 drones: one shoots, one heals
+        function d5(x) {
+            bg(x);
+            const sy = 55 + 10 * Math.sin(t);
+            spr(x, SHIP, 60, sy, 44, 22);
+            const a = t * 2.2;
+            const d1 = [60 + Math.cos(a) * 34, sy + Math.sin(a) * 24], d2 = [60 + Math.cos(a + Math.PI) * 34, sy + Math.sin(a + Math.PI) * 24];
+            x.fillStyle = '#FF7755'; x.beginPath(); x.arc(...d1, 4, 0, 7); x.fill(); x.strokeStyle = '#FF7755'; x.stroke();
+            x.fillStyle = '#00FFAA'; x.beginPath(); x.arc(...d2, 4, 0, 7); x.fill();
+            spr(x, BYDO, 175, 30 + 20 * Math.sin(t * 1.3), 20, 20);
+            const k = (t % 0.8) / 0.8;
+            x.fillStyle = '#FFB000'; x.fillRect(d1[0] + k * (175 - d1[0]), d1[1] + k * (30 + 20 * Math.sin(t * 1.3) - d1[1]), 5, 2);
+            if ((t % 1.5) < 0.7) { x.strokeStyle = 'rgba(0,255,170,0.7)'; x.setLineDash([2, 2]); x.beginPath(); x.moveTo(...d2); x.lineTo(60, sy); x.stroke(); x.setLineDash([]); txt(x, '+2', 70, sy - 14, '#00FFAA'); }
+            txt(x, 'attack', 6, 14, '#FF7755', 8); txt(x, 'repair', 44, 14, '#00FFAA', 8);
+        }
+
+        // 6 missiles: homing, ammo counter, reload
+        let ammo = 6, mis = [], mt = 0, reload = 0;
+        function d6(x, dt) {
+            bg(x);
+            spr(x, SHIP, 30, 55, 40, 20);
+            const targets = [[165, 25 + 8 * Math.sin(t)], [175, 60], [160, 92 + 6 * Math.sin(t * 1.4)]];
+            targets.forEach(([a, b]) => spr(x, PATA, a, b, 20, 20));
+            if (dt) {
+                if (reload > 0) { reload -= dt; if (reload <= 0) ammo = 6; }
+                else { mt -= dt; if (mt <= 0 && ammo > 0) { mt = 0.5; ammo--; mis.push({ x: 48, y: 55, vx: 60, vy: (Math.random() - 0.5) * 90, tg: ammo % 3 }); } if (ammo === 0 && !mis.length) reload = 1.6; }
+                mis.forEach(m => { const [a, b] = targets[m.tg]; const dx = a - m.x, dy = b - m.y, d = Math.hypot(dx, dy); m.vx += dx / d * 500 * dt; m.vy += dy / d * 500 * dt; const s = Math.hypot(m.vx, m.vy); if (s > 150) { m.vx *= 150 / s; m.vy *= 150 / s; } m.x += m.vx * dt; m.y += m.vy * dt; m.dead = d < 8; });
+                mis = mis.filter(m => !m.dead);
+            }
+            mis.forEach(m => { x.save(); x.translate(m.x, m.y); x.rotate(Math.atan2(m.vy, m.vx)); x.fillStyle = '#FFB000'; x.fillRect(-4, -1.5, 8, 3); x.fillStyle = 'rgba(255,120,60,0.6)'; x.fillRect(-10, -1, 6, 2); x.restore(); });
+            txt(x, reload > 0 ? 'EMPTY · resupply…' : 'AMMO ' + '▮'.repeat(ammo) + '▯'.repeat(6 - ammo), 6, 14, reload > 0 ? '#FF7755' : '#FFB000');
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            const step = paused ? 0 : dt;
+            t += step;
+            d1(c[0]); d2(c[1]); d3(c[2]); d4(c[3]); d5(c[4]); d6(c[5], step);
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

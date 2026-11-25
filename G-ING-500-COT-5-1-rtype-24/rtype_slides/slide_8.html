@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 08 — Inheritance Hurts</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-oop {
+            background: var(--epi-light);
+            display: flex;
+            align-items: stretch;
+        }
+
+        .oop-left {
+            position: relative;
+            z-index: 1;
+            width: 54%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vh 1.5vw 5vh 4vw;
+        }
+
+        .tree {
+            background: #0d0d0d;
+            border-radius: 10px;
+            width: 100%;
+            padding: 2.5vh 1.5vw;
+        }
+        .tree svg { width: 100%; height: auto; display: block; }
+        .tree text { font-family: "JetBrains Mono", monospace; }
+        .tree image { image-rendering: pixelated; }
+
+        .oop-right {
+            position: relative;
+            z-index: 1;
+            width: 46%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.5vw;
+            gap: 2.6vh;
+        }
+
+        .oop-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .oop-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4vw;
+            line-height: 1;
+            white-space: nowrap;
+            color: var(--epi-dark-blue);
+        }
+        .oop-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .oop-subtitle { font-size: 1.8vw; color: #333; }
+        .oop-subtitle b { color: var(--epi-dark-blue); }
+
+        .qs { display: flex; flex-direction: column; gap: 1.6vh; }
+        .q {
+            font-size: 1.35vw;
+            color: #333;
+            line-height: 1.3;
+            padding-left: 1vw;
+            border-left: 3px solid #D0D8F0;
+        }
+        .q b { color: var(--epi-dark-blue); }
+        .q .hot { color: #cc3300; font-weight: 700; }
+
+        .answer {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.2vw;
+            font-weight: 700;
+            color: #fff;
+            background: var(--epi-blue);
+            border-radius: 6px;
+            padding: 1.4vh 1.2vw;
+            align-self: flex-start;
+        }
+        .answer span { color: var(--epi-mint); }
+
+        .slide-oop .deco-block-1,
+        .slide-oop .deco-block-2 { background: #D0D8F0; }
+        .slide-oop .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-oop">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="oop-left">
+            <div class="tree">
+                <svg viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg">
+                    <!-- edges -->
+                    <g stroke="#3a3a6a" stroke-width="2" fill="none">
+                        <path d="M300 56 L150 106"/>
+                        <path d="M300 56 L420 106"/>
+                        <path d="M150 140 L150 196"/>
+                        <path d="M420 140 L330 196"/>
+                        <path d="M420 140 L510 196"/>
+                        <path d="M510 230 L430 296"/>
+                        <path d="M510 230 L560 296"/>
+                    </g>
+
+                    <!-- nodes -->
+                    <g font-size="15" font-weight="700" text-anchor="middle">
+                        <rect x="220" y="22" width="160" height="34" rx="6" fill="#15152a" stroke="#8899EE" stroke-width="1.5"/>
+                        <text x="300" y="45" fill="#fff">GameObject</text>
+
+                        <rect x="85" y="106" width="130" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="150" y="129" fill="#cdd6f4">Drawable</text>
+
+                        <rect x="355" y="106" width="130" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="420" y="129" fill="#cdd6f4">Movable</text>
+
+                        <rect x="80" y="196" width="140" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="150" y="219" fill="#cdd6f4">Background</text>
+
+                        <rect x="270" y="196" width="120" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="330" y="219" fill="#cdd6f4">Missile</text>
+
+                        <rect x="455" y="196" width="110" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="510" y="219" fill="#cdd6f4">Ship</text>
+
+                        <rect x="380" y="296" width="100" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="430" y="319" fill="#cdd6f4">Player</text>
+
+                        <rect x="512" y="296" width="84" height="34" rx="6" fill="#15152a" stroke="#3a3a6a" stroke-width="1.5"/>
+                        <text x="554" y="319" fill="#cdd6f4">Bydos</text>
+                    </g>
+
+                    <!-- sprites next to leaves -->
+                    <image href="assets/player_cyan.png" x="398" y="340" width="64" height="24"/>
+                    <image href="assets/bydos.png" x="540" y="336" width="28" height="32"/>
+
+                    <!-- the Force: where does it go? -->
+                    <g stroke="#FF4400" stroke-width="2" stroke-dasharray="6 5" fill="none">
+                        <path d="M150 372 C 150 300, 300 280, 330 230"/>
+                        <path d="M210 372 C 260 300, 470 300, 505 230"/>
+                        <path d="M80 372 C 30 300, 30 160, 85 123"/>
+                    </g>
+                    <rect x="70" y="372" width="170" height="44" rx="8" fill="#2a0e00" stroke="#FF4400" stroke-width="2"/>
+                    <image href="assets/force.png" x="82" y="382" width="32" height="24"/>
+                    <text x="176" y="400" text-anchor="middle" font-size="16" font-weight="700" fill="#FF7755">Force ???</text>
+
+                    <text x="256" y="400" font-size="12" fill="#FF7755">Drawable? Missile? Ship? all three?</text>
+                    <text x="256" y="420" font-size="12" fill="#888">→ multiple inheritance: the diamond problem</text>
+                </svg>
+            </div>
+        </div>
+
+        <div class="oop-right">
+            <div class="oop-eyebrow">Epitech Afrique — Engine</div>
+            <div class="oop-title">Inheritance Hurts<span class="cursor"></span></div>
+            <div class="oop-subtitle">The classic <b>GameObject</b> tree — until the Force shows up.</div>
+
+            <div class="qs">
+                <div class="q">Should a <b>Background</b> and a <b>Bydos</b> share an ancestor?</div>
+                <div class="q">The Force moves, collides, shoots, sticks to the ship… <span class="hot">how many parents?</span></div>
+                <div class="q">A Bydos that turns into a power-up when killed? A ship that loses its gun? <b>You can't change a class at runtime.</b></div>
+                <div class="q">Every new idea = <b>a new subclass</b>.</div>
+            </div>
+
+            <div class="answer">Composition over inheritance <span>→ ECS</span></div>
+        </div>
+
+    </section>
+</body>
+</html>

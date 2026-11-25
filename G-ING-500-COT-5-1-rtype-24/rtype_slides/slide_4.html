@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 04 — TCP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        :root { --proto: #8899EE; --proto-text: #3344BB; }
+
+        .slide-net {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 7vh 5vw 5vh 5vw;
+            gap: 3.5vh;
+        }
+
+        .net-head { display: flex; flex-direction: column; gap: 1.2vh; position: relative; z-index: 1; }
+
+        .net-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .net-title-row { display: flex; align-items: baseline; gap: 2vw; }
+
+        .net-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+
+        .net-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .net-fullname {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 600;
+            font-size: 2.4vw;
+            color: #333;
+        }
+        .net-fullname b { color: var(--proto-text); font-weight: 700; }
+
+        .net-tag { font-size: 1.7vw; color: #555; }
+
+        /* ---------- animated stage ---------- */
+        .stage {
+            position: relative;
+            z-index: 1;
+            background: #0d0d0d;
+            border-radius: 10px;
+            padding: 3vh 1.8vw;
+            display: flex;
+            align-items: stretch;
+            gap: 1.5vw;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+        }
+
+        .ep {
+            width: 15vw;
+            flex-shrink: 0;
+            border: 1.5px solid #3a3a6a;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1vh;
+            padding: 2vh 0;
+            background: #15152a;
+        }
+        .ep-role { font-size: 1.1vw; letter-spacing: 0.15em; text-transform: uppercase; color: #8899EE; }
+        .ep-addr { font-size: 1.4vw; font-weight: 700; color: #fff; }
+
+        .lane { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2vh; }
+
+        .track {
+            position: relative;
+            height: 4vw;
+            background:
+                linear-gradient(90deg, #333 50%, transparent 50%) center / 14px 2px repeat-x;
+        }
+
+        .pkt {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin-top: -1.5vw;
+            min-width: 3vw;
+            height: 3vw;
+            padding: 0 0.6vw;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3vw;
+            font-weight: 700;
+            color: #0d0d0d;
+            white-space: nowrap;
+        }
+        .pkt.data { background: var(--proto); }
+        .pkt.boom { background: none; color: #FF4400; font-size: 2vw; }
+        .pkt.ctrl { background: #0d0d0d; border: 1.5px solid #AAB6FF; color: #AAB6FF; font-size: 1vw; height: 2.2vw; margin-top: -1.1vw; }
+        .pkt.resend { background: #FFB000; }
+
+        .note {
+            font-size: 1.35vw;
+            color: #888;
+            height: 2.2vw;
+            line-height: 2.2vw;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .note.good { color: #00FFAA; }
+        .note.bad  { color: #FF7755; }
+        .note.warn { color: #FFB000; }
+        .note.info { color: #AAB6FF; }
+
+        .recv { display: flex; justify-content: center; align-items: center; gap: 0.8vw; font-size: 1vw; color: #6B82D6; }
+        .recv > span { display: flex; gap: 0.5vw; }
+        .slot {
+            width: 2.4vw; height: 2.4vw;
+            border-radius: 4px;
+            border: 1px solid #2a2a2a;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1vw; font-weight: 700; color: transparent;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .slot.ok   { background: var(--proto); color: #0d0d0d; border-color: var(--proto); }
+        .slot.lost { border: 1.5px dashed #FF4400; color: #FF4400; }
+        .slot.wait { background: #2a2a2a; color: #888; border-color: #555; }
+
+        /* ---------- text under the stage ---------- */
+        .uses {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3vw;
+            font-size: 1.5vw;
+            color: #333;
+            line-height: 1.35;
+        }
+        .uses b { color: var(--epi-dark-blue); }
+
+        .net-rule {
+            position: relative;
+            z-index: 1;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            color: #333;
+            border-left: 4px solid var(--epi-orange);
+            padding: 0.6vh 1vw;
+            background: #FF440010;
+        }
+        .net-rule b { color: #cc3300; }
+
+        .slide-net .deco-block-1,
+        .slide-net .deco-block-2 { background: #D0D8F0; }
+        .slide-net .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-net">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="net-head">
+            <div class="net-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="net-title-row">
+                <div class="net-title">TCP<span class="cursor"></span></div>
+                <div class="net-fullname"><b>T</b>ransmission <b>C</b>ontrol <b>P</b>rotocol</div>
+            </div>
+            <div class="net-tag">Reliable. Ordered. Waits.</div>
+        </div>
+
+        <div class="stage">
+            <div class="ep">
+                <div class="ep-role">client</div>
+                <div class="ep-addr">10.0.0.2:50412</div>
+            </div>
+
+            <div class="lane">
+                <div class="track" id="track"></div>
+                <div class="note" id="note"></div>
+                <div class="recv">received <span id="recv"></span></div>
+            </div>
+
+            <div class="ep">
+                <div class="ep-role">server</div>
+                <div class="ep-addr">10.0.0.1:4242</div>
+            </div>
+        </div>
+
+        <div class="uses">
+            <div>Connection first, every packet acknowledged, lost ones resent. <b>Everything arrives, in order — even if late.</b></div>
+            <div>Use it where every message matters: <b>login</b>, <b>lobby</b>, <b>in-game text chat</b>.</div>
+        </div>
+
+        <div class="net-rule">Subject: a TCP connection is <b>tolerated — with a strong justification.</b> Never for in-game traffic.</div>
+
+    </section>
+
+    <script>
+        const TRAVEL = 2400;   // ms for a data packet to cross the wire
+        const CTRL   = 1600;   // ms for a handshake / ACK message
+        const GAP    = 1100;   // ms between two sends
+        const HOLD   = 2200;   // ms pause on key moments
+
+        const track = document.getElementById('track');
+        const noteEl = document.getElementById('note');
+        const note = (text, kind = '') => { noteEl.textContent = text; noteEl.className = 'note ' + kind; };
+
+        // Fly a packet along the wire. dir: 1 = client → server, -1 = server → client.
+        // loseAt (0..1): it vanishes at that point. Resolves true if delivered.
+        function fly(label, cls, { dir = 1, loseAt = null, travel = TRAVEL } = {}) {
+            return new Promise(resolve => {
+                const el = document.createElement('div');
+                el.className = 'pkt ' + cls;
+                el.textContent = label;
+                track.appendChild(el);
+                const end = track.clientWidth - el.offsetWidth;
+                const [from, to] = dir === 1 ? [0, end] : [end, 0];
+                const stop = loseAt === null ? to : from + (to - from) * loseAt;
+                const dur = loseAt === null ? travel : travel * loseAt;
+                el.animate(
+                    [{ transform: `translateX(${from}px)` }, { transform: `translateX(${stop}px)` }],
+                    { duration: dur, easing: 'linear', fill: 'forwards' }
+                ).finished.then(() => {
+                    if (loseAt === null) { el.remove(); resolve(true); return; }
+                    el.className = 'pkt boom';
+                    el.textContent = '✕';
+                    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1500, fill: 'forwards' })
+                      .finished.then(() => { el.remove(); resolve(false); });
+                });
+            });
+        }
+
+        function makeSlots() {
+            const box = document.getElementById('recv');
+            box.innerHTML = '';
+            const slots = [];
+            for (let i = 1; i <= 5; i++) {
+                const s = document.createElement('span');
+                s.className = 'slot';
+                s.textContent = i;
+                box.appendChild(s);
+                slots.push(s);
+            }
+            return (n, state) => { slots[n - 1].className = 'slot ' + state; };
+        }
+
+        async function run() {
+            const set = makeSlots();
+            const ctrl = { travel: CTRL };
+
+            note('First, the 3-way handshake.', 'info');
+            await sleep(1200);
+            note('SYN — "can we talk?"', 'info');
+            await fly('SYN', 'ctrl', ctrl);
+            note('SYN-ACK — "yes. can we?"', 'info');
+            await fly('SYN-ACK', 'ctrl', { ...ctrl, dir: -1 });
+            note('ACK — "yes." Connected.', 'info');
+            await fly('ACK', 'ctrl', ctrl);
+            await sleep(1000);
+
+            note('Data. Each ACK = "the next number I expect".');
+            const trips = [];
+            for (let i = 1; i <= 5; i++) {
+                const lost = i === 3;
+                trips.push(fly(i, 'data', { loseAt: lost ? 0.45 : null }).then(ok => {
+                    if (!ok) { note('Packet 3 is lost on the way…', 'bad'); return; }
+                    if (i < 3) { set(i, 'ok'); fly('ACK ' + (i + 1), 'ctrl', { ...ctrl, dir: -1 }); }
+                    else {
+                        set(i, 'wait');
+                        note(i === 4
+                            ? '4 is BLOCKED → ACK 3 again: "I still need 3".'
+                            : '5 too → ACK 3 again. A duplicate ACK.', 'bad');
+                        fly('ACK 3', 'ctrl', { ...ctrl, dir: -1 });
+                    }
+                }));
+                await sleep(GAP);
+            }
+            await Promise.all(trips);
+            await sleep(HOLD);
+
+            note('No ACK past 3 → timeout → client resends 3.', 'warn');
+            await sleep(1200);
+            await fly(3, 'resend');
+            for (const n of [3, 4, 5]) { set(n, 'ok'); await sleep(500); }
+            note('ACK 6: "got 1–5 in order, send 6." But late.', 'warn');
+            await fly('ACK 6', 'ctrl', { ...ctrl, dir: -1 });
+        }
+
+        (async function loop() {
+            if (document.fonts) await document.fonts.ready;
+            for (;;) {
+                await run();
+                await sleep(5000);
+            }
+        })();
+    </script>
+</body>
+</html>

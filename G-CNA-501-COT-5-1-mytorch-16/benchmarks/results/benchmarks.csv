@@ -1,0 +1,4 @@
+model,classes,parameters,training_time_s,inference_time_s,accuracy,f1
+basic,3,51715,905,3.33,0.8726,0.8662
+medium,3,239491,3948,8.36,0.9305,0.9250
+full,5,239621,3366,9.10,0.9300,0.9244

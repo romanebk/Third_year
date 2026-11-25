@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Scripting</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-lua {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4.5vh 4.5vw 3vh 4.5vw; gap: 1.6vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 2vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .main { display: grid; grid-template-columns: 1.1fr 0.9fr 1fr; gap: 1vw; position: relative; z-index: 1; align-items: stretch; }
+        .h { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.25vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.6vh; }
+        .h span { font-family: "JetBrains Mono", monospace; font-size: 0.66vw; font-weight: 700; letter-spacing: 0.1em; color: #6B82D6; text-transform: uppercase; }
+        .code { background: #0d0d0d; border-radius: 8px; padding: 1.1vh 0.9vw; font-family: "JetBrains Mono", monospace; font-size: 0.8vw; line-height: 1.55; color: #cdd6f4; position: relative; }
+        .code div { white-space: pre; }
+        .cm { color: #7a7a8a; } .k { color: #FF7755; } .f { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; } .api { color: #00B8D4; }
+        .tw { color: #00FFAA; border-bottom: 1.5px dashed #00FFAA; cursor: pointer; user-select: none; }
+        .tw:hover { background: #00FFAA22; }
+        .toast { position: absolute; right: 0.8vw; top: 0.8vh; font-size: 0.7vw; color: #0d0d0d; background: #00FFAA; padding: 0.3vh 0.5vw; border-radius: 4px; opacity: 0; transition: opacity 0.3s; }
+        .toast.on { opacity: 1; }
+
+        canvas { width: 100%; aspect-ratio: 320 / 210; border-radius: 8px; background: #05050d; display: block; }
+        .hint { font-family: "JetBrains Mono", monospace; font-size: 0.72vw; color: #888; margin-top: 0.6vh; }
+        .hint b { color: #00885F; }
+
+        .side { display: flex; flex-direction: column; gap: 0.8vh; }
+        .pt { font-size: 0.95vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.82vw; color: #1A1ACC; }
+
+        .bottom { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; }
+        .box { font-size: 0.95vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; }
+        .net { border-left: 4px solid #00C080; background: #00FFAA14; }
+        .net b { color: #00885F; }
+        .lib { border-left: 4px solid #1A1ACC; background: #1A1ACC0d; }
+        .lib b { color: var(--epi-dark-blue); }
+        .lib code { font-family: "JetBrains Mono", monospace; font-size: 0.85vw; color: #1A1ACC; }
+
+        .slide-lua .deco-block-1, .slide-lua .deco-block-2 { background: #D0D8F0; }
+        .slide-lua .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lua">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #3 · Tools</div>
+                <div class="title">Scripting<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Behaviour in a <b>script</b>, not in C++. Change it, save it: <b>no recompile</b>.</div>
+        </div>
+
+        <div class="main">
+            <div>
+                <div class="h">scripts/bug.lua <span>a designer writes this</span></div>
+                <div class="code">
+                    <span class="toast" id="toast">saved · hot reload</span>
+                    <div><span class="k">local</span> amplitude = <span class="tw" data-k="amp">60</span></div>
+                    <div><span class="k">local</span> speed     = <span class="tw" data-k="spd">120</span></div>
+                    <div><span class="k">local</span> fire_every = <span class="tw" data-k="fire">2.0</span></div>
+                    <div></div>
+                    <div><span class="k">function</span> <span class="f">on_spawn</span>(self)</div>
+                    <div>  self.t = <span class="v">0</span></div>
+                    <div><span class="k">end</span></div>
+                    <div></div>
+                    <div><span class="k">function</span> <span class="f">on_update</span>(self, dt)</div>
+                    <div>  self.t = self.t + dt</div>
+                    <div>  self:<span class="api">move</span>(-speed * dt,</div>
+                    <div>            math.cos(self.t * <span class="v">3</span>) * amplitude * dt)</div>
+                    <div>  <span class="k">if</span> self:<span class="api">every</span>(fire_every) <span class="k">then</span> self:<span class="api">shoot</span>(<span class="s">"aimed"</span>) <span class="k">end</span></div>
+                    <div><span class="k">end</span></div>
+                    <div></div>
+                    <div><span class="k">function</span> <span class="f">on_death</span>(self)</div>
+                    <div>  <span class="api">spawn</span>(<span class="s">"powerup"</span>, self.x, self.y)</div>
+                    <div><span class="k">end</span></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="h">The game <span>running</span></div>
+                <canvas id="cv" width="320" height="210"></canvas>
+                <div class="hint">Click the <b>green values</b> in the script: the bugs change <b>while the game runs</b>.</div>
+            </div>
+
+            <div class="side">
+                <div class="h">How it works <span>engine side</span></div>
+                <div class="pt">The engine <b>calls hooks</b>: <code>on_spawn</code>, <code>on_update</code>, <code>on_hit</code>, <code>on_death</code>.</div>
+                <div class="pt">The script only sees <b>what you expose</b>: <code>move</code>, <code>shoot</code>, <code>spawn</code>, <code>player_pos</code>… No files, no sockets: a sandbox.</div>
+                <div class="pt"><b>Hot reload</b>: watch the file, reload it when it changes. Designers tune while playing.</div>
+                <div class="pt">A <b>Script</b> component names the file. The prefab stays data, the behaviour becomes data too.</div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="box net"><b>Scripts run in the room.</b> Gameplay decides there, like the rest: clients never run gameplay scripts, at most cosmetic ones.</div>
+            <div class="box lib"><b>Lua</b> is the classic choice: small, fast, made to be embedded. Its C API, or a binding like <code>sol2</code>. Look at how Roblox (Luau) or WoW add-ons use it.</div>
+        </div>
+    </section>
+
+    <script>
+        const P = { amp: [60, 110, 20], spd: [120, 200, 60], fire: [2.0, 0.6, 4.0] };
+        const idx = { amp: 0, spd: 0, fire: 0 };
+        const val = k => P[k][idx[k]];
+        const toast = document.getElementById('toast');
+        let toastT = 0;
+        document.querySelectorAll('.tw').forEach(el => el.addEventListener('click', () => {
+            const k = el.dataset.k; idx[k] = (idx[k] + 1) % P[k].length;
+            el.textContent = k === 'fire' ? val(k).toFixed(1) : String(val(k));
+            toast.textContent = 'bug.lua saved · hot reload ' + (2 + Math.random() * 3 | 0) + ' ms';
+            toast.classList.add('on'); toastT = 1.6;
+            bugs.forEach(b => b.flash = 0.3);
+        }));
+
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 320, H = 210;
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const BUG = img('bug.png'), SHIP = img('player_cyan.png');
+        let t = 0, bugs = [], shots = [], ups = [];
+        const ship = { x: 36, y: 105 };
+        function spawnBug(k) { bugs.push({ x: W + 20 + k * 70, y: 50 + (k % 3) * 55, t: k * 0.7, cd: 0.5 + k * 0.4, flash: 0 }); }
+        for (let k = 0; k < 4; k++) spawnBug(k);
+
+        const wave = x => Math.cos(x);
+        function update(dt) {
+            t += dt;
+            ship.y = 105 + 50 * Math.sin(t * 0.9);
+            bugs.forEach(b => {
+                b.t += dt;
+                b.x += -val('spd') * dt;
+                b.y += wave(b.t * 3) * val('amp') * dt;
+                b.y = Math.max(14, Math.min(H - 14, b.y));
+                b.cd -= dt;
+                if (b.cd <= 0) { b.cd = val('fire'); const dx = ship.x - b.x, dy = ship.y - b.y, d = Math.hypot(dx, dy); shots.push({ x: b.x, y: b.y, vx: dx / d * 140, vy: dy / d * 140 }); }
+                b.flash = Math.max(0, b.flash - dt);
+            });
+            bugs = bugs.filter(b => { if (b.x < -20) { ups.push({ x: 20, y: b.y, t: 0 }); return false; } return true; });
+            while (bugs.length < 4) spawnBug(0), bugs[bugs.length - 1].x = W + 20 + Math.random() * 60, bugs[bugs.length - 1].y = 30 + Math.random() * 150;
+            shots.forEach(s => { s.x += s.vx * dt; s.y += s.vy * dt; }); shots = shots.filter(s => s.x > -5 && s.y > -5 && s.y < H + 5);
+            ups.forEach(u => u.t += dt); ups = ups.filter(u => u.t < 0.8);
+            if (toastT > 0) { toastT -= dt; if (toastT <= 0) toast.classList.remove('on'); }
+        }
+        function draw() {
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            for (let i = 0; i < 40; i++) { const x = (((i * 71.3) - t * 25 * (1 + i % 2)) % W + W) % W; ctx.fillStyle = '#2a2a55'; ctx.fillRect(x, (i * 37.9) % H, 1.2, 1.2); }
+            if (SHIP.complete) ctx.drawImage(SHIP, ship.x - 22, ship.y - 11, 44, 22);
+            bugs.forEach(b => {
+                if (!BUG.complete) return;
+                ctx.drawImage(BUG, b.x - 13, b.y - 13, 26, 26);
+                if (b.flash > 0) { ctx.strokeStyle = `rgba(0,255,170,${b.flash / 0.3})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b.x, b.y, 18, 0, 7); ctx.stroke(); ctx.lineWidth = 1; }
+            });
+            ctx.fillStyle = '#FF7755'; shots.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 3, 0, 7); ctx.fill(); });
+            ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillStyle = '#6B82D6';
+            ctx.fillText('amplitude ' + val('amp') + ' · speed ' + val('spd') + ' · fire every ' + val('fire').toFixed(1) + ' s', 8, H - 8);
+        }
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 22 — Libraries</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-lib {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 5vw 3.5vh 5vw;
+            gap: 1.8vh;
+        }
+
+        .head { display: flex; flex-direction: column; gap: 0.8vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.8vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8vw; position: relative; z-index: 1; }
+
+        .cat {
+            background: #fff;
+            border-radius: 8px;
+            border-top: 4px solid var(--accent, #8899EE);
+            padding: 1vh 0.9vw 1.1vh;
+            display: flex; flex-direction: column; gap: 0.6vh;
+            box-shadow: 0 2px 8px rgba(26, 26, 204, 0.05);
+        }
+        .cat .cn { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.15vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; }
+        .cat .layer { font-family: "JetBrains Mono", monospace; font-size: 0.6vw; letter-spacing: 0.1em; text-transform: uppercase; color: #999; font-weight: 500; }
+        .libs { display: flex; flex-direction: column; gap: 0.35vh; }
+        .lib { font-family: "JetBrains Mono", monospace; font-size: 0.92vw; color: #1A1ACC; font-weight: 700; display: flex; justify-content: space-between; gap: 0.5vw; }
+        .lib span { font-weight: 400; color: #777; font-size: 0.8vw; white-space: nowrap; }
+
+        .c-plug { --accent: #8899EE; }
+        .c-core { --accent: #0d0d0d; }
+        .c-tool { --accent: #00C080; }
+        .c-own  { --accent: #FF4400; background: #FF44000f; border: 1.5px dashed #FF440088; border-top: 4px solid #FF4400; }
+        .c-own .cn { color: #cc3300; }
+        .c-own .lib { color: #cc3300; }
+        .c-ref  { --accent: #FF4400; background: #0d0d0d; }
+        .c-ref .cn { color: #fff; }
+        .c-ref .lib { color: #FF7755; }
+        .c-ref .lib span { color: #9a9aae; }
+
+        .foot { position: relative; z-index: 1; display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 0.95vw; color: #555; }
+        .foot b { color: #cc3300; }
+        .foot i { font-style: normal; color: #1A1ACC; font-weight: 700; }
+
+        .slide-lib .deco-block-1, .slide-lib .deco-block-2 { background: #D0D8F0; }
+        .slide-lib .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lib">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Engine</div>
+            <div class="title">Libraries<span class="cursor"></span></div>
+            <div class="subtitle">Don't reinvent the wheel — <b>build the engine, not the parsers</b>.</div>
+        </div>
+
+        <div class="grid">
+            <div class="cat c-plug">
+                <span class="cn">Graphics &amp; window <span class="layer">plugin</span></span>
+                <div class="libs">
+                    <div class="lib">SFML <span>2D, easy</span></div>
+                    <div class="lib">raylib <span>2D/3D, C, simple</span></div>
+                    <div class="lib">SDL3 <span>low-level, portable</span></div>
+                </div>
+            </div>
+            <div class="cat c-plug">
+                <span class="cn">Networking <span class="layer">plugin</span></span>
+                <div class="libs">
+                    <div class="lib">asio <span>standalone, async UDP</span></div>
+                    <div class="lib">Boost.Asio <span>same, with Boost</span></div>
+                    <div class="lib">ENet <span>reliable over UDP</span></div>
+                </div>
+            </div>
+            <div class="cat c-plug">
+                <span class="cn">Audio <span class="layer">plugin</span></span>
+                <div class="libs">
+                    <div class="lib">SFML Audio <span>if you use SFML</span></div>
+                    <div class="lib">miniaudio <span>single header</span></div>
+                    <div class="lib">OpenAL Soft <span>3D positional</span></div>
+                </div>
+            </div>
+            <div class="cat c-plug">
+                <span class="cn">Physics <span class="layer">plugin</span></span>
+                <div class="libs">
+                    <div class="lib">Box2D <span>2D rigid bodies</span></div>
+                    <div class="lib">Chipmunk2D <span>2D, lightweight</span></div>
+                </div>
+            </div>
+
+            <div class="cat c-core">
+                <span class="cn">Scene &amp; config files <span class="layer">core</span></span>
+                <div class="libs">
+                    <div class="lib">yaml-cpp <span>YAML, classic</span></div>
+                    <div class="lib">rapidyaml <span>YAML, fast</span></div>
+                    <div class="lib">nlohmann/json <span>JSON, easy</span></div>
+                    <div class="lib">toml++ <span>TOML config</span></div>
+                </div>
+            </div>
+            <div class="cat c-own">
+                <span class="cn">Write it yourself <span class="layer">graded</span></span>
+                <div class="libs">
+                    <div class="lib">serialization <span>struct ↔ bytes</span></div>
+                    <div class="lib">binary protocol <span>packets, headers</span></div>
+                    <div class="lib">bit packing <span>track #2 bonus</span></div>
+                </div>
+            </div>
+            <div class="cat c-core">
+                <span class="cn">Logging &amp; profiling <span class="layer">core</span></span>
+                <div class="libs">
+                    <div class="lib">spdlog <span>fast logger</span></div>
+                    <div class="lib">fmt <span>formatting</span></div>
+                    <div class="lib">Tracy <span>frame profiler</span></div>
+                </div>
+            </div>
+            <div class="cat c-core">
+                <span class="cn">Scripting <span class="layer">plugin</span></span>
+                <div class="libs">
+                    <div class="lib">Lua + sol2 <span>the classic</span></div>
+                    <div class="lib">LuaJIT <span>faster Lua</span></div>
+                    <div class="lib">pybind11 <span>Python</span></div>
+                </div>
+            </div>
+
+            <div class="cat c-tool">
+                <span class="cn">Editor &amp; UI <span class="layer">tooling</span></span>
+                <div class="libs">
+                    <div class="lib">Dear ImGui <span>debug UI, editors</span></div>
+                    <div class="lib">imgui-sfml · rlImGui <span>backends</span></div>
+                    <div class="lib">ImGuizmo <span>move gizmos</span></div>
+                </div>
+            </div>
+            <div class="cat c-tool">
+                <span class="cn">Reflection &amp; utils <span class="layer">tooling</span></span>
+                <div class="libs">
+                    <div class="lib">magic_enum <span>enum ↔ string</span></div>
+                    <div class="lib">Boost.PFR <span>struct fields</span></div>
+                    <div class="lib">CLI11 <span>CLI editor args</span></div>
+                </div>
+            </div>
+            <div class="cat c-tool">
+                <span class="cn">Tests <span class="layer">tooling</span></span>
+                <div class="libs">
+                    <div class="lib">Catch2 <span>modern, easy</span></div>
+                    <div class="lib">GoogleTest <span>industry standard</span></div>
+                    <div class="lib">doctest <span>lightweight</span></div>
+                </div>
+            </div>
+            <div class="cat c-ref">
+                <span class="cn">Read, don't use</span>
+                <div class="libs">
+                    <div class="lib">EnTT <span>ECS reference</span></div>
+                    <div class="lib">flecs <span>ECS reference</span></div>
+                    <div class="lib">Godot src <span>engine reference</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <span>All available through <i>vcpkg</i> · <i>Conan</i> · <i>CPM</i></span>
+            <span>The engine <b>and the protocol</b> are yours — no ECS lib, no serialization lib. Ask your unit manager.</span>
+        </div>
+    </section>
+</body>
+</html>

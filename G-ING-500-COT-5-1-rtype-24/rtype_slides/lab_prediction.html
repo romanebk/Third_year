@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Prediction Lab</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="netsim.css">
+    <script src="pause.js"></script>
+    <script src="netsim.js"></script>
+    <style>
+        .slide-lab {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4vh 4vw 3vh 4vw;
+            gap: 1.6vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 1.6vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.2vw; line-height: 1; color: var(--epi-dark-blue); white-space: nowrap; }
+        .title .cursor { display: inline-block; width: 1.6vw; height: 0.5vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.25vw; color: #444; line-height: 1.35; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        #lab { position: relative; z-index: 1; }
+        .try { position: relative; z-index: 1; display: flex; gap: 1.6vw; font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #555; }
+        .try b { color: #cc3300; }
+
+        .slide-lab .deco-block-1, .slide-lab .deco-block-2 { background: #D0D8F0; }
+        .slide-lab .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lab">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #2 · Lab</div>
+                <div class="title">Prediction Lab<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Client 1 <b>waits for the server</b>, client 2 <b>predicts</b>. Move both. Feel the difference.</div>
+        </div>
+
+        <div id="lab"></div>
+
+        <div class="try">
+            <span>try: <b>latency 400 ms</b> on client 1</span>
+            <span>turn prediction <b>on</b> for both</span>
+            <span>tick rate <b>5 ticks/s</b> — who suffers?</span>
+        </div>
+    </section>
+
+    <script>
+        NetSim.mount(document.getElementById('lab'), {
+            tick: 20,
+            lat: [150, 150],
+            pred: [false, true],
+            interp: [true, true],
+        });
+    </script>
+</body>
+</html>

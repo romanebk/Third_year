@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Going Further</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-gf {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 5vw 3.5vh 5vw;
+            gap: 1.8vh;
+        }
+        .head { display: flex; flex-direction: column; gap: 0.8vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.8vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8vw; position: relative; z-index: 1; }
+        .card {
+            background: #fff; border-radius: 8px; border-left: 4px solid var(--c);
+            padding: 1.1vh 0.9vw; display: flex; flex-direction: column; gap: 0.6vh;
+            box-shadow: 0 2px 8px rgba(26, 26, 204, 0.05);
+        }
+        .card .cn { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.2vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; }
+        .card .grp { font-family: "JetBrains Mono", monospace; font-size: 0.6vw; letter-spacing: 0.1em; text-transform: uppercase; color: #999; font-weight: 500; }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.3vw; }
+        .chips span { font-family: "JetBrains Mono", monospace; font-size: 0.8vw; padding: 0.35vh 0.45vw; border-radius: 4px; background: #F0F2F8; color: #1A1ACC; border: 1px solid #D0D8F0; }
+
+        .c-inst { --c: #0d0d0d; }
+        .c-data { --c: #FFB000; }
+        .c-lag  { --c: #00C080; }
+        .c-meas { --c: #FF4400; }
+
+        .foot {
+            position: relative; z-index: 1;
+            display: grid; grid-template-columns: 1.3fr 1fr; gap: 1vw;
+        }
+        .test {
+            background: #0d0d0d; border-radius: 8px; padding: 1.2vh 1vw;
+            font-family: "JetBrains Mono", monospace; color: #cdd6f4; font-size: 0.85vw;
+            display: flex; flex-direction: column; gap: 0.6vh;
+        }
+        .test b { color: #FF7755; }
+        .test .cmd { color: #00FFAA; }
+        .test .want { color: #FFB000; }
+        .read {
+            background: #fff; border-radius: 8px; border: 1.5px solid #D0D8F0;
+            padding: 1.2vh 1vw; display: flex; flex-direction: column; gap: 0.4vh; font-size: 0.9vw; color: #333;
+        }
+        .read .rh { font-family: "JetBrains Mono", monospace; font-size: 0.72vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; }
+        .read b { color: var(--epi-dark-blue); }
+
+        .slide-gf .deco-block-1, .slide-gf .deco-block-2 { background: #D0D8F0; }
+        .slide-gf .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-gf">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #2 · Advanced Networking</div>
+            <div class="title">Going Further<span class="cursor"></span></div>
+            <div class="subtitle">Pick your battles — then <b>prove them with numbers</b>.</div>
+        </div>
+
+        <div class="grid">
+            <div class="card c-inst"><span class="cn">Accounts <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>login · register</span><span>hashed passwords</span><span>sessions · tokens</span></div></div>
+            <div class="card c-inst"><span class="cn">Users DB <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>SQLite · Postgres</span><span>profiles</span><span>stats · history</span></div></div>
+            <div class="card c-inst"><span class="cn">Admin dashboard <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>console: kick · ban</span><span>list rooms</span><span>web panel</span></div></div>
+            <div class="card c-inst"><span class="cn">Social <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>text chat</span><span>friends</span><span>voice</span></div></div>
+
+            <div class="card c-inst"><span class="cn">Rules per room <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>difficulty</span><span>lives</span><span>friendly fire</span><span>max players</span></div></div>
+            <div class="card c-inst"><span class="cn">Scoreboard <span class="grp">multi-instance</span></span>
+                <div class="chips"><span>global ranking</span><span>ELO</span><span>per-level records</span></div></div>
+            <div class="card c-data"><span class="cn">Efficiency <span class="grp">transmission</span></span>
+                <div class="chips"><span>bit packing</span><span>quantization</span><span>delta snapshots</span><span>LZ4 · zlib · RLE</span></div></div>
+            <div class="card c-data"><span class="cn">Reliability <span class="grp">transmission</span></span>
+                <div class="chips"><span>ACK + resend</span><span>dedup · ordering</span><span>reconnect</span></div></div>
+
+            <div class="card c-lag"><span class="cn">Lag hiding <span class="grp">high-level</span></span>
+                <div class="chips"><span>prediction</span><span>interpolation</span><span>reconciliation</span></div></div>
+            <div class="card c-lag"><span class="cn">Fairness <span class="grp">high-level</span></span>
+                <div class="chips"><span>lag compensation</span><span>input delay</span><span>rollback</span></div></div>
+            <div class="card c-lag"><span class="cn">Security <span class="grp">high-level</span></span>
+                <div class="chips"><span>server authority</span><span>validate inputs</span><span>rate limiting</span></div></div>
+            <div class="card c-meas"><span class="cn">Metrics <span class="grp">measure</span></span>
+                <div class="chips"><span>bandwidth / s</span><span>ping · jitter</span><span>lagometer</span></div></div>
+        </div>
+
+        <div class="foot">
+            <div class="test">
+                <span><b>Break your network</b> — clumsy (Windows) · netem (Linux): 150 ms · 2 % loss · duplicates · 5 KB/s</span>
+                <span class="cmd">tc qdisc add dev lo root netem delay 150ms loss 2%</span>
+                <span class="want">The subject wants numbers: bandwidth used, responsiveness under lag.</span>
+            </div>
+            <div class="read">
+                <span class="rh">read — from the appendix</span>
+                <span><b>Fast-Paced Multiplayer</b> — Gabriel Gambetta</span>
+                <span><b>Game Networking Resources</b> · how <b>Quake 3</b>, <b>Overwatch</b>, <b>Valorant</b> do it</span>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 05 — You've Built This Before</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-mix {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8vh 5vw 6vh 5vw;
+            gap: 5vh;
+        }
+
+        .mix-head { display: flex; flex-direction: column; gap: 1.5vh; position: relative; z-index: 1; }
+
+        .mix-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .mix-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+
+        .mix-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .mix-subtitle {
+            font-size: 2vw;
+            color: #333;
+        }
+        .mix-subtitle b { color: var(--epi-dark-blue); }
+
+        .equation {
+            display: flex;
+            align-items: stretch;
+            gap: 0.6vw;
+            position: relative;
+            z-index: 1;
+        }
+
+        .op {
+            display: flex;
+            align-items: center;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 2.2vw;
+            color: var(--epi-periwinkle);
+        }
+
+        .card {
+            flex: 1;
+            background: var(--epi-white);
+            border-radius: 10px;
+            border-top: 5px solid var(--accent);
+            padding: 2.6vh 0.8vw;
+            display: flex;
+            flex-direction: column;
+            gap: 1.4vh;
+            box-shadow: 0 2px 10px rgba(26, 26, 204, 0.06);
+        }
+
+        .card-tek {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.9vw;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #999;
+        }
+
+        .card-name {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 1.75vw;
+            color: var(--epi-dark-blue);
+        }
+
+        .card-then {
+            font-size: 1.05vw;
+            color: #555;
+            line-height: 1.35;
+        }
+
+        .card-now {
+            margin-top: auto;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.8vw;
+            font-weight: 700;
+            color: var(--accent-text);
+            background: var(--accent-bg);
+            border-radius: 5px;
+            padding: 0.8vh 0.8vw;
+        }
+
+        .c-wolf   { --accent: #FF4400; --accent-text: #B83200; --accent-bg: #FF440014; }
+        .c-core   { --accent: #8899EE; --accent-text: #3A4DB8; --accent-bg: #8899EE1C; }
+        .c-ray    { --accent: #FFB000; --accent-text: #A06E00; --accent-bg: #FFB00018; }
+        .c-arcade { --accent: #FF00CC; --accent-text: #B0008E; --accent-bg: #FF00CC14; }
+        .c-zappy  { --accent: #00FFAA; --accent-text: #00885F; --accent-bg: #00FFAA1C; }
+
+        .card-result {
+            flex: 1;
+            background: var(--epi-blue);
+            border-radius: 10px;
+            padding: 2.8vh 1.4vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2vh;
+            color: var(--epi-white);
+        }
+
+        .card-result .card-name { color: var(--epi-white); font-size: 2.4vw; }
+
+        .card-result .sprites {
+            display: flex;
+            align-items: center;
+            gap: 0.3vw;
+        }
+        .card-result img { image-rendering: pixelated; }
+        .card-result .ship  { width: 6.5vw; }
+        .card-result .force { width: 3.2vw; }
+
+        .card-result .card-then { color: rgba(255,255,255,0.85); text-align: center; }
+
+        .slide-mix .deco-block-1,
+        .slide-mix .deco-block-2 { background: #D0D8F0; }
+        .slide-mix .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-mix">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="mix-head">
+            <div class="mix-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="mix-title">You've Built This Before<span class="cursor"></span></div>
+            <div class="mix-subtitle">Five projects in one. <b>You'll recognize each piece as we go.</b></div>
+        </div>
+
+        <div class="equation">
+            <div class="card c-wolf">
+                <div class="card-tek">Tek1</div>
+                <div class="card-name">Wolf3D</div>
+                <div class="card-then">A playable game: levels, enemies, controls — making it fun to play.</div>
+                <div class="card-now">→ game design</div>
+            </div>
+
+            <div class="op">+</div>
+
+            <div class="card c-core">
+                <div class="card-tek">Tek1</div>
+                <div class="card-name">Corewar</div>
+                <div class="card-then">Robot Factory wrote bytecode, the VM read it back: magic, header, byte order.</div>
+                <div class="card-now">→ binary protocol</div>
+            </div>
+
+            <div class="op">+</div>
+
+            <div class="card c-ray">
+                <div class="card-tek">Tek2</div>
+                <div class="card-name">Raytracer</div>
+                <div class="card-then">Interfaces, factories, design patterns — an architecture you can extend.</div>
+                <div class="card-now">→ engine design</div>
+            </div>
+
+            <div class="op">+</div>
+
+            <div class="card c-arcade">
+                <div class="card-tek">Tek2</div>
+                <div class="card-name">Arcade</div>
+                <div class="card-then">Game logic on one side, graphics library on the other — decoupled.</div>
+                <div class="card-now">→ engine subsystems</div>
+            </div>
+
+            <div class="op">+</div>
+
+            <div class="card c-zappy">
+                <div class="card-tek">Tek2</div>
+                <div class="card-name">Zappy</div>
+                <div class="card-then">A server running the world, clients connecting, a protocol to document.</div>
+                <div class="card-now">→ server &amp; network</div>
+            </div>
+
+            <div class="op">=</div>
+
+            <div class="card-result">
+                <div class="sprites">
+                    <img class="ship"  src="assets/player_cyan.png" alt="R-9 ship">
+                    <img class="force" src="assets/force.png" alt="Force orb">
+                </div>
+                <div class="card-name">R-Type</div>
+                <div class="card-then">…all at once,<br>over UDP, in real time.</div>
+            </div>
+        </div>
+
+    </section>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Spawn, don't fork</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-sp {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6vh 5vw 4vh 5vw;
+            gap: 2.2vh;
+        }
+
+        .head { display: flex; flex-direction: column; gap: 1vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; position: relative; z-index: 1; }
+
+        .col {
+            background: #fff;
+            border-radius: 10px;
+            border-top: 5px solid var(--accent);
+            padding: 1.8vh 1.3vw;
+            display: flex; flex-direction: column; gap: 1.2vh;
+            box-shadow: 0 2px 10px rgba(26, 26, 204, 0.06);
+        }
+        .bad  { --accent: #FF4400; }
+        .good { --accent: #00C080; }
+        .col-head { display: flex; align-items: baseline; gap: 0.8vw; }
+        .col-name { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 1.5vw; color: var(--epi-dark-blue); }
+        .col-tag { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; font-weight: 700; color: var(--accent); }
+
+        /* memory picture */
+        .mem { display: flex; align-items: center; gap: 0.8vw; font-family: "JetBrains Mono", monospace; font-size: 0.8vw; }
+        .proc {
+            border-radius: 6px; padding: 0.8vh 0.7vw; display: flex; flex-direction: column; gap: 0.4vh; min-width: 9vw;
+        }
+        .proc b { font-size: 0.9vw; }
+        .proc span { padding: 0.2vh 0.4vw; border-radius: 3px; font-size: 0.72vw; }
+        .p-l { background: #0d0d0d; color: #fff; border: 2px solid #8899EE; }
+        .p-l span { background: #2a2a3a; color: #cdd6f4; }
+        .p-copy { background: #0d0d0d; color: #fff; border: 2px dashed #FF4400; }
+        .p-copy span { background: #FF440033; color: #FF7755; }
+        .p-room { background: #1A1ACC; color: #fff; }
+        .p-room span { background: #ffffff22; color: #fff; }
+        .mem .ar { color: #999; font-size: 1.2vw; }
+
+        .code {
+            background: #0d0d0d; border-radius: 6px; padding: 1vh 0.9vw;
+            font-family: "JetBrains Mono", monospace; font-size: 0.85vw; line-height: 1.55; color: #cdd6f4;
+        }
+        .code > div { white-space: pre; }
+        .fn { color: #FFB000; } .st { color: #00FFAA; } .cm { color: #7a7a8a; }
+
+        .list { list-style: none; display: flex; flex-direction: column; gap: 0.6vh; }
+        .list li { font-size: 1.05vw; color: #333; line-height: 1.3; padding-left: 1.3vw; position: relative; }
+        .list li::before { position: absolute; left: 0; font-weight: 700; }
+        .bad .list li::before { content: "−"; color: #cc3300; }
+        .good .list li::before { content: "+"; color: #00A070; }
+        .list li b { color: var(--epi-dark-blue); }
+        .list code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+
+        .more {
+            position: relative; z-index: 1;
+            display: flex; gap: 0.8vw; align-items: center;
+            font-family: "JetBrains Mono", monospace; font-size: 0.95vw; color: #555;
+        }
+        .more span { background: #fff; border: 1.5px solid #D0D8F0; border-radius: 5px; padding: 0.6vh 0.8vw; color: #1A1ACC; }
+        .more span b { color: #333; font-weight: 500; }
+
+        .slide-sp .deco-block-1, .slide-sp .deco-block-2 { background: #D0D8F0; }
+        .slide-sp .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-sp">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #2</div>
+            <div class="title">Spawn, don't fork<span class="cursor"></span></div>
+            <div class="subtitle">A room is <b>its own binary</b>. The lobby just starts it.</div>
+        </div>
+
+        <div class="cols">
+            <div class="col bad">
+                <div class="col-head"><span class="col-name">fork()</span><span class="col-tag">copies the lobby</span></div>
+                <div class="mem">
+                    <div class="proc p-l"><b>L</b><span>memory</span><span>sockets</span><span>threads</span></div>
+                    <span class="ar">→</span>
+                    <div class="proc p-copy"><b>L copy</b><span>memory (CoW)</span><span>sockets leaked</span><span>1 thread, locks stuck</span></div>
+                </div>
+                <ul class="list">
+                    <li>The child inherits <b>every fd</b> of the lobby.</li>
+                    <li>Multi-threaded lobby: only the caller survives — <b>locks stay locked</b>.</li>
+                    <li><b>No Windows</b> equivalent.</li>
+                </ul>
+            </div>
+
+            <div class="col good">
+                <div class="col-head"><span class="col-name">spawn</span><span class="col-tag">starts a fresh program</span></div>
+                <div class="code">
+                    <div><span class="cm">// Linux · Windows: CreateProcess</span></div>
+                    <div><span class="fn">posix_spawn</span>(&amp;pid, <span class="st">"./r-type_room"</span>, …, argv, env);</div>
+                    <div><span class="cm">// argv: --port 4243 --name "Force Field"</span></div>
+                    <div><span class="cm">//       --mode endless --lobby 127.0.0.1:4242</span></div>
+                </div>
+                <ul class="list">
+                    <li>Clean process: <b>its own memory</b>, nothing inherited.</li>
+                    <li>Everything it needs comes from <b>argv</b>.</li>
+                    <li>Cross-platform: <code>Boost.Process</code> · <code>reproc</code>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="more">
+            going further:
+            <span>pool <b>— idle rooms ready at boot</b></span>
+            <span>agents <b>— rooms on other machines</b></span>
+        </div>
+    </section>
+</body>
+</html>

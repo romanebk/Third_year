@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Levels</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-lvl {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 5vw 3.5vh 5vw; gap: 1.8vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 2vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .strip { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 0.8vh; }
+        canvas { width: 100%; aspect-ratio: 1160 / 190; border-radius: 10px; background: #05050d; display: block; }
+        .log { display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #555; }
+        .log b { color: #cc3300; }
+        .log #ev { color: var(--epi-dark-blue); font-weight: 700; }
+
+        .bottom { position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.6vw; }
+        .code {
+            background: #0d0d0d; border-radius: 8px; padding: 1.3vh 1vw;
+            font-family: "JetBrains Mono", monospace; font-size: 0.82vw; line-height: 1.55; color: #cdd6f4;
+        }
+        .code div { white-space: pre; transition: background 0.2s; border-radius: 3px; }
+        .code div.hot { background: #1A1ACC66; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; }
+
+        .side { display: flex; flex-direction: column; gap: 1vh; justify-content: center; }
+        .pt { font-size: 1.05vw; color: #333; line-height: 1.35; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .twists { font-size: 1vw; color: #333; line-height: 1.4; border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 0.9vh 1vw; }
+        .twists b { color: #cc3300; }
+
+        .slide-lvl .deco-block-1, .slide-lvl .deco-block-2 { background: #D0D8F0; }
+        .slide-lvl .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lvl">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #3</div>
+                <div class="title">Levels<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">A level is <b>a timeline of spawns</b>, read from a file.</div>
+        </div>
+
+        <div class="strip">
+            <canvas id="cv" width="1160" height="190"></canvas>
+            <div class="log"><span>scroll <b id="sc">0</b> px · the camera is the frame</span><span id="ev">—</span></div>
+        </div>
+
+        <div class="bottom">
+            <div class="code" id="code">
+                <div><span class="cm"># levels/level_1.yaml</span></div>
+                <div><span class="k">name</span>: <span class="s">"Bydo Outpost"</span>   <span class="k">music</span>: <span class="s">stage1.ogg</span>   <span class="k">scroll</span>: <span class="v">60</span> <span class="cm"># px/s</span></div>
+                <div><span class="k">background</span>: [<span class="s">stars.png</span>, <span class="s">nebula.png</span>]   <span class="k">terrain</span>: <span class="s">outpost.map</span></div>
+                <div><span class="k">waves</span>:</div>
+                <div data-at="400">  - { <span class="k">at</span>: <span class="v">400</span>,  <span class="k">spawn</span>: <span class="s">bydo</span>,     <span class="k">count</span>: <span class="v">4</span>, <span class="k">pattern</span>: <span class="s">straight</span> }</div>
+                <div data-at="1000">  - { <span class="k">at</span>: <span class="v">1000</span>, <span class="k">spawn</span>: <span class="s">bug</span>,      <span class="k">count</span>: <span class="v">5</span>, <span class="k">pattern</span>: <span class="s">sine</span> }</div>
+                <div data-at="1600">  - { <span class="k">at</span>: <span class="v">1600</span>, <span class="k">spawn</span>: <span class="s">crab</span>,     <span class="k">count</span>: <span class="v">2</span>, <span class="k">on</span>: <span class="s">ground</span> }</div>
+                <div data-at="2200">  - { <span class="k">at</span>: <span class="v">2200</span>, <span class="k">spawn</span>: <span class="s">patapata</span>, <span class="k">count</span>: <span class="v">3</span>, <span class="k">pattern</span>: <span class="s">chaser</span> }</div>
+                <div data-at="2600">  - { <span class="k">at</span>: <span class="v">2600</span>, <span class="k">checkpoint</span>: <span class="v">true</span> }</div>
+                <div data-at="3200"><span class="k">boss</span>: { <span class="k">at</span>: <span class="v">3200</span>, <span class="k">prefab</span>: <span class="s">dobkeratops.yaml</span>, <span class="k">scroll</span>: <span class="s">stop</span> }</div>
+            </div>
+
+            <div class="side">
+                <div class="pt">Spawns keyed on <b>scroll distance</b>, not on wall-clock time.</div>
+                <div class="pt">The <b>room</b> reads the file and runs it. Clients only get what to draw.</div>
+                <div class="pt"><b>Obstacles</b> are content too: terrain, walls, closing corridors.</div>
+                <div class="pt">New level = <b>new file</b>. No recompile, no new class.</div>
+                <div class="twists"><b>Give each level a twist.</b> Level 3: a giant vessel for the whole stage. Level 4: monsters leave solid trails. A theme, a rule, a surprise.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 1160, H = 190, LEN = 3700, VIEW = 520;       // level units; camera shows VIEW units
+        const X = u => u / LEN * W;                            // level unit → strip pixel
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const I = { bydo: img('bydos.png'), bug: img('bug.png'), crab: img('crab.png'), pata: img('patapata.png'), boss: img('dobkeratops.png'), ship: img('player_cyan.png') };
+
+        const waves = [
+            { at: 400,  spr: 'bydo', n: 4, y: 50,  txt: 'at 400: spawn 4× bydo · straight' },
+            { at: 1000, spr: 'bug',  n: 5, y: 95,  txt: 'at 1000: spawn 5× bug · sine' },
+            { at: 1600, spr: 'crab', n: 2, y: 126, txt: 'at 1600: spawn 2× crab · on ground' },
+            { at: 2200, spr: 'pata', n: 3, y: 70,  txt: 'at 2200: spawn 3× patapata · chaser' },
+            { at: 2600, cp: true,              txt: 'at 2600: checkpoint saved' },
+            { at: 3200, boss: true,            txt: 'at 3200: BOSS · scroll stops' },
+        ];
+
+        // terrain: ground & ceiling heights along the level
+        const ground = u => 168 - (u > 1300 && u < 2100 ? 18 + 10 * Math.sin(u / 60) : 4 * Math.sin(u / 90));
+        const ceil = u => (u > 1900 && u < 2700 ? 22 + 16 * Math.sin(u / 80) : 0);
+
+        let cam = 0, hold = 0;
+        const sc = document.getElementById('sc'), ev = document.getElementById('ev');
+        const lines = [...document.querySelectorAll('#code div[data-at]')];
+        let fired = new Set();
+
+        function update(dt) {
+            if (hold > 0) { hold -= dt; if (hold <= 0) { cam = 0; fired.clear(); ev.textContent = '—'; lines.forEach(l => l.classList.remove('hot')); } return; }
+            const edge = cam + VIEW;
+            const bossAt = 3200;
+            if (edge < bossAt + 200) cam += 230 * dt;
+            else if (hold <= 0 && !fired.has('end')) { fired.add('end'); hold = 3; }
+            waves.forEach((w, i) => {
+                if (!fired.has(i) && cam + VIEW >= w.at) {
+                    fired.add(i); ev.textContent = '▶ ' + w.txt;
+                    lines.forEach(l => l.classList.toggle('hot', +l.dataset.at === w.at));
+                }
+            });
+            sc.textContent = Math.round(cam);
+        }
+
+        function draw() {
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            // zones
+            ctx.fillStyle = '#0c0c22'; ctx.fillRect(X(1300), 0, X(1400), H);
+            ctx.fillStyle = '#1a0a14'; ctx.fillRect(X(3000), 0, X(700), H);
+            ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillStyle = '#3a3a6a';
+            ctx.fillText('SPACE', X(60), 16); ctx.fillText('OUTPOST · walls', X(1320), 16); ctx.fillText('BOSS ROOM', X(3020), 16);
+            // stars
+            for (let i = 0; i < 90; i++) { const sx = (i * 131.7) % W, sy = (i * 57.3) % 150 + 8; ctx.fillStyle = '#2a2a55'; ctx.fillRect(sx, sy, 1.5, 1.5); }
+            // terrain
+            ctx.fillStyle = '#3a2c18';
+            ctx.beginPath(); ctx.moveTo(0, H);
+            for (let u = 0; u <= LEN; u += 20) ctx.lineTo(X(u), ground(u));
+            ctx.lineTo(W, H); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(0, 0);
+            for (let u = 0; u <= LEN; u += 20) ctx.lineTo(X(u), ceil(u));
+            ctx.lineTo(W, 0); ctx.fill();
+
+            // markers
+            waves.forEach((w, i) => {
+                const on = fired.has(i), x = X(w.at);
+                ctx.strokeStyle = on ? '#FFB000' : '#3a3a6a'; ctx.setLineDash([3, 4]);
+                ctx.beginPath(); ctx.moveTo(x, 22); ctx.lineTo(x, H - 6); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = on ? '#FFB000' : '#55608a'; ctx.fillText(String(w.at), x + 3, H - 8);
+                ctx.globalAlpha = on ? 1 : 0.45;
+                if (w.spr) for (let k = 0; k < w.n; k++) { const im = I[w.spr]; if (im.complete) ctx.drawImage(im, x + 8 + k * 16, w.y + (k % 2) * 10, 18, 18); }
+                if (w.cp) { ctx.fillStyle = '#00FFAA'; ctx.fillRect(x + 4, 40, 12, 8); ctx.fillStyle = on ? '#00FFAA' : '#55608a'; ctx.fillText('CHECKPOINT', x + 20, 48); }
+                if (w.boss && I.boss.complete) ctx.drawImage(I.boss, x + 60, 26, 80, 105);
+                ctx.globalAlpha = 1;
+            });
+
+            // camera frame
+            const cx = X(cam), cw = X(VIEW);
+            ctx.fillStyle = 'rgba(26,26,204,0.18)'; ctx.fillRect(cx, 2, cw, H - 4);
+            ctx.strokeStyle = '#8899EE'; ctx.lineWidth = 2; ctx.strokeRect(cx + 1, 2, cw - 2, H - 4); ctx.lineWidth = 1;
+            if (I.ship.complete) ctx.drawImage(I.ship, cx + 12, 88, 30, 15);
+            ctx.fillStyle = '#AAB6FF'; ctx.fillText('CAMERA', cx + 6, H - 22);
+            if (hold > 0) { ctx.fillStyle = '#FF7755'; ctx.fillText('scroll: stop', cx + cw - 90, H - 22); }
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

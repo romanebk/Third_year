@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Hangar</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-hg { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .hg-left {
+            position: relative; z-index: 1; width: 58%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        .ui { width: 100%; background: #0d0d0d; border-radius: 10px; overflow: hidden; font-family: "JetBrains Mono", monospace; color: #cdd6f4; }
+        .top { display: flex; justify-content: space-between; align-items: baseline; padding: 1.4vh 1.2vw; border-bottom: 1px solid #2a2a4a; }
+        .logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.4vw; color: #fff; }
+        .logo span { color: #FF4400; }
+        .logo i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 0.75vw; color: #8899EE; margin-left: 0.5vw; letter-spacing: 0.1em; }
+        .cr { font-size: 1vw; color: #FFB000; font-weight: 700; }
+        .cr small { color: #6B82D6; font-weight: 500; font-size: 0.7vw; margin-left: 0.4vw; }
+
+        .body { display: grid; grid-template-columns: 1.05fr 1fr; }
+        .stage { position: relative; height: 30vh; background: radial-gradient(ellipse at 50% 80%, #1A1ACC55, #05050d 65%); display: flex; align-items: center; justify-content: center; gap: 0.6vw; border-right: 1px solid #2a2a4a; }
+        .stage img { image-rendering: pixelated; }
+        #ship { width: 11vw; animation: hover 3s ease-in-out infinite; }
+        #force { width: 4.4vw; animation: hover 3s ease-in-out infinite; animation-delay: -0.4s; }
+        @keyframes hover { 50% { transform: translateY(-1vh); } }
+        .pad { position: absolute; bottom: 4vh; width: 60%; height: 1.2vh; border-radius: 50%; background: radial-gradient(#00FFFF55, transparent 70%); }
+        .nm { position: absolute; top: 1.4vh; left: 1vw; font-size: 0.8vw; color: #00B8D4; }
+        .nm b { color: #fff; }
+
+        .shop { padding: 1.2vh 1vw; display: flex; flex-direction: column; gap: 1vh; }
+        .tabs { display: flex; gap: 0.3vw; }
+        .tabs span { font-size: 0.72vw; font-weight: 700; letter-spacing: 0.08em; padding: 0.5vh 0.6vw; border-radius: 4px; border: 1px solid #2a2a4a; color: #6B82D6; cursor: pointer; }
+        .tabs span.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5vw; }
+        .it { border: 1.5px solid #2a2a4a; border-radius: 6px; padding: 0.8vh 0.4vw; display: flex; flex-direction: column; align-items: center; gap: 0.4vh; cursor: pointer; background: #15152a; }
+        .it:hover { border-color: #6B82D6; }
+        .it.sel { border-color: #FFB000; }
+        .it img { height: 2.6vw; image-rendering: pixelated; }
+        .it .n { font-size: 0.66vw; color: #cdd6f4; }
+        .it .p { font-size: 0.66vw; color: #FFB000; }
+        .it .p.own { color: #00FFAA; }
+        .it .p.eq { color: #00B8D4; }
+        #buy { font-family: inherit; font-weight: 700; font-size: 0.9vw; letter-spacing: 0.08em; padding: 1vh; border-radius: 6px; border: none; cursor: pointer; background: #FFB000; color: #0d0d0d; }
+        #buy:disabled { background: #2a2a4a; color: #6B82D6; cursor: default; }
+
+        .log { border-top: 1px solid #2a2a4a; padding: 1vh 1.2vw; font-size: 0.72vw; line-height: 1.6; height: 10.5vh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+        .log div { white-space: nowrap; }
+        .log .c { color: #00FFAA; } .log .l { color: #8899EE; } .log .db { color: #FFB000; } .log .x { color: #FF7755; }
+
+        .hg-right {
+            position: relative; z-index: 1; width: 42%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 5vh 4.2vw 5vh 1vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        .points { display: flex; flex-direction: column; gap: 0.85vh; }
+        .pt { font-size: 1vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .box { font-size: 0.95vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; }
+        .net { border-left: 4px solid #00C080; background: #00FFAA14; }
+        .net b { color: #00885F; }
+        .art { border-left: 4px solid var(--epi-orange); background: #FF440010; }
+        .art b { color: #cc3300; }
+
+        .slide-hg .deco-block-1, .slide-hg .deco-block-2 { background: #D0D8F0; }
+        .slide-hg .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-hg">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="hg-left">
+            <div class="ui">
+                <div class="top">
+                    <div class="logo">R<span>·</span>TYPE<i>HANGAR</i></div>
+                    <div class="cr"><span id="cr">1200</span> CR<small>earned in missions</small></div>
+                </div>
+                <div class="body">
+                    <div class="stage">
+                        <div class="nm">squad <b>NOVA-7</b> · your ship</div>
+                        <img id="ship" src="assets/player_cyan.png" alt="ship">
+                        <img id="force" src="assets/force.png" alt="force">
+                        <div class="pad"></div>
+                    </div>
+                    <div class="shop">
+                        <div class="tabs"><span class="on" data-t="paint">PAINT</span><span data-t="force">FORCE</span></div>
+                        <div class="items" id="items"></div>
+                        <button id="buy">EQUIP</button>
+                    </div>
+                </div>
+                <div class="log" id="log"></div>
+            </div>
+        </div>
+
+        <div class="hg-right">
+            <div class="eyebrow">Epitech Afrique — Track #3 · Meta</div>
+            <div class="title">Hangar<span class="cursor"></span></div>
+            <div class="subtitle">Earn in missions. <b>Show it off.</b></div>
+
+            <div class="points">
+                <div class="pt"><b>A shop, quarters, a hangar</b>: a hub scene where the player customizes the ship. Paint, Force skin, engine trail…</div>
+                <div class="pt"><b>The server decides.</b> Prices and balance live in the users DB. The client asks, the lobby checks, then writes.</div>
+                <div class="pt"><b>Others see it.</b> The skin id travels with the player into the room: every client draws it.</div>
+                <div class="pt"><b>Cosmetic only</b>, or it becomes pay-to-win: a game design decision.</div>
+            </div>
+
+            <div class="box net"><b>Same as the galactic map:</b> slow data in the lobby and its DB, never in the room's tick.</div>
+            <div class="box art"><b>Needs art.</b> Artists in the team, or assets found online (itch.io, OpenGameArt, Kenney). Check the licence, credit the author.</div>
+        </div>
+    </section>
+
+    <script>
+        const ITEMS = {
+            paint: [
+                { id: 'cyan',    n: 'R-9 cyan',    src: 'player_cyan.png',    price: 0,   own: true },
+                { id: 'magenta', n: 'Magenta',     src: 'player_magenta.png', price: 300 },
+                { id: 'green',   n: 'Jungle',      src: 'player_green.png',   price: 300 },
+                { id: 'red',     n: 'Bydo red',    src: 'player_red.png',     price: 500 },
+                { id: 'blue',    n: 'Deep blue',   src: 'player_blue.png',    price: 400 },
+            ],
+            force: [
+                { id: 'f_std',   n: 'Standard',    hue: 0,   price: 0,   own: true },
+                { id: 'f_ice',   n: 'Ice',         hue: 180, price: 250 },
+                { id: 'f_toxic', n: 'Toxic',       hue: 90,  price: 250 },
+                { id: 'f_void',  n: 'Void',        hue: 260, price: 600 },
+            ],
+        };
+        let credits = 1200, tab = 'paint', sel = { paint: 'cyan', force: 'f_std' }, eq = { paint: 'cyan', force: 'f_std' };
+        const $ = id => document.getElementById(id);
+        const find = (t, id) => ITEMS[t].find(i => i.id === id);
+
+        function log(html) {
+            const d = document.createElement('div'); d.innerHTML = html; $('log').appendChild(d);
+            while ($('log').children.length > 5) $('log').removeChild($('log').firstChild);
+        }
+        function preview() {
+            const p = find('paint', sel.paint), f = find('force', sel.force);
+            $('ship').src = 'assets/' + p.src;
+            $('force').style.filter = f.hue ? `hue-rotate(${f.hue}deg) saturate(1.4)` : '';
+        }
+        function render() {
+            document.querySelectorAll('.tabs span').forEach(s => s.classList.toggle('on', s.dataset.t === tab));
+            $('items').innerHTML = '';
+            ITEMS[tab].forEach(it => {
+                const d = document.createElement('div'); d.className = 'it' + (sel[tab] === it.id ? ' sel' : '');
+                const src = it.src ? 'assets/' + it.src : 'assets/force.png';
+                const st = eq[tab] === it.id ? '<span class="p eq">EQUIPPED</span>' : it.own ? '<span class="p own">OWNED</span>' : `<span class="p">${it.price} CR</span>`;
+                d.innerHTML = `<img src="${src}" style="${it.hue ? `filter:hue-rotate(${it.hue}deg) saturate(1.4)` : ''}"><span class="n">${it.n}</span>${st}`;
+                d.addEventListener('click', () => { sel[tab] = it.id; preview(); render(); });
+                $('items').appendChild(d);
+            });
+            const it = find(tab, sel[tab]), b = $('buy');
+            if (eq[tab] === it.id) { b.textContent = 'EQUIPPED'; b.disabled = true; }
+            else if (it.own) { b.textContent = 'EQUIP'; b.disabled = false; }
+            else { b.textContent = `BUY · ${it.price} CR`; b.disabled = false; }
+            $('cr').textContent = credits;
+        }
+        document.querySelectorAll('.tabs span').forEach(s => s.addEventListener('click', () => { tab = s.dataset.t; render(); }));
+        $('buy').addEventListener('click', async () => {
+            const it = find(tab, sel[tab]), b = $('buy');
+            b.disabled = true;
+            if (!it.own) {
+                log(`<span class="c">client →</span> <span class="l">lobby</span>: BUY ${it.id}`);
+                await sleep(500);
+                if (credits < it.price) { log(`<span class="l">lobby</span>: <span class="x">refused · balance ${credits} &lt; ${it.price}</span>`); render(); return; }
+                log(`<span class="l">lobby</span>: balance ${credits} ≥ ${it.price} ✓ · <span class="db">UPDATE users SET credits = ${credits - it.price} · INSERT owned(${it.id})</span>`);
+                await sleep(500);
+                credits -= it.price; it.own = true;
+            }
+            eq[tab] = it.id;
+            log(`<span class="l">lobby</span>: equipped ${it.id} · <span class="c">next room: every client draws it</span>`);
+            render();
+        });
+        log('<span class="l">lobby</span>: NOVA-7 profile loaded from <span class="db">users DB</span> · 1200 CR');
+        preview(); render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Who Runs the Engine?</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-wr {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6vh 5vw 4vh 5vw;
+            gap: 2.4vh;
+        }
+        .head { display: flex; flex-direction: column; gap: 1vh; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.7vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        .subtitle .no { color: #cc3300; }
+
+        .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.4vw; position: relative; z-index: 1; }
+        .bin {
+            border-radius: 10px;
+            padding: 2vh 1.3vw;
+            display: flex; flex-direction: column; gap: 1.2vh;
+            font-family: "JetBrains Mono", monospace;
+        }
+        .b-cli  { background: #fff; border: 2px solid #D0D8F0; color: #1A1ACC; }
+        .b-room { background: #1A1ACC; color: #fff; }
+        .b-lob  { background: #0d0d0d; color: #fff; border: 2px solid #8899EE; }
+
+        .bn { display: flex; justify-content: space-between; align-items: center; }
+        .bn b { font-family: "Space Grotesk", sans-serif; font-size: 1.9vw; }
+        .bn code { font-size: 0.85vw; opacity: 0.8; }
+
+        .chip { align-self: flex-start; font-size: 1vw; font-weight: 700; letter-spacing: 0.1em; padding: 0.6vh 0.9vw; border-radius: 6px; }
+        .eng { background: #FF4400; color: #fff; }
+        .noeng { border: 1.5px dashed #666; color: #999; text-decoration: line-through; }
+
+        .grp { font-size: 0.72vw; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin-top: 0.4vh; }
+        .tags { display: flex; flex-wrap: wrap; gap: 0.4vw; }
+        .tags span { font-size: 0.85vw; padding: 0.4vh 0.6vw; border-radius: 4px; }
+        .b-cli .tags span  { background: #F0F2F8; border: 1px solid #D0D8F0; }
+        .b-room .tags span { background: #ffffff22; }
+        .b-lob .tags span  { background: #22222e; border: 1px solid #3a3a6a; color: #cdd6f4; }
+        .tags .sys { border-left: 3px solid #00C080 !important; }
+
+        .role { font-family: "Inter", sans-serif; font-size: 1.1vw; line-height: 1.35; margin-top: auto; }
+        .b-cli .role { color: #333; }
+        .b-room .role, .b-lob .role { color: #D0D8F0; }
+
+        .foot {
+            position: relative; z-index: 1;
+            font-size: 1.15vw; color: #333; line-height: 1.35;
+            border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 1vh 1vw;
+        }
+        .foot b { color: #cc3300; }
+
+        .slide-wr .deco-block-1, .slide-wr .deco-block-2 { background: #D0D8F0; }
+        .slide-wr .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-wr">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div class="eyebrow">Epitech Afrique — Track #2</div>
+            <div class="title">Who Runs the Engine?<span class="cursor"></span></div>
+            <div class="subtitle">Client and room: <b>yes</b>. Lobby: <span class="no"><b>no</b></span>.</div>
+        </div>
+
+        <div class="cols">
+            <div class="bin b-cli">
+                <div class="bn"><b>Client</b><code>r-type_client</code></div>
+                <span class="chip eng">ENGINE</span>
+                <span class="grp">plugins</span>
+                <div class="tags"><span>graphics</span><span>audio</span><span>network</span></div>
+                <span class="grp">systems</span>
+                <div class="tags"><span class="sys">input</span><span class="sys">prediction</span><span class="sys">interpolation</span><span class="sys">render</span></div>
+                <span class="role">Shows the game. Guesses <b>its own ship</b>, smooths the others.</span>
+            </div>
+
+            <div class="bin b-room">
+                <div class="bn"><b>Room</b><code>r-type_room</code></div>
+                <span class="chip eng">ENGINE</span>
+                <span class="grp">plugins</span>
+                <div class="tags"><span>network</span><span>scripting</span></div>
+                <span class="grp">systems</span>
+                <div class="tags"><span class="sys">movement</span><span class="sys">collision</span><span class="sys">spawns</span><span class="sys">snapshots</span></div>
+                <span class="role">Simulates the game. <b>The final word</b>. No screen.</span>
+            </div>
+
+            <div class="bin b-lob">
+                <div class="bn"><b>Lobby</b><code>r-type_server</code></div>
+                <span class="chip noeng">ENGINE</span>
+                <span class="grp">just a server</span>
+                <div class="tags"><span>sockets</span><span>accounts / DB</span><span>room list</span><span>spawn rooms</span><span>heartbeats</span></div>
+                <span class="role">Runs no game. <b>Orchestration only</b> — a plain server is enough.</span>
+            </div>
+        </div>
+
+        <div class="foot">One engine library, <b>different plugins and systems per binary</b>. Same code for prediction on the client and simulation in the room.</div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 06 — Lobby &amp; Rooms</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-arch {
+            background: var(--epi-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6vh 5vw 4vh 5vw;
+            gap: 2.4vh;
+        }
+
+        .arch-head { display: flex; flex-direction: column; gap: 1.2vh; position: relative; z-index: 1; }
+
+        .arch-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .arch-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+
+        .arch-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .arch-subtitle { font-size: 1.9vw; color: #333; }
+        .arch-subtitle b { color: #cc3300; }
+
+        .diagram { position: relative; z-index: 1; width: 100%; }
+        .diagram svg { width: 100%; height: auto; display: block; }
+
+        .diagram text { font-family: "Inter", sans-serif; }
+        .diagram .mono { font-family: "JetBrains Mono", monospace; }
+        .diagram image { image-rendering: pixelated; }
+
+        .legend {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            white-space: nowrap;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.95vw;
+            color: #444;
+        }
+        .legend span { display: flex; align-items: center; gap: 0.6vw; }
+        .legend i { display: inline-block; width: 3vw; height: 0; }
+        .legend .l-join { border-top: 2px dashed #8899EE; }
+        .legend .l-udp  { border-top: 3px solid #00C080; }
+        .legend .l-pin  { width: auto; height: auto; font-style: normal; font-weight: 700; font-size: 0.9vw; color: #fff; background: #1A1ACC; border-radius: 1vw; padding: 0.1vh 0.6vw; }
+        .legend .l-eng  { width: 1.6vw; height: 1.1vw; background: #FF4400; border-radius: 3px; }
+
+        .arch-note {
+            position: relative;
+            z-index: 1;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.05vw;
+            color: #333;
+            border-left: 4px solid #0d0d0d;
+            padding: 0.6vh 1vw;
+            background: #0d0d0d0d;
+        }
+        .arch-note b { color: #0d0d0d; }
+
+        .slide-arch .deco-block-1,
+        .slide-arch .deco-block-2 { background: #D0D8F0; }
+        .slide-arch .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-arch">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="arch-head">
+            <div class="arch-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="arch-title">Lobby &amp; Rooms<span class="cursor"></span></div>
+            <div class="arch-subtitle">One lobby, one process per game. <b>The engine is the kernel of every room and client.</b></div>
+        </div>
+
+        <div class="diagram">
+            <svg viewBox="0 0 1160 392" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- engine chip -->
+                    <g id="chip">
+                        <rect x="0" y="0" width="74" height="22" rx="4" fill="#FF4400"/>
+                        <text x="37" y="15" text-anchor="middle" class="mono" font-size="11" font-weight="700" fill="#fff" letter-spacing="1">ENGINE</text>
+                    </g>
+                    <!-- client box: 120 x 84, sprite + pin added per client -->
+                    <g id="client-box">
+                        <rect x="0" y="0" width="120" height="84" rx="8" fill="#fff" stroke="#D0D8F0" stroke-width="1.5"/>
+                        <text x="12" y="48" class="mono" font-size="11" letter-spacing="2" fill="#8899EE">CLIENT</text>
+                        <use href="#chip" x="12" y="54"/>
+                    </g>
+                    <!-- pins: where the client is right now -->
+                    <g id="pin-L">
+                        <rect x="0" y="0" width="30" height="20" rx="10" fill="#0d0d0d" stroke="#8899EE" stroke-width="1.5"/>
+                        <text x="15" y="14.5" text-anchor="middle" class="mono" font-size="12" font-weight="700" fill="#fff">L</text>
+                    </g>
+                    <g id="pin-r1"><rect x="0" y="0" width="30" height="20" rx="10" fill="#1A1ACC"/><text x="15" y="14.5" text-anchor="middle" class="mono" font-size="12" font-weight="700" fill="#fff">r1</text></g>
+                    <g id="pin-r2"><rect x="0" y="0" width="30" height="20" rx="10" fill="#1A1ACC"/><text x="15" y="14.5" text-anchor="middle" class="mono" font-size="12" font-weight="700" fill="#fff">r2</text></g>
+                    <g id="pin-r3"><rect x="0" y="0" width="30" height="20" rx="10" fill="#1A1ACC"/><text x="15" y="14.5" text-anchor="middle" class="mono" font-size="12" font-weight="700" fill="#fff">r3</text></g>
+                    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                        <path d="M0 0 L10 5 L0 10 z" fill="#8899EE"/>
+                    </marker>
+                    <!-- room: 250 x 176 -->
+                    <g id="room-body">
+                        <rect x="0" y="0" width="250" height="176" rx="10" fill="#1A1ACC"/>
+                        <text x="20" y="36" class="mono" font-size="11" letter-spacing="2" fill="#AAB6FF">ROOM · PROCESS</text>
+                        <use href="#chip" transform="translate(20 84) scale(1.2)"/>
+                        <rect x="118" y="86" width="112" height="22" rx="11" fill="none" stroke="#6B82D6" stroke-width="1.2"/>
+                        <text x="174" y="101" text-anchor="middle" class="mono" font-size="10" fill="#AAB6FF">threads: its call</text>
+                        <text x="20" y="140" font-size="13" fill="#D0D8F0">physics · collisions · spawns</text>
+                        <text x="20" y="160" font-size="13" fill="#D0D8F0">has the final word</text>
+                    </g>
+                </defs>
+
+                <!-- ===== server frame ===== -->
+                <rect x="2" y="2" width="1156" height="258" rx="12" fill="#E4E8F6" stroke="#8899EE" stroke-width="1.5" stroke-dasharray="6 5"/>
+                <text x="18" y="24" class="mono" font-size="12" letter-spacing="2" fill="#3344BB">server machine</text>
+
+                <!-- lobby L: the master, no engine -->
+                <rect x="30" y="64" width="200" height="176" rx="10" fill="#0d0d0d" stroke="#8899EE" stroke-width="2"/>
+                <text x="130" y="126" text-anchor="middle" font-size="60" font-weight="700" fill="#fff" font-family="Space Grotesk, sans-serif">L</text>
+                <text x="130" y="152" text-anchor="middle" class="mono" font-size="11" letter-spacing="1" fill="#8899EE">LOBBY · r-type_server</text>
+                <text x="130" y="176" text-anchor="middle" font-size="13" fill="#cdd6f4">accept · group players</text>
+                <text x="130" y="194" text-anchor="middle" font-size="13" fill="#cdd6f4">spawn room processes</text>
+                <rect x="58" y="206" width="144" height="22" rx="4" fill="none" stroke="#666" stroke-width="1.2" stroke-dasharray="4 3"/>
+                <text x="130" y="221" text-anchor="middle" class="mono" font-size="10" fill="#999">no engine</text>
+
+                <!-- rooms r1..r3 -->
+                <use href="#room-body" x="300" y="64"/>
+                <text x="530" y="120" text-anchor="end" font-size="48" font-weight="700" fill="#fff" font-family="Space Grotesk, sans-serif">r1</text>
+
+                <use href="#room-body" x="590" y="64"/>
+                <text x="820" y="120" text-anchor="end" font-size="48" font-weight="700" fill="#fff" font-family="Space Grotesk, sans-serif">r2</text>
+
+                <use href="#room-body" x="880" y="64"/>
+                <text x="1110" y="120" text-anchor="end" font-size="48" font-weight="700" fill="#fff" font-family="Space Grotesk, sans-serif">r3</text>
+
+                <!-- L starts rooms: bus line above the rooms -->
+                <g stroke="#8899EE" stroke-width="2" fill="none">
+                    <path d="M130 64 L130 42 L1005 42"/>
+                    <path d="M425 42 L425 62" marker-end="url(#arr)"/>
+                    <path d="M715 42 L715 62" marker-end="url(#arr)"/>
+                    <path d="M1005 42 L1005 62" marker-end="url(#arr)"/>
+                </g>
+                <text x="250" y="36" class="mono" font-size="11" fill="#6B82D6">spawns</text>
+
+                <!-- ===== clients (pinned to where they are now) ===== -->
+                <!-- in L: waiting -->
+                <use href="#client-box" x="70" y="304"/>
+                <image href="assets/player_blue.png" x="82" y="312" width="42" height="16"/>
+                <use href="#pin-L" x="148" y="310"/>
+
+                <!-- in r1 -->
+                <use href="#client-box" x="300" y="304"/>
+                <image href="assets/player_cyan.png" x="312" y="312" width="42" height="16"/>
+                <use href="#pin-r1" x="378" y="310"/>
+                <use href="#client-box" x="430" y="304"/>
+                <image href="assets/player_magenta.png" x="442" y="312" width="42" height="16"/>
+                <use href="#pin-r1" x="508" y="310"/>
+
+                <!-- in r2 -->
+                <use href="#client-box" x="655" y="304"/>
+                <image href="assets/player_green.png" x="667" y="312" width="42" height="16"/>
+                <use href="#pin-r2" x="733" y="310"/>
+
+                <!-- in r3 -->
+                <use href="#client-box" x="945" y="304"/>
+                <image href="assets/player_red.png" x="957" y="312" width="42" height="16"/>
+                <use href="#pin-r3" x="1023" y="310"/>
+
+                <!-- ===== links ===== -->
+                <!-- waiting in the lobby (dashed) -->
+                <path d="M130 304 L130 240" stroke="#8899EE" stroke-width="2" stroke-dasharray="6 5" fill="none"/>
+                <!-- in a room: UDP -->
+                <g stroke="#00C080" stroke-width="3" fill="none">
+                    <path d="M360 304 L360 240"/>
+                    <path d="M490 304 L490 240"/>
+                    <path d="M715 304 L715 240"/>
+                    <path d="M1005 304 L1005 240"/>
+                </g>
+                <g class="mono" font-size="11" font-weight="700" fill="#00A070">
+                    <text x="368" y="286">UDP</text>
+                    <text x="498" y="286">UDP</text>
+                    <text x="723" y="286">UDP</text>
+                    <text x="1013" y="286">UDP</text>
+                </g>
+            </svg>
+        </div>
+
+        <div class="legend">
+            <span><i class="l-join"></i>in the lobby — TCP is fine</span>
+            <span><i class="l-udp"></i>in a room — UDP only</span>
+            <span><i class="l-eng"></i>same engine in rooms &amp; clients</span>
+            <span><i class="l-pin">r1</i>where the client is now</span>
+        </div>
+
+        <div class="arch-note"><b>L has no engine.</b> It runs no game — it only orchestrates: who's online, which rooms exist, spawning them.</div>
+
+    </section>
+</body>
+</html>

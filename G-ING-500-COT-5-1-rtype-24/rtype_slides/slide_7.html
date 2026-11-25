@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 07 — The Lobby</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-lobby {
+            background: var(--epi-light);
+            display: flex;
+            align-items: stretch;
+        }
+
+        .lobby-left {
+            position: relative;
+            z-index: 1;
+            width: 61%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vh 1.5vw 5vh 3vw;
+        }
+
+        /* ---------- mock game UI ---------- */
+        .ui {
+            position: relative;
+            width: 100%;
+            background: #0d0d0d;
+            border-radius: 10px;
+            overflow: hidden;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+            padding: 2.8vh 1.8vw;
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+
+        .ui-top { display: flex; justify-content: space-between; align-items: baseline; }
+        .ui-logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.9vw; color: #fff; letter-spacing: 0.04em; }
+        .ui-logo span { color: #FF4400; }
+        .ui-meta { font-size: 0.9vw; color: #6B82D6; }
+        .ui-meta b { color: #00FFAA; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 1vw; }
+        th {
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.8vw;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #6B82D6;
+            padding: 0 0.6vw 0.8vh;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        td { padding: 1.6vh 0.6vw; border-bottom: 1px solid #1a1a2a; white-space: nowrap; }
+        tr.sel td { background: #1A1ACC55; }
+        tr.sel td:first-child { box-shadow: inset 3px 0 0 #00FFAA; }
+        tr.full td { color: #666; }
+
+        .room-name { color: #fff; font-weight: 700; }
+        .room-id { color: #6B82D6; font-size: 0.8vw; margin-left: 0.4vw; }
+
+        .pill {
+            display: inline-block;
+            font-size: 0.75vw;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 0.3vh 0.6vw;
+            border-radius: 1vw;
+        }
+        .pub  { color: #00FFAA; border: 1px solid #00FFAA88; }
+        .priv { color: #FFB000; border: 1px solid #FFB00088; }
+
+        .mode { color: #AAB6FF; }
+
+        .ships { display: flex; gap: 0.2vw; align-items: center; }
+        .ships img { width: 2.1vw; image-rendering: pixelated; }
+        .ships .empty { width: 2.1vw; height: 0.8vw; border: 1px dashed #555; border-radius: 2px; }
+        .count { margin-left: 0.5vw; color: #999; font-size: 0.9vw; }
+
+        .status-wait { color: #00FFAA; }
+        .status-play { color: #FFB000; }
+
+        .ui-bottom { display: flex; gap: 0.8vw; align-items: center; }
+        .btn {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 1.1vh 1.3vw;
+            border-radius: 6px;
+            border: 1.5px solid #3a3a6a;
+            color: #e6e8ff;
+            background: #15152a;
+        }
+        .btn.primary { background: #00FFAA; border-color: #00FFAA; color: #0d0d0d; }
+        .btn.code { margin-left: auto; color: #888; border-style: dashed; font-weight: 500; }
+
+        /* ---------- right column ---------- */
+        .lobby-right {
+            position: relative;
+            z-index: 1;
+            width: 39%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 4vw 5vh 1.5vw;
+            gap: 2.6vh;
+        }
+
+        .lobby-eyebrow {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1.1vw;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .lobby-title {
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            font-size: 4.5vw;
+            line-height: 1;
+            color: var(--epi-dark-blue);
+        }
+        .lobby-title .cursor {
+            display: inline-block;
+            width: 2vw;
+            height: 0.6vw;
+            background: var(--epi-orange);
+            vertical-align: baseline;
+            margin-left: 0.3vw;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        .lobby-subtitle { font-size: 1.8vw; color: #333; }
+        .lobby-subtitle b { color: var(--epi-dark-blue); }
+
+        .actions { display: flex; flex-direction: column; gap: 1.6vh; }
+        .action { display: flex; align-items: flex-start; gap: 1vw; }
+        .badge {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.85vw;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 0.5vh 0.6vw;
+            border-radius: 5px;
+            min-width: 7.5vw;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .b-join   { background: #00FFAA22; color: #00AA77; border: 1.5px solid #00FFAA88; }
+        .b-create { background: #8899EE22; color: #3344BB; border: 1.5px solid #8899EE88; }
+        .b-quick  { background: #FF440018; color: #cc3300; border: 1.5px solid #FF440077; }
+        .b-priv   { background: #FFB00018; color: #A06E00; border: 1.5px solid #FFB00088; }
+        .action-desc { font-size: 1.3vw; color: #333; line-height: 1.3; }
+        .action-desc b { color: var(--epi-dark-blue); }
+        .action-desc code { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; color: #1A1ACC; }
+
+        .slide-lobby .deco-block-1,
+        .slide-lobby .deco-block-2 { background: #D0D8F0; }
+        .slide-lobby .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-lobby">
+
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="lobby-left">
+            <div class="ui">
+                <div class="ui-top">
+                    <div class="ui-logo">R-TYPE <span>·</span> LOBBY</div>
+                    <div class="ui-meta">you: player_42 · <b>12 online</b> · 5 rooms</div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr><th>Room</th><th>Mode</th><th></th><th>Players</th><th>Uptime</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="room-name">Bydo Hunters</span><span class="room-id">r1</span></td>
+                            <td class="mode">Campaign</td>
+                            <td><span class="pill pub">PUBLIC</span></td>
+                            <td><div class="ships"><img src="assets/player_cyan.png" alt=""><img src="assets/player_magenta.png" alt=""><span class="empty"></span><span class="empty"></span><span class="count">2/4</span></div></td>
+                            <td class="status-play" data-up="734">12:14</td>
+                        </tr>
+                        <tr class="sel">
+                            <td><span class="room-name">Force Field</span><span class="room-id">r2</span></td>
+                            <td class="mode">Endless</td>
+                            <td><span class="pill pub">PUBLIC</span></td>
+                            <td><div class="ships"><img src="assets/player_green.png" alt=""><span class="empty"></span><span class="empty"></span><span class="empty"></span><span class="count">1/4</span></div></td>
+                            <td class="status-wait">waiting</td>
+                        </tr>
+                        <tr>
+                            <td><span class="room-name">Tek3 Night</span><span class="room-id">r3</span></td>
+                            <td class="mode">Boss Rush</td>
+                            <td><span class="pill priv">PRIVATE</span></td>
+                            <td><div class="ships"><img src="assets/player_red.png" alt=""><img src="assets/player_blue.png" alt=""><img src="assets/player_cyan.png" alt=""><span class="empty"></span><span class="count">3/4</span></div></td>
+                            <td class="status-play" data-up="211">03:31</td>
+                        </tr>
+                        <tr class="full">
+                            <td><span class="room-name">Dobkeratops</span><span class="room-id">r4</span></td>
+                            <td class="mode">Boss Rush</td>
+                            <td><span class="pill pub">PUBLIC</span></td>
+                            <td><div class="ships"><img src="assets/player_cyan.png" alt=""><img src="assets/player_magenta.png" alt=""><img src="assets/player_green.png" alt=""><img src="assets/player_red.png" alt=""><span class="count">4/4</span></div></td>
+                            <td class="status-play" data-up="1502">25:02</td>
+                        </tr>
+                        <tr>
+                            <td><span class="room-name">1v1 me</span><span class="room-id">r5</span></td>
+                            <td class="mode">Versus</td>
+                            <td><span class="pill priv">PRIVATE</span></td>
+                            <td><div class="ships"><img src="assets/player_blue.png" alt=""><span class="empty"></span><span class="count">1/2</span></div></td>
+                            <td class="status-wait">waiting</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="ui-bottom">
+                    <span class="btn primary">JOIN</span>
+                    <span class="btn">CREATE ROOM</span>
+                    <span class="btn">QUICK JOIN</span>
+                    <span class="btn code">code: ____</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="lobby-right">
+            <div class="lobby-eyebrow">Epitech Afrique — R-Type</div>
+            <div class="lobby-title">The Lobby<span class="cursor"></span></div>
+            <div class="lobby-subtitle">What a player sees while pinned to <b>L</b>.</div>
+
+            <div class="actions">
+                <div class="action">
+                    <span class="badge b-join">JOIN</span>
+                    <span class="action-desc">L answers with the room's address — <code>ip:port</code> — and the client switches to <b>UDP</b>.</span>
+                </div>
+                <div class="action">
+                    <span class="badge b-create">CREATE</span>
+                    <span class="action-desc">L <b>spawns a new room process</b>: name, mode, public or private.</span>
+                </div>
+                <div class="action">
+                    <span class="badge b-quick">QUICK JOIN</span>
+                    <span class="action-desc">L picks a <b>public</b> room with a free slot — or creates one.</span>
+                </div>
+                <div class="action">
+                    <span class="badge b-priv">PRIVATE</span>
+                    <span class="action-desc">Hidden from quick join — needs the <b>room code</b>.</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <script>
+        // live uptime on running rooms (pause-aware via pause.js sleep)
+        const fmt = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+        (async function tick() {
+            const cells = [...document.querySelectorAll('[data-up]')];
+            for (;;) {
+                await sleep(1000);
+                cells.forEach(td => {
+                    const up = +td.dataset.up + 1;
+                    td.dataset.up = up;
+                    td.textContent = fmt(up);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

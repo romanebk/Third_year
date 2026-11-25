@@ -50,6 +50,7 @@ bonus_tests: bonus
 
 clean:
 	rm -f *.o *~ *#
+	rm -f $(SRC_DIR)/*.d
 	rm -f $(SRC_DIR)/*.o
 	rm -f *.gcno *.gcda
 	$(MAKE) -C bonus clean

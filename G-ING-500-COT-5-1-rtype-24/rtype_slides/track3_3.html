@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — The Force</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-frc { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .frc-left {
+            position: relative; z-index: 1; width: 56%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+        canvas { width: 100%; aspect-ratio: 640 / 330; border-radius: 10px; background: #05050d; display: block; }
+
+        .states { display: flex; align-items: center; gap: 0.4vw; font-family: "JetBrains Mono", monospace; font-size: 0.85vw; }
+        .st { cursor: pointer; user-select: none; padding: 0.8vh 0.7vw; border-radius: 6px; border: 1.5px solid #D0D8F0; background: #fff; color: #6B82D6; font-weight: 700; transition: all 0.2s; }
+        .st:hover { border-color: #1A1ACC; }
+        .st.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .arr { color: #AAB6FF; font-weight: 700; }
+        .mode { margin-left: auto; font-size: 0.75vw; color: #999; cursor: pointer; user-select: none; }
+        .mode b { color: #1A1ACC; }
+        .what { font-family: "JetBrains Mono", monospace; font-size: 0.95vw; color: #333; min-height: 2.6vh; }
+        .what b { color: #cc3300; }
+
+        .frc-right {
+            position: relative; z-index: 1; width: 44%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.8vh;
+            padding: 5vh 4.5vw 5vh 1.2vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 1.1vh; }
+        .pt { font-size: 1.1vw; color: #333; line-height: 1.35; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.92vw; color: #1A1ACC; }
+
+        .net { font-size: 1.05vw; color: #333; line-height: 1.4; border-left: 4px solid #00C080; background: #00FFAA14; padding: 1vh 1vw; }
+        .net b { color: #00885F; }
+
+        .slide-frc .deco-block-1, .slide-frc .deco-block-2 { background: #D0D8F0; }
+        .slide-frc .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-frc">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="frc-left">
+            <canvas id="cv" width="640" height="330"></canvas>
+            <div class="states">
+                <span class="st" data-s="front">FRONT</span><span class="arr">→</span>
+                <span class="st" data-s="detached">DETACHED</span><span class="arr">→</span>
+                <span class="st" data-s="recall">RECALL</span><span class="arr">→</span>
+                <span class="st" data-s="back">BACK</span><span class="arr">→</span>
+                <span class="st" data-s="charge">CHARGE</span>
+                <span class="mode" id="mode">click a step · <b>auto</b></span>
+            </div>
+            <div class="what" id="what"></div>
+        </div>
+
+        <div class="frc-right">
+            <div class="eyebrow">Epitech Afrique — Track #3 · Weapons</div>
+            <div class="title">The Force<span class="cursor"></span></div>
+            <div class="subtitle">One weapon, <b>a whole state machine</b>.</div>
+
+            <div class="points">
+                <div class="pt"><b>Attached front</b>: shoots forward, <b>blocks</b> enemy shots.</div>
+                <div class="pt"><b>Attached back</b>: shoots <b>backwards</b>.</div>
+                <div class="pt"><b>Detached</b>: flies off, fights alone. <b>Recall</b> brings it home.</div>
+                <div class="pt"><b>Charge</b>: hold fire, release a super-charged shot.</div>
+                <div class="pt">It's an entity with a <code>ForceState</code> component. <b>One system</b> runs the transitions.</div>
+            </div>
+
+            <div class="net"><b>Server decides.</b> "Detach" is an input like any other: the room applies it, the clients show it.</div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 640, H = 330;
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const SH = img('player_cyan.png'), FO = img('force.png'), EN = img('bydos.png');
+        const spr = (i, x, y, w, h, flip) => { if (!i.complete) return; ctx.save(); ctx.translate(x, y); if (flip) ctx.scale(-1, 1); ctx.drawImage(i, -w / 2, -h / 2, w, h); ctx.restore(); };
+
+        const STATES = [
+            { s: 'front',    d: 3.6, txt: '<b>FRONT</b> · shoots forward · enemy shots hit the Force and vanish' },
+            { s: 'detached', d: 3.6, txt: '<b>DETACHED</b> · the Force flies ahead and fights on its own' },
+            { s: 'recall',   d: 1.8, txt: '<b>RECALL</b> · comes back — touch it from behind to attach it back' },
+            { s: 'back',     d: 3.6, txt: '<b>BACK</b> · shoots backwards at what comes from behind' },
+            { s: 'charge',   d: 3.2, txt: '<b>CHARGE</b> · hold fire… release: a super-charged shot' },
+        ];
+        let si = 0, st = 0, t = 0;
+        const ship = { x: 250, y: 165 };
+        const force = { x: 300, y: 165 };
+        let shots = [], enemyShots = [], blasts = [], cool = 0, ecool = 0, charge = 0, beam = null;
+        const stars = Array.from({ length: 60 }, () => ({ x: Math.random() * W, y: Math.random() * H, v: 20 + Math.random() * 50 }));
+
+        const chips = [...document.querySelectorAll('.st')];
+        const what = document.getElementById('what');
+        function setState(i) {
+            si = i; st = 0;
+            chips.forEach(c => c.classList.toggle('on', c.dataset.s === STATES[i].s));
+            what.innerHTML = STATES[i].txt;
+            shots = []; enemyShots = []; charge = 0; beam = null;
+            if (STATES[i].s === 'recall' && force.x < 400) { force.x = 480; force.y = 130; }  // start from far away so the return is visible
+        }
+        setState(0);
+
+        // click a step to hold it; click "auto" to cycle again
+        let manual = false;
+        const mode = document.getElementById('mode');
+        function setMode(m) { manual = m; mode.innerHTML = manual ? 'holding · click here for <b>auto</b>' : 'click a step · <b>auto</b>'; }
+        chips.forEach((c, i) => c.addEventListener('click', () => { setMode(true); setState(i); }));
+        mode.addEventListener('click', () => setMode(false));
+
+        function update(dt) {
+            t += dt; st += dt;
+            if (st > STATES[si].d) setState(manual ? si : (si + 1) % STATES.length);
+            const S = STATES[si].s;
+            stars.forEach(s => { s.x -= s.v * dt; if (s.x < 0) { s.x = W; s.y = Math.random() * H; } });
+            ship.y = 165 + 30 * Math.sin(t * 1.3);
+
+            // force target position
+            let tx = ship.x + 48, ty = ship.y;
+            if (S === 'detached') { tx = 470 + 20 * Math.sin(t * 2); ty = 165 + 60 * Math.sin(t * 1.1); }
+            if (S === 'back') { tx = ship.x - 46; }
+            if (S === 'charge') { tx = ship.x + 48; }
+            const k = S === 'detached' ? 3 : S === 'recall' ? 3.5 : 12;
+            if (S === 'recall') { tx = ship.x - 46; }
+            force.x += (tx - force.x) * Math.min(1, k * dt);
+            force.y += (ty - force.y) * Math.min(1, k * dt);
+
+            // player shots
+            cool -= dt;
+            if (cool <= 0 && S !== 'charge' && S !== 'recall') {
+                cool = 0.28;
+                if (S === 'front' || S === 'detached') shots.push({ x: force.x + 14, y: force.y, vx: 420 });
+                if (S === 'detached') shots.push({ x: ship.x + 30, y: ship.y, vx: 420 });
+                if (S === 'back') { shots.push({ x: ship.x + 30, y: ship.y, vx: 420 }); shots.push({ x: force.x - 14, y: force.y, vx: -420 }); }
+            }
+            if (S === 'charge') {
+                if (st < 2.2) charge = Math.min(1, st / 2.2);
+                else if (!beam) { beam = { x: ship.x + 40, y: ship.y }; charge = 0; }
+            }
+            if (beam) beam.x += 700 * dt;
+            shots.forEach(b => b.x += b.vx * dt);
+            shots = shots.filter(b => b.x > -20 && b.x < W + 20);
+
+            // enemy shots toward the ship during FRONT (blocked by the Force)
+            ecool -= dt;
+            if (S === 'front' && ecool <= 0) { ecool = 0.7; enemyShots.push({ x: 590, y: force.y, vx: -260 }); }
+            enemyShots.forEach(b => b.x += b.vx * dt);
+            enemyShots = enemyShots.filter(b => {
+                if (Math.abs(b.x - force.x) < 16 && Math.abs(b.y - force.y) < 18) { blasts.push({ x: force.x + 12, y: b.y, t: 0 }); return false; }
+                return b.x > -10;
+            });
+            blasts.forEach(b => b.t += dt);
+            blasts = blasts.filter(b => b.t < 0.3);
+        }
+
+        function draw() {
+            const S = STATES[si].s;
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            stars.forEach(s => { ctx.fillStyle = '#6B82D6'; ctx.fillRect(s.x, s.y, 1.5, 1.5); });
+
+            // enemies for context
+            if (S === 'front') spr(EN, 605, ship.y, 42, 36);
+            if (S === 'detached') spr(EN, 560, 110 + 30 * Math.sin(t * 2), 42, 36);
+            if (S === 'back') spr(EN, 60 + 10 * Math.sin(t * 3), 165, 42, 36, true);
+
+            ctx.fillStyle = '#FFB000';
+            shots.forEach(b => { ctx.fillRect(b.x - 8, b.y - 2, 16, 4); });
+            ctx.fillStyle = '#FF7755';
+            enemyShots.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, 5, 0, 7); ctx.fill(); });
+            blasts.forEach(b => { ctx.strokeStyle = `rgba(255,220,120,${1 - b.t / 0.3})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b.x, b.y, 6 + b.t * 50, 0, 7); ctx.stroke(); });
+
+            if (S === 'recall') { ctx.strokeStyle = '#00FFAA66'; ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(force.x, force.y); ctx.lineTo(ship.x - 46, ship.y); ctx.stroke(); ctx.setLineDash([]); }
+
+            spr(SH, ship.x, ship.y, 72, 36);
+            spr(FO, force.x, force.y, 36, 34);
+
+            if (S === 'charge' && charge > 0) {
+                const r = 6 + charge * 18;
+                const g = ctx.createRadialGradient(ship.x + 40, ship.y, 0, ship.x + 40, ship.y, r);
+                g.addColorStop(0, '#fff'); g.addColorStop(0.4, '#8899EE'); g.addColorStop(1, 'rgba(26,26,204,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ship.x + 40, ship.y, r, 0, 7); ctx.fill();
+                ctx.fillStyle = '#1a1a2a'; ctx.fillRect(20, H - 24, 200, 10);
+                ctx.fillStyle = '#00FFAA'; ctx.fillRect(20, H - 24, 200 * charge, 10);
+                ctx.fillStyle = '#6B82D6'; ctx.font = '11px "JetBrains Mono", monospace'; ctx.fillText('BEAM', 228, H - 15);
+            }
+            if (beam) {
+                const g = ctx.createLinearGradient(beam.x - 90, 0, beam.x, 0);
+                g.addColorStop(0, 'rgba(136,153,238,0)'); g.addColorStop(1, '#ffffff');
+                ctx.fillStyle = g; ctx.fillRect(beam.x - 90, beam.y - 12, 90, 24);
+            }
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

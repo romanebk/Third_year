@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Modding</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-mod {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4.5vh 4.5vw 3vh 4.5vw; gap: 1.6vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 2vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .main { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1vw; position: relative; z-index: 1; }
+        .col { display: flex; flex-direction: column; gap: 0.9vh; }
+        .h { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.35vw; color: var(--epi-dark-blue); display: flex; justify-content: space-between; align-items: baseline; }
+        .h span { font-family: "JetBrains Mono", monospace; font-size: 0.68vw; font-weight: 700; letter-spacing: 0.1em; color: #6B82D6; text-transform: uppercase; }
+        .code {
+            background: #0d0d0d; border-radius: 8px; padding: 1.1vh 0.9vw;
+            font-family: "JetBrains Mono", monospace; font-size: 0.78vw; line-height: 1.55; color: #cdd6f4;
+        }
+        .code div { white-space: pre; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; } .d { color: #6B82D6; } .o { color: #FF7755; font-weight: 700; }
+        .txt { font-size: 0.95vw; color: #333; line-height: 1.35; }
+        .txt b { color: var(--epi-dark-blue); }
+
+        /* live demo */
+        .demo { background: #0d0d0d; border-radius: 8px; padding: 1.1vh 0.9vw; font-family: "JetBrains Mono", monospace; color: #cdd6f4; font-size: 0.78vw; display: flex; flex-direction: column; gap: 0.8vh; }
+        .packs { display: flex; flex-direction: column; gap: 0.5vh; }
+        .pk { display: flex; align-items: center; gap: 0.6vw; cursor: pointer; user-select: none; padding: 0.5vh 0.5vw; border-radius: 5px; border: 1px solid #2a2a4a; }
+        .pk .box { width: 0.9vw; height: 0.9vw; border: 1.5px solid #6B82D6; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.7vw; color: #0d0d0d; }
+        .pk.on { border-color: #00C080; }
+        .pk.on .box { background: #00FFAA; border-color: #00FFAA; }
+        .pk small { color: #6B82D6; margin-left: auto; }
+        .view { display: grid; grid-template-columns: auto 1fr; gap: 0.9vw; align-items: center; background: #05050d; border-radius: 6px; padding: 1vh 0.8vw; }
+        .view img { width: 5vw; image-rendering: pixelated; }
+        .spawn { display: flex; flex-wrap: wrap; gap: 0.35vw; align-items: center; }
+        .spawn img { height: 2.4vw; image-rendering: pixelated; }
+        .spawn .new { outline: 1.5px dashed #00FFAA; outline-offset: 2px; border-radius: 3px; }
+        .lbl { color: #6B82D6; font-size: 0.68vw; }
+        .res { color: #9a9aae; font-size: 0.7vw; min-height: 2.2vh; }
+        .res b { color: #00FFAA; font-weight: 500; }
+
+        .bottom { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; }
+        .box2 { font-size: 0.95vw; color: #333; line-height: 1.4; padding: 0.9vh 1vw; }
+        .map { border-left: 4px solid #1A1ACC; background: #1A1ACC0d; }
+        .map b { color: var(--epi-dark-blue); }
+        .look { border-left: 4px solid var(--epi-orange); background: #FF440010; }
+        .look b { color: #cc3300; }
+
+        .slide-mod .deco-block-1, .slide-mod .deco-block-2 { background: #D0D8F0; }
+        .slide-mod .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-mod">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #3 · Rewarded</div>
+                <div class="title">Modding<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Let <b>players</b> change your game, without your source code. Learn from <b>Minecraft</b>.</div>
+        </div>
+
+        <div class="main">
+            <div class="col">
+                <div class="h">Resource packs <span>how it looks</span></div>
+                <div class="code">
+                    <div><span class="cm"># a folder (or a zip) dropped in packs/</span></div>
+                    <div><span class="d">retro_red/</span></div>
+                    <div>├─ <span class="s">pack.yaml</span>        <span class="cm">name, version, priority</span></div>
+                    <div>└─ <span class="d">assets/rtype/</span></div>
+                    <div>   ├─ <span class="d">sprites/</span><span class="o">player.png</span>   <span class="cm">← same path</span></div>
+                    <div>   ├─ <span class="d">sounds/</span><span class="o">shot.ogg</span>     <span class="cm">  as the game's:</span></div>
+                    <div>   └─ <span class="d">lang/</span>fr.yaml         <span class="cm">  it wins</span></div>
+                </div>
+                <div class="txt"><b>Override by path.</b> The engine looks for a file in every enabled pack, top priority first, then in the base game. Textures, sounds, texts: no code.</div>
+            </div>
+
+            <div class="col">
+                <div class="h">Data packs & tags <span>how it plays</span></div>
+                <div class="code">
+                    <div><span class="cm"># data/rtype/tags/enemy/bosses.yaml</span></div>
+                    <div><span class="k">replace</span>: <span class="v">false</span>          <span class="cm"># merge with the others</span></div>
+                    <div><span class="k">values</span>:</div>
+                    <div>  - <span class="s">rtype:dobkeratops</span></div>
+                    <div>  - <span class="s">bydo_plus:giga_crab</span>  <span class="cm"># a mod adds itself</span></div>
+                    <div>  - <span class="s">#bydo_plus:minibosses</span> <span class="cm"># tags nest</span></div>
+                    <div></div>
+                    <div><span class="cm"># level_3.yaml asks for the tag, not a list:</span></div>
+                    <div><span class="k">boss</span>: { <span class="k">pick</span>: <span class="s">"#rtype:bosses"</span> }</div>
+                </div>
+                <div class="txt"><b>Tags</b> are named groups. The game logic asks for <b>the group</b>, so a mod joins it and <b>just works</b>. <b>Namespaces</b> (<code>rtype:</code>, <code>bydo_plus:</code>) avoid collisions.</div>
+            </div>
+
+            <div class="col">
+                <div class="h">Try it <span>click the packs</span></div>
+                <div class="demo">
+                    <div class="packs">
+                        <div class="pk" data-p="retro"><span class="box"></span>retro_red <small>resource pack</small></div>
+                        <div class="pk" data-p="bydo"><span class="box"></span>bydo_plus <small>data pack</small></div>
+                    </div>
+                    <div class="view">
+                        <img id="player" src="assets/player_cyan.png" alt="player">
+                        <div><div class="lbl">assets/rtype/sprites/player.png</div><div class="res" id="pres">from <b>base game</b></div></div>
+                    </div>
+                    <div>
+                        <div class="lbl">#rtype:enemies → what the spawner can pick</div>
+                        <div class="spawn" id="spawn"></div>
+                    </div>
+                    <div class="res" id="log">2 packs available · 0 enabled</div>
+                </div>
+                <div class="txt">For code: <b>plugins</b> (.so / .dll) and <b>Lua</b> scripts. Minecraft's mod loaders (Forge, Fabric) do the same for Java.</div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="box2 map"><b>For R-Type:</b> everything a designer adds (sprites, sounds, enemies, levels, tags) already lives in files. A modder is just a designer from outside your team.</div>
+            <div class="box2 look"><b>Look it up:</b> how Minecraft resource packs, data packs and tags work, and how Factorio or Skyrim load mods. Then document your format: modders need a how-to.</div>
+        </div>
+    </section>
+
+    <script>
+        const on = { retro: false, bydo: false };
+        const base = ['bydos.png', 'bug.png', 'patapata.png'], added = ['crab.png', 'orb.png'];
+        function render() {
+            document.querySelectorAll('.pk').forEach(p => { const v = on[p.dataset.p]; p.classList.toggle('on', v); p.querySelector('.box').textContent = v ? '✓' : ''; });
+            document.getElementById('player').src = 'assets/' + (on.retro ? 'player_red.png' : 'player_cyan.png');
+            document.getElementById('pres').innerHTML = on.retro ? 'from <b>packs/retro_red</b> (overrides the base game)' : 'from <b>base game</b>';
+            const sp = document.getElementById('spawn'); sp.innerHTML = '';
+            base.concat(on.bydo ? added : []).forEach(n => { const i = new Image(); i.src = 'assets/' + n; if (added.includes(n)) i.className = 'new'; sp.appendChild(i); });
+            const n = Object.values(on).filter(Boolean).length;
+            document.getElementById('log').innerHTML = on.bydo ? '<b>+2 enemies</b> joined #rtype:enemies · no line of C++ touched' : (2 + ' packs available · ' + n + ' enabled');
+        }
+        document.querySelectorAll('.pk').forEach(p => p.addEventListener('click', () => { on[p.dataset.p] = !on[p.dataset.p]; render(); }));
+        render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 10 — Entity</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-e { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .e-left {
+            position: relative; z-index: 1;
+            width: 56%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vh 1.5vw 5vh 4vw;
+        }
+
+        .panel {
+            width: 100%;
+            background: #0d0d0d;
+            border-radius: 10px;
+            padding: 3vh 1.8vw;
+            font-family: "JetBrains Mono", monospace;
+            color: #cdd6f4;
+            display: flex; flex-direction: column; gap: 2.6vh;
+        }
+
+        .code { font-size: 1.2vw; line-height: 1.6; }
+        .kw { color: #FF7755; }
+        .ty { color: #00FFAA; }
+        .cm { color: #555; }
+
+        .reg-label { font-size: 0.9vw; color: #6B82D6; letter-spacing: 0.12em; text-transform: uppercase; }
+
+        .registry { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5vw; }
+        .slot {
+            height: 6.2vw;
+            border-radius: 6px;
+            border: 1.5px solid #2a2a4a;
+            background: #15152a;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.6vh;
+            transition: background 0.4s, border-color 0.4s, opacity 0.4s;
+        }
+        .slot .id { font-size: 1.3vw; font-weight: 700; color: #fff; }
+        .slot .what { font-size: 0.75vw; color: #888; height: 1.8vw; display: flex; align-items: center; }
+        .slot .what img { height: 1.6vw; image-rendering: pixelated; }
+        .slot.free { background: none; border-style: dashed; }
+        .slot.free .id { color: #444; }
+        .slot.flash-new  { border-color: #00FFAA; background: #00FFAA22; }
+        .slot.flash-dead { border-color: #FF4400; background: #FF440022; }
+
+        .reg-note { font-size: 1.1vw; height: 1.8vw; line-height: 1.8vw; white-space: nowrap; overflow: hidden; color: #888; }
+        .reg-note.good { color: #00FFAA; }
+        .reg-note.bad  { color: #FF7755; }
+
+        .e-right {
+            position: relative; z-index: 1;
+            width: 44%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.5vw;
+            gap: 2.4vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title-row { display: flex; align-items: center; gap: 1.4vw; }
+        .letter {
+            font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3vw;
+            width: 5vw; height: 5vw; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; background: #0d0d0d;
+        }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4.5vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.9vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 1.5vh; }
+        .pt { font-size: 1.3vw; color: #333; line-height: 1.3; padding-left: 1vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; color: #1A1ACC; }
+
+        .net {
+            font-size: 1.2vw; color: #333; line-height: 1.35;
+            border-left: 4px solid #00C080; background: #00FFAA14; padding: 1vh 1vw;
+        }
+        .net b { color: #00885F; }
+        .net code { font-family: "JetBrains Mono", monospace; font-size: 1vw; color: #1A1ACC; }
+
+        .slide-e .deco-block-1, .slide-e .deco-block-2 { background: #D0D8F0; }
+        .slide-e .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-e">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="e-left">
+            <div class="panel">
+                <div class="code">
+                    <div><span class="kw">using</span> <span class="ty">Entity</span> = std::size_t;</div>
+                    <div class="cm">// that's it. no class, no methods, no data.</div>
+                </div>
+
+                <div class="reg-label">registry — the entities alive right now</div>
+                <div class="registry" id="registry"></div>
+                <div class="reg-note" id="note"></div>
+            </div>
+        </div>
+
+        <div class="e-right">
+            <div class="eyebrow">Epitech Afrique — Engine</div>
+            <div class="title-row">
+                <span class="letter">E</span>
+                <div class="title">Entity<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">A <b>thing</b> in the game. <b>Just a number.</b></div>
+
+            <div class="points">
+                <div class="pt">"Player", "Bydos"… are <b>not</b> stored in the entity — they come from its <b>components</b>.</div>
+                <div class="pt">The <b>registry</b> creates and destroys them. Killing an entity = <b>removing its components</b>.</div>
+                <div class="pt">Keep <b>IDs</b>, never pointers to components. And freed IDs get <b>reused</b> — careful with anyone still holding the old one.</div>
+            </div>
+
+            <div class="net">Over the network, the ID is <b>what server and clients agree on</b>: <code>entity 6 moved to (320, 90)</code>. The room hands out the IDs.</div>
+        </div>
+    </section>
+
+    <script>
+        const S = {
+            player:  '<img src="assets/player_cyan.png" alt="">',
+            bydos:   '<img src="assets/bydos.png" alt="">',
+            force:   '<img src="assets/force.png" alt="">',
+            missile: '<span style="display:inline-block;width:1.8vw;height:0.35vw;background:#5FE8FF;border-radius:2px"></span>',
+            bg:      '<span style="display:inline-block;width:2.2vw;height:1vw;background:linear-gradient(90deg,#1A1ACC,#0d0d0d);border:1px solid #333;border-radius:2px"></span>',
+        };
+        const START = ['player', 'bydos', 'missile', 'force', 'bg', null, 'bydos', null];
+
+        const reg = document.getElementById('registry');
+        const noteEl = document.getElementById('note');
+        const note = (t, k = '') => { noteEl.textContent = t; noteEl.className = 'reg-note ' + k; };
+
+        const slots = START.map((_, i) => {
+            const el = document.createElement('div');
+            el.innerHTML = `<span class="id">${i}</span><span class="what"></span>`;
+            reg.appendChild(el);
+            return el;
+        });
+
+        function set(i, kind, flash = '') {
+            const el = slots[i];
+            el.className = 'slot' + (kind ? '' : ' free') + (flash ? ' ' + flash : '');
+            el.querySelector('.what').innerHTML = kind ? S[kind] : 'free';
+        }
+
+        async function run() {
+            START.forEach((k, i) => set(i, k));
+            note('8 slots. Some alive, some free.');
+            await sleep(3000);
+
+            set(2, 'missile', 'flash-dead');
+            note('Missile #2 hits a wall → destroyed.', 'bad');
+            await sleep(1800);
+            set(2, null);
+            note('#2 is free again. Its components are gone.', 'bad');
+            await sleep(3000);
+
+            set(5, 'bydos', 'flash-new');
+            note('A Bydos spawns → registry gives it #5.', 'good');
+            await sleep(3000);
+
+            set(2, 'missile', 'flash-new');
+            note('The player fires → the new missile reuses #2.', 'good');
+            await sleep(3500);
+
+            slots.forEach((_, i) => slots[i].classList.remove('flash-new', 'flash-dead'));
+            note('Same numbers, different things. An ID means nothing alone.');
+            await sleep(4000);
+        }
+
+        (async function loop() {
+            if (document.fonts) await document.fonts.ready;
+            for (;;) await run();
+        })();
+    </script>
+</body>
+</html>

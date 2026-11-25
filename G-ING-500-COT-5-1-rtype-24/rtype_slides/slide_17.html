@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 17 — Watch This</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-vid { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .vid-left {
+            position: relative; z-index: 1;
+            width: 62%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vh 1.5vw 5vh 4vw;
+        }
+
+        .player {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #0d0d0d url("https://i.ytimg.com/vi/Hqw0barvNVk/hqdefault.jpg") center / cover no-repeat;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(26, 26, 204, 0.15);
+        }
+        .player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d0d0d33; transition: background 0.2s; }
+        .fallback:hover { background: #0d0d0d11; }
+        .play {
+            width: 6vw; height: 4.2vw; border-radius: 1vw;
+            background: #FF0033;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px #0008;
+        }
+        .play::after { content: ""; border-left: 1.6vw solid #fff; border-top: 1vw solid transparent; border-bottom: 1vw solid transparent; margin-left: 0.3vw; }
+
+        .vid-right {
+            position: relative; z-index: 1;
+            width: 38%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.5vw;
+            gap: 2.4vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4.2vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            border-top: 5px solid #FF4400;
+            padding: 2vh 1.2vw;
+            display: flex; flex-direction: column; gap: 0.8vh;
+            box-shadow: 0 2px 10px rgba(26, 26, 204, 0.06);
+        }
+        .vt { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.6vw; line-height: 1.2; color: var(--epi-dark-blue); }
+        .va { font-family: "JetBrains Mono", monospace; font-size: 1vw; color: #666; }
+
+        .why { font-size: 1.35vw; color: #333; line-height: 1.35; }
+        .why b { color: var(--epi-dark-blue); }
+
+        .open {
+            align-self: flex-start;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1vw; font-weight: 700;
+            color: #fff; background: var(--epi-blue);
+            padding: 1vh 1.2vw; border-radius: 6px;
+            text-decoration: none;
+        }
+        .open:hover { background: var(--epi-dark-blue); }
+
+        .slide-vid .deco-block-1, .slide-vid .deco-block-2 { background: #D0D8F0; }
+        .slide-vid .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-vid">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="vid-left">
+            <div class="player" id="player">
+                <!-- file:// → YouTube refuses embeds (error 153): show a clickable thumbnail instead -->
+                <a class="fallback" href="https://www.youtube.com/watch?v=Hqw0barvNVk" target="_blank" rel="noopener">
+                    <span class="play"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="vid-right">
+            <div class="eyebrow">Epitech Afrique — Engine</div>
+            <div class="title">Watch This<span class="cursor"></span></div>
+
+            <div class="card">
+                <div class="vt">I Made a Game Engine That Simulates Real Light</div>
+                <div class="va">Jacob Gordiak · YouTube</div>
+            </div>
+
+            <div class="why">Someone building <b>their own engine</b> from scratch — the road you're about to take.</div>
+
+            <a class="open" href="https://www.youtube.com/watch?v=Hqw0barvNVk" target="_blank" rel="noopener">Open on YouTube ↗</a>
+        </div>
+    </section>
+
+    <script>
+        // Served over http(s)? Swap the thumbnail for the real embedded player.
+        if (location.protocol !== 'file:') {
+            document.getElementById('player').innerHTML =
+                '<iframe src="https://www.youtube-nocookie.com/embed/Hqw0barvNVk?rel=0"' +
+                ' title="I Made a Game Engine That Simulates Real Light"' +
+                ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+                ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        }
+    </script>
+</body>
+</html>

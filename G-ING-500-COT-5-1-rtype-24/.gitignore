@@ -1,0 +1,48 @@
+build/
+cmake-build-*/
+.cache/
+compile_commands.json
+*.o
+*.a
+*.so
+*.dll
+*.exe
+.vscode/
+.idea/
+.DS_Store
+# course archives, not part of the source tree
+*.zip
+.cpm-cache/
+
+# Personal settings written by the client (name, host, keys, volumes)
+client.cfg
+
+# Local tools and editors (each developer has their own)
+.freebuff/
+.claude/
+.opencode/
+.cursor/
+.vs/
+CMakeUserPresets.json
+
+# Windows / Visual Studio build output
+/out/
+*.obj
+*.pdb
+*.ilk
+*.lib
+
+# Logs, scratch and crash files
+*.log
+nohup.out
+*.tmp
+*.swp
+*~
+/core
+core.[0-9]*
+
+# Secrets
+.env
+
+# Personal notes to prepare the defense
+/explication/

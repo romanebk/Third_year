@@ -1,0 +1,19 @@
+add_executable(game_tests
+  Boss_test.cpp
+  Campaign_test.cpp
+  Collision_test.cpp
+  Components_test.cpp
+  Endless_test.cpp
+  Enemies_test.cpp
+  Level_test.cpp
+  Movement_test.cpp
+  Pickups_test.cpp
+  Player_test.cpp
+  Rules_test.cpp
+  Shoot_test.cpp
+  Snapshot_test.cpp
+  Tick_test.cpp
+)
+target_link_libraries(game_tests PRIVATE game GTest::gtest_main)
+rtype_set_warnings(game_tests)
+gtest_discover_tests(game_tests)

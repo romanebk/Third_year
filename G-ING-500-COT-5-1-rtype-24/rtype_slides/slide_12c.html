@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slide 12c — The Registry</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-reg {
+            background: var(--epi-light);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 4.5vh 4.5vw 3.5vh 4.5vw; gap: 1.8vh;
+        }
+        .head { display: flex; align-items: baseline; gap: 2vw; position: relative; z-index: 1; }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9vw; position: relative; z-index: 1; }
+        .col { background: #0d0d0d; border-radius: 10px; padding: 1.4vh 0.9vw; display: flex; flex-direction: column; gap: 0.9vh; border-top: 4px solid var(--c); }
+        .ch { display: flex; justify-content: space-between; align-items: baseline; }
+        .ch b { font-family: "Space Grotesk", sans-serif; font-size: 1.3vw; color: #fff; }
+        .ch span { font-family: "JetBrains Mono", monospace; font-size: 0.64vw; letter-spacing: 0.1em; color: var(--c); font-weight: 700; }
+        .op { display: flex; flex-direction: column; gap: 0.15vh; padding-bottom: 0.7vh; border-bottom: 1px solid #1f1f33; }
+        .op:last-child { border-bottom: none; }
+        .sig { font-family: "JetBrains Mono", monospace; font-size: 0.74vw; color: #cdd6f4; white-space: nowrap; }
+        .sig .f { color: var(--c); font-weight: 700; }
+        .sig .t { color: #8899EE; }
+        .sig .s { color: #FFB000; }
+        .what { font-size: 0.74vw; color: #9a9aae; line-height: 1.3; }
+        .crud { font-family: "JetBrains Mono", monospace; font-size: 0.6vw; font-weight: 700; color: #0d0d0d; background: var(--c); border-radius: 3px; padding: 0 0.3vw; margin-right: 0.3vw; }
+
+        .c-ent { --c: #00FFAA; }
+        .c-cmp { --c: #FFB000; }
+        .c-qry { --c: #8899EE; }
+        .c-scn { --c: #FF00CC; }
+
+        .foot { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; }
+        .box { font-size: 1vw; color: #333; line-height: 1.4; padding: 1vh 1vw; }
+        .pure { border-left: 4px solid #1A1ACC; background: #1A1ACC0d; }
+        .pure b { color: var(--epi-dark-blue); }
+        .trap { border-left: 4px solid var(--epi-orange); background: #FF440010; }
+        .trap b { color: #cc3300; }
+
+        .slide-reg .deco-block-1, .slide-reg .deco-block-2 { background: #D0D8F0; }
+        .slide-reg .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-reg">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="head">
+            <div>
+                <div class="eyebrow">Epitech Afrique — Track #1 · ECS</div>
+                <div class="title">The Registry<span class="cursor"></span></div>
+            </div>
+            <div class="subtitle">Everything a system, a script or the editor can <b>ask</b> it.</div>
+        </div>
+
+        <div class="grid">
+            <div class="col c-ent">
+                <div class="ch"><b>Entities</b><span>CRUD</span></div>
+                <div class="op"><span class="sig"><span class="crud">C</span><span class="f">create</span>(<span class="s">"Bug"</span>, {<span class="s">"enemy"</span>})</span><span class="what">a new id + its card</span></div>
+                <div class="op"><span class="sig"><span class="crud">C</span><span class="f">instantiate</span>(<span class="s">"prefabs/bug.yaml"</span>)</span><span class="what">from a prefab, children included</span></div>
+                <div class="op"><span class="sig"><span class="crud">C</span><span class="f">clone</span>(e)</span><span class="what">same components, new uuid</span></div>
+                <div class="op"><span class="sig"><span class="crud">R</span><span class="f">alive</span>(e) · <span class="f">info</span>(e)</span><span class="what">still valid? name, tags, parent</span></div>
+                <div class="op"><span class="sig"><span class="crud">U</span><span class="f">rename</span> · <span class="f">tag</span> · <span class="f">untag</span></span><span class="what">edit the card</span></div>
+                <div class="op"><span class="sig"><span class="crud">D</span><span class="f">destroy</span>(e)</span><span class="what">children too · at the end of the frame</span></div>
+            </div>
+
+            <div class="col c-cmp">
+                <div class="ch"><b>Components</b><span>CRUD</span></div>
+                <div class="op"><span class="sig"><span class="crud">C</span><span class="f">add</span>&lt;<span class="t">Velocity</span>&gt;(e, …)</span><span class="what">attach data to an entity</span></div>
+                <div class="op"><span class="sig"><span class="crud">R</span><span class="f">get</span>&lt;<span class="t">Health</span>&gt;(e)</span><span class="what">must exist</span></div>
+                <div class="op"><span class="sig"><span class="crud">R</span><span class="f">try_get</span>&lt;<span class="t">Health</span>&gt;(e)</span><span class="what">maybe: returns nothing if absent</span></div>
+                <div class="op"><span class="sig"><span class="crud">R</span><span class="f">has</span>&lt;<span class="t">Weapon</span>&gt;(e)</span><span class="what">yes or no</span></div>
+                <div class="op"><span class="sig"><span class="crud">U</span><span class="f">replace</span>&lt;<span class="t">Sprite</span>&gt;(e, …)</span><span class="what">swap the value · fires "changed"</span></div>
+                <div class="op"><span class="sig"><span class="crud">D</span><span class="f">remove</span>&lt;<span class="t">Poisoned</span>&gt;(e)</span><span class="what">the effect wore off</span></div>
+            </div>
+
+            <div class="col c-qry">
+                <div class="ch"><b>Find &amp; query</b><span>READ</span></div>
+                <div class="op"><span class="sig"><span class="f">find</span>(uuid) · <span class="f">find</span>(<span class="s">"Boss"</span>)</span><span class="what">one entity, by uuid or by name</span></div>
+                <div class="op"><span class="sig"><span class="f">view</span>&lt;<span class="t">Transform</span>, <span class="t">Velocity</span>&gt;()</span><span class="what">every entity with both: a system's loop</span></div>
+                <div class="op"><span class="sig"><span class="f">with_tag</span>(<span class="s">"enemy"</span>)</span><span class="what">every entity with the tag</span></div>
+                <div class="op"><span class="sig"><span class="f">with_tags</span>({<span class="s">"enemy"</span>, <span class="s">"flying"</span>})</span><span class="what">all of them at once</span></div>
+                <div class="op"><span class="sig"><span class="f">parent</span>(e) · <span class="f">children</span>(e)</span><span class="what">walk the tree</span></div>
+                <div class="op"><span class="sig"><span class="f">set_parent</span>(child, parent)</span><span class="what">the Force docks on the ship</span></div>
+            </div>
+
+            <div class="col c-scn">
+                <div class="ch"><b>Scenes</b><span>MANAGER</span></div>
+                <div class="op"><span class="sig"><span class="f">load</span>(<span class="s">"level_1.yaml"</span>)</span><span class="what">two-pass loader: create, then link</span></div>
+                <div class="op"><span class="sig"><span class="f">switch_to</span>(<span class="s">"boss"</span>)</span><span class="what">unload the old one, load the new</span></div>
+                <div class="op"><span class="sig"><span class="f">persist</span>(e)</span><span class="what">survives the switch: the player</span></div>
+                <div class="op"><span class="sig"><span class="f">unload</span>() · <span class="f">active</span>()</span><span class="what">free it · which one is running</span></div>
+                <div class="op"><span class="sig"><span class="f">save</span>(<span class="s">"save_1.yaml"</span>)</span><span class="what">uuids and components back to a file</span></div>
+                <div class="op"><span class="sig"><span class="f">on_create</span> · <span class="f">on_destroy</span></span><span class="what">callbacks: sounds, network, editor</span></div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <div class="box pure"><b>Stores and finds, never decides.</b> The registry has no game logic: systems ask it, then act. The same API serves the game, the scripts and the editor.</div>
+            <div class="box trap"><b>Destroying inside a loop</b> breaks the loop you are in. Mark it, destroy at the end of the frame: same trap as the vector realloc.</div>
+        </div>
+    </section>
+</body>
+</html>

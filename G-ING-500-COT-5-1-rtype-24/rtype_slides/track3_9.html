@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #3 — Bosses</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-boss { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .b-left {
+            position: relative; z-index: 1; width: 57%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.1vh;
+            padding: 4vh 1.2vw 4vh 3.5vw;
+        }
+        canvas { width: 100%; aspect-ratio: 640 / 380; border-radius: 10px; background: #05050d; display: block; }
+        .fsm { display: flex; align-items: center; gap: 0.4vw; font-family: "JetBrains Mono", monospace; font-size: 0.8vw; }
+        .fsm span.st { padding: 0.7vh 0.6vw; border-radius: 5px; border: 1.5px solid #D0D8F0; background: #fff; color: #6B82D6; font-weight: 700; }
+        .fsm span.st.on { background: #1A1ACC; border-color: #1A1ACC; color: #fff; }
+        .fsm span.st.dead.on { background: #FF4400; border-color: #FF4400; }
+        .fsm .ar { color: #AAB6FF; font-weight: 700; }
+        .fsm .cond { color: #999; font-size: 0.66vw; }
+
+        .b-right {
+            position: relative; z-index: 1; width: 43%;
+            display: flex; flex-direction: column; justify-content: center; gap: 1.4vh;
+            padding: 4vh 4.5vw 4vh 1.2vw;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 4vw; line-height: 1; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.5vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+        .code { background: #0d0d0d; border-radius: 8px; padding: 1.1vh 0.9vw; font-family: "JetBrains Mono", monospace; font-size: 0.78vw; line-height: 1.55; color: #cdd6f4; }
+        .code div { white-space: pre; }
+        .cm { color: #7a7a8a; } .k { color: #8899EE; } .v { color: #00FFAA; } .s { color: #FFB000; }
+        .points { display: flex; flex-direction: column; gap: 0.8vh; }
+        .pt { font-size: 0.98vw; color: #333; line-height: 1.33; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+
+        .slide-boss .deco-block-1, .slide-boss .deco-block-2 { background: #D0D8F0; }
+        .slide-boss .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-boss">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="b-left">
+            <canvas id="cv" width="640" height="380"></canvas>
+            <div class="fsm">
+                <span class="st" data-p="0">PHASE 1</span><span class="cond">&lt;60%</span><span class="ar">→</span>
+                <span class="st" data-p="1">PHASE 2</span><span class="cond">&lt;25%</span><span class="ar">→</span>
+                <span class="st" data-p="2">PHASE 3 · ENRAGED</span><span class="cond">0%</span><span class="ar">→</span>
+                <span class="st dead" data-p="3">DEATH</span>
+            </div>
+        </div>
+
+        <div class="b-right">
+            <div class="eyebrow">Epitech Afrique — Track #3</div>
+            <div class="title">Bosses<span class="cursor"></span></div>
+            <div class="subtitle">The legend of R-Type: <b>Dobkeratops</b>.</div>
+
+            <div class="code">
+                <div><span class="cm"># prefabs/dobkeratops.yaml</span></div>
+                <div><span class="k">Health</span>: { <span class="k">hp</span>: <span class="v">3000</span>, <span class="k">weak_point</span>: <span class="s">core</span> }</div>
+                <div><span class="k">Boss</span>:</div>
+                <div>  <span class="k">phases</span>:</div>
+                <div>    - { <span class="k">until</span>: <span class="v">60%</span>, <span class="k">attacks</span>: [<span class="s">spread</span>],        <span class="k">every</span>: <span class="v">1.4</span> }</div>
+                <div>    - { <span class="k">until</span>: <span class="v">25%</span>, <span class="k">attacks</span>: [<span class="s">tail</span>, <span class="s">spawn:bug</span>], <span class="k">every</span>: <span class="v">1.1</span> }</div>
+                <div>    - { <span class="k">until</span>: <span class="v">0%</span>,  <span class="k">attacks</span>: [<span class="s">spread</span>, <span class="s">tail</span>], <span class="k">every</span>: <span class="v">0.6</span>, <span class="k">enrage</span>: <span class="v">true</span> }</div>
+                <div>  <span class="k">telegraph</span>: <span class="v">0.5</span>    <span class="cm"># warn before every attack</span></div>
+            </div>
+
+            <div class="points">
+                <div class="pt">A boss is a <b>state machine</b>: phases switch on HP, each with its own attacks.</div>
+                <div class="pt"><b>Weak point</b>: only the core takes damage. The fight teaches the player where to aim.</div>
+                <div class="pt"><b>Telegraph</b> every attack: a flash, a red line, then the hit. Hard, but fair.</div>
+                <div class="pt">The <b>room</b> owns the HP and the phase. Clients only show them.</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+        const W = 640, H = 380;
+        ctx.imageSmoothingEnabled = false;
+        const img = n => { const i = new Image(); i.src = 'assets/' + n; return i; };
+        const BOSS = img('dobkeratops.png'), SHIP = img('player_cyan.png'), BUG = img('bug.png');
+        const BW = 190, BH = 248;                                  // boss draw size
+        const MAXHP = 3000;
+        const PH = [{ until: 0.60, every: 1.4, atk: ['spread'] }, { until: 0.25, every: 1.1, atk: ['tail', 'bug'] }, { until: 0, every: 0.6, atk: ['spread', 'tail'] }];
+
+        let t, hp, phase, atkT, tele, pending, bullets, shots, bugs, fx, dead, deadT, flash, sweep, ai;
+        function reset() {
+            t = 0; hp = MAXHP; phase = 0; atkT = 1.2; tele = 0; pending = null; bullets = []; shots = []; bugs = []; fx = []; dead = false; deadT = 0; flash = 0; sweep = null; ai = 0;
+        }
+        reset();
+        const chips = [...document.querySelectorAll('.fsm .st')];
+        const boss = () => ({ x: 470, y: 190 + Math.sin(t * 0.8) * 14 });
+        const core = () => { const b = boss(); return { x: b.x - 22, y: b.y + 38 }; };   // the glowing core on its belly
+        const ship = { x: 90, y: 190 };
+        let fireT = 0;
+
+        function update(dt) {
+            t += dt;
+            if (dead) { deadT += dt; if (deadT > 3) reset(); return; }
+            ship.y = 190 + 120 * Math.sin(t * 0.9) * Math.cos(t * 0.37);
+            const c = core();
+
+            // player fire: aims roughly at the core
+            fireT -= dt;
+            if (fireT <= 0) { fireT = 0.16; const tt = (c.x - ship.x - 36) / 520, dy = (c.y - ship.y) + (Math.random() - 0.5) * 60; shots.push({ x: ship.x + 36, y: ship.y, vx: 520, vy: dy / tt }); }
+            shots.forEach(s => { s.x += s.vx * dt; s.y += s.vy * dt; });
+            const b = boss();
+            shots = shots.filter(s => {
+                if (Math.hypot(s.x - c.x, s.y - c.y) < 18) { hp -= 38; flash = 0.08; fx.push({ k: 'dmg', x: c.x, y: c.y - 20, t: 0 }); return false; }
+                if (s.x > b.x - BW * 0.35 && s.x < b.x + BW * 0.4 && Math.abs(s.y - b.y) < BH * 0.45 && Math.abs(s.y - c.y) > 20) { fx.push({ k: 'ping', x: s.x, y: s.y, t: 0 }); return false; }
+                return s.x < W + 10;
+            });
+
+            // phase from HP
+            const r = hp / MAXHP;
+            const np = r > 0.60 ? 0 : r > 0.25 ? 1 : 2;
+            if (np !== phase) { phase = np; fx.push({ k: 'phase', t: 0 }); }
+            if (hp <= 0) { dead = true; deadT = 0; for (let i = 0; i < 6; i++) fx.push({ k: 'boom', x: b.x + (Math.random() - 0.5) * 120, y: b.y + (Math.random() - 0.5) * 180, t: -i * 0.25 }); return; }
+
+            // attacks: telegraph, then hit
+            atkT -= dt;
+            if (!pending && atkT <= 0) { const list = PH[phase].atk; pending = list[ai++ % list.length]; tele = 0.5; if (pending === 'tail') sweep = { t: -0.5, y0: ship.y }; }
+            if (pending) {
+                tele -= dt;
+                if (tele <= 0) {
+                    if (pending === 'spread') { const n = phase === 2 ? 9 : 5; for (let i = 0; i < n; i++) { const a = Math.PI + (i - (n - 1) / 2) * 0.16; bullets.push({ x: b.x - 70, y: b.y - 60, vx: Math.cos(a) * 230, vy: Math.sin(a) * 230 }); } }
+                    if (pending === 'bug') for (let i = 0; i < 3; i++) bugs.push({ x: b.x - 40, y: b.y + 60, ph: i * 2, t: 0 });
+                    pending = null; atkT = PH[phase].every;
+                }
+            }
+            if (sweep) { sweep.t += dt; if (sweep.t > 0.8) sweep = null; }
+            bullets.forEach(q => { q.x += q.vx * dt; q.y += q.vy * dt; }); bullets = bullets.filter(q => q.x > -10 && q.y > -10 && q.y < H + 10);
+            bugs.forEach(g => { g.t += dt; g.x -= 150 * dt; g.y += Math.sin(g.t * 4 + g.ph) * 90 * dt; }); bugs = bugs.filter(g => g.x > -30);
+            fx.forEach(f => f.t += dt); fx = fx.filter(f => f.t < (f.k === 'phase' ? 1.4 : f.k === 'boom' ? 0.6 : 0.5));
+            flash = Math.max(0, flash - dt);
+        }
+
+        function draw() {
+            ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, W, H);
+            for (let i = 0; i < 70; i++) { ctx.fillStyle = '#2a2a55'; ctx.fillRect(((i * 97.3) - t * 20 * (1 + i % 3)) % W + (((i * 97.3) - t * 20 * (1 + i % 3)) % W < 0 ? W : 0), (i * 53.7) % H, 1.5, 1.5); }
+            const b = boss(), c = core(), enr = phase === 2 && !dead;
+
+            // boss
+            if (BOSS.complete && (!dead || deadT < 1.4)) {
+                ctx.save();
+                if (dead) ctx.globalAlpha = Math.max(0, 1 - deadT / 1.4);
+                if (enr) ctx.filter = `hue-rotate(${-20 + 10 * Math.sin(t * 12)}deg) saturate(1.6)`;
+                ctx.drawImage(BOSS, b.x - BW / 2, b.y - BH / 2, BW, BH);
+                ctx.restore();
+                if (flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.6; ctx.drawImage(BOSS, b.x - BW / 2, b.y - BH / 2, BW, BH); ctx.restore(); }
+                // weak point
+                const pr = 10 + 3 * Math.sin(t * 6);
+                const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, pr * 2.2);
+                g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, enr ? '#FF4400' : '#FFB000'); g.addColorStop(1, 'rgba(255,68,0,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, pr * 2.2, 0, 7); ctx.fill();
+                if (!dead) { ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillStyle = '#FFB000'; ctx.fillText('WEAK POINT', c.x - 72, c.y + 4); }
+            }
+
+            // telegraph
+            if (pending && !dead) {
+                const on = (tele * 10 | 0) % 2 === 0;
+                if (pending === 'spread') { ctx.fillStyle = on ? 'rgba(255,68,0,0.8)' : 'rgba(255,68,0,0.2)'; ctx.beginPath(); ctx.arc(b.x - 70, b.y - 60, 12, 0, 7); ctx.fill(); }
+                if (pending === 'bug') { ctx.strokeStyle = on ? '#00FFAA' : '#00FFAA44'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b.x - 40, b.y + 60, 16, 0, 7); ctx.stroke(); ctx.lineWidth = 1; }
+            }
+            if (sweep && !dead) {
+                if (sweep.t < 0) { ctx.strokeStyle = (sweep.t * 10 | 0) % 2 ? 'rgba(255,68,0,0.9)' : 'rgba(255,68,0,0.3)'; ctx.setLineDash([8, 6]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, sweep.y0); ctx.lineTo(b.x - 80, sweep.y0); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 1; ctx.font = '10px "JetBrains Mono", monospace'; ctx.fillStyle = '#FF7755'; ctx.fillText('TAIL INCOMING', 16, sweep.y0 - 8); }
+                else { const k = sweep.t / 0.8, x = b.x - 80 - k * (b.x - 20); ctx.fillStyle = 'rgba(210,120,80,0.9)'; ctx.fillRect(x, sweep.y0 - 10, b.x - 80 - x, 20); ctx.fillStyle = '#ffb08a'; ctx.beginPath(); ctx.arc(x, sweep.y0, 13, 0, 7); ctx.fill(); }
+            }
+
+            // bullets, bugs, shots, ship
+            ctx.fillStyle = '#FF7755'; bullets.forEach(q => { ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.fill(); });
+            bugs.forEach(g => { if (BUG.complete) ctx.drawImage(BUG, g.x - 14, g.y - 14, 28, 28); });
+            ctx.fillStyle = '#FFB000'; shots.forEach(s => ctx.fillRect(s.x - 6, s.y - 1.5, 12, 3));
+            if (SHIP.complete) ctx.drawImage(SHIP, ship.x - 30, ship.y - 15, 60, 30);
+
+            fx.forEach(f => {
+                if (f.k === 'dmg') { ctx.font = 'bold 11px "JetBrains Mono", monospace'; ctx.fillStyle = `rgba(255,176,0,${1 - f.t / 0.5})`; ctx.fillText('-38', f.x, f.y - f.t * 30); }
+                if (f.k === 'ping') { ctx.fillStyle = `rgba(160,160,180,${1 - f.t / 0.5})`; ctx.fillRect(f.x - 2, f.y - 2, 4, 4); if (f.t < 0.1) { ctx.font = '9px "JetBrains Mono", monospace'; ctx.fillText('ping', f.x - 10, f.y - 6); } }
+                if (f.k === 'boom' && f.t > 0) { const k = f.t / 0.6; ctx.fillStyle = `rgba(255,${200 - 120 * k | 0},60,${1 - k})`; ctx.beginPath(); ctx.arc(f.x, f.y, 10 + 50 * k, 0, 7); ctx.fill(); }
+                if (f.k === 'phase') { ctx.font = 'bold 22px "Space Grotesk", sans-serif'; ctx.fillStyle = `rgba(255,68,0,${1 - f.t / 1.4})`; ctx.fillText(phase === 2 ? 'PHASE 3 · ENRAGED' : 'PHASE ' + (phase + 1), 200, 70); }
+            });
+
+            // HP bar with phase markers
+            const bx = 150, bw = 340, by = 18;
+            ctx.fillStyle = '#1a1a2a'; ctx.fillRect(bx, by, bw, 10);
+            ctx.fillStyle = enr ? '#FF4400' : phase === 1 ? '#FFB000' : '#00FFAA'; ctx.fillRect(bx, by, bw * Math.max(0, hp / MAXHP), 10);
+            ctx.fillStyle = '#ffffff'; [0.60, 0.25].forEach(m => ctx.fillRect(bx + bw * m - 1, by - 3, 2, 16));
+            ctx.font = 'bold 11px "JetBrains Mono", monospace'; ctx.fillStyle = '#cdd6f4'; ctx.fillText('DOBKERATOPS', bx, by + 26);
+            ctx.fillStyle = '#9a9aae'; ctx.fillText(Math.max(0, hp | 0) + ' / ' + MAXHP, bx + bw - 90, by + 26);
+            if (dead) { ctx.font = 'bold 26px "Space Grotesk", sans-serif'; ctx.fillStyle = '#FFB000'; ctx.fillText('BOSS DEFEATED', 200, 200); }
+
+            chips.forEach(ch => ch.classList.toggle('on', dead ? ch.dataset.p === '3' : +ch.dataset.p === phase));
+        }
+
+        let last = performance.now();
+        (function frame(now) {
+            const dt = Math.min(0.05, (now - last) / 1000); last = now;
+            if (!paused) update(dt);
+            draw();
+            requestAnimationFrame(frame);
+        })(last);
+    </script>
+</body>
+</html>

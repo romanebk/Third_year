@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="pause.js"></script>
+    <style>
+        .slide-adm { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .adm-left {
+            position: relative; z-index: 1;
+            width: 64%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4vh 1.2vw 4vh 3vw;
+        }
+
+        /* ---------- mock web panel ---------- */
+        .ui {
+            width: 100%; background: #0d0d0d; border-radius: 10px; overflow: hidden;
+            font-family: "JetBrains Mono", monospace; color: #cdd6f4;
+            display: flex; flex-direction: column;
+        }
+        .bar {
+            display: flex; align-items: center; gap: 0.5vw;
+            background: #1a1a2a; padding: 0.9vh 1vw; font-size: 0.75vw; color: #6B82D6;
+        }
+        .bar .dot { width: 0.6vw; height: 0.6vw; border-radius: 50%; background: #3a3a6a; }
+        .bar .url { margin-left: 0.8vw; background: #0d0d0d; border-radius: 4px; padding: 0.3vh 0.8vw; flex: 1; }
+        .bar .url b { color: #00FFAA; font-weight: 500; }
+        .bar .who { color: #FFB000; }
+
+        .body { padding: 1.8vh 1.3vw; display: flex; flex-direction: column; gap: 1.6vh; }
+
+        .top { display: flex; justify-content: space-between; align-items: baseline; }
+        .logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.5vw; color: #fff; }
+        .logo span { color: #FF4400; }
+        .logo i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 0.8vw; color: #8899EE; margin-left: 0.5vw; letter-spacing: 0.1em; }
+        .meta { font-size: 0.8vw; color: #6B82D6; }
+        .meta b { color: #00FFAA; }
+
+        .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6vw; }
+        .tile { background: #15152a; border-radius: 6px; padding: 1vh 0.8vw; display: flex; flex-direction: column; gap: 0.3vh; }
+        .tile .tl { font-size: 0.65vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; }
+        .tile .tv { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.6vw; color: #fff; }
+        .tile .tv small { font-size: 0.8vw; color: #9a9aae; font-weight: 500; }
+        .tile canvas { width: 100%; height: 2.6vh; }
+
+        .sec { font-size: 0.65vw; letter-spacing: 0.12em; text-transform: uppercase; color: #6B82D6; display: flex; justify-content: space-between; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8vw; }
+        th { text-align: left; font-weight: 500; font-size: 0.62vw; letter-spacing: 0.1em; text-transform: uppercase; color: #55608a; padding: 0 0.4vw 0.5vh; border-bottom: 1px solid #2a2a4a; }
+        td { padding: 0.75vh 0.4vw; border-bottom: 1px solid #1a1a2a; white-space: nowrap; }
+        .id { color: #8899EE; font-weight: 700; }
+        .nm { color: #fff; }
+        .ok { color: #00FFAA; } .warn { color: #FFB000; } .bad { color: #FF7755; }
+        .act span {
+            display: inline-block; font-size: 0.62vw; font-weight: 700; letter-spacing: 0.06em;
+            padding: 0.2vh 0.45vw; border-radius: 4px; border: 1px solid #3a3a6a; color: #cdd6f4; margin-right: 0.25vw;
+        }
+        .act .r { border-color: #FF775588; color: #FF7755; }
+        tr.dead td { background: #FF44001a; }
+        tr.banned td { color: #555 !important; text-decoration: line-through; }
+        tr.banned td.act { text-decoration: none; }
+        .act .bn { border-color: #FF4400; background: #FF4400; color: #fff; }
+
+        .two { display: grid; grid-template-columns: 1.15fr 1fr; gap: 1vw; }
+
+        .console { background: #08080f; border: 1px solid #2a2a4a; border-radius: 6px; padding: 0.8vh 0.7vw; font-size: 0.72vw; height: 13.5vh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+        .console div { white-space: nowrap; line-height: 1.55; }
+        .console .t { color: #55608a; }
+        .console .cmd { color: #00FFAA; }
+        .console .in { color: #fff; }
+        .console .cur { display: inline-block; width: 0.45vw; height: 0.9vw; background: #00FFAA; vertical-align: middle; animation: blink 1s steps(1) infinite; }
+
+        /* ---------- right ---------- */
+        .adm-right {
+            position: relative; z-index: 1;
+            width: 36%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4vw 5vh 1vw;
+            gap: 2vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.3vw; line-height: 1; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 1.2vh; }
+        .pt { font-size: 1.05vw; color: #333; line-height: 1.35; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+
+        .warnbox { font-size: 1vw; color: #333; line-height: 1.4; border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 1vh 1vw; }
+        .warnbox b { color: #cc3300; }
+
+        .slide-adm .deco-block-1, .slide-adm .deco-block-2 { background: #D0D8F0; }
+        .slide-adm .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-adm">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="adm-left">
+            <div class="ui">
+                <div class="bar">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="url">https://<b>lobby.rtype.local:8443</b>/admin</span>
+                    <span class="who">● admin</span>
+                </div>
+
+                <div class="body">
+                    <div class="top">
+                        <div class="logo">R<span>·</span>TYPE<i>ADMIN</i></div>
+                        <div class="meta">L up <b id="up">02:14:07</b> · 3 rooms · 3 slots free</div>
+                    </div>
+
+                    <div class="tiles">
+                        <div class="tile"><span class="tl">players online</span><span class="tv" id="pl">11</span><canvas id="sp1"></canvas></div>
+                        <div class="tile"><span class="tl">bandwidth out</span><span class="tv"><span id="bw">412</span> <small>KB/s</small></span><canvas id="sp2"></canvas></div>
+                        <div class="tile"><span class="tl">avg ping</span><span class="tv"><span id="pg">48</span> <small>ms</small></span><canvas id="sp3"></canvas></div>
+                        <div class="tile"><span class="tl">packet loss</span><span class="tv"><span id="ls">0.4</span> <small>%</small></span><canvas id="sp4"></canvas></div>
+                    </div>
+
+                    <div class="sec"><span>rooms</span><span>heartbeat every 1 s</span></div>
+                    <table>
+                        <tr><th>id</th><th>name</th><th>players</th><th>tick</th><th>cpu · mem</th><th>heartbeat</th><th>actions</th></tr>
+                        <tr><td class="id">r1</td><td class="nm">Bydo Rush</td><td>4/4</td><td>60/s</td><td>18% · 42 MB</td><td class="ok">0.3 s ago</td><td class="act"><span>INSPECT</span><span class="r">KILL</span></td></tr>
+                        <tr><td class="id">r2</td><td class="nm">Dobkeratops</td><td>3/4</td><td>60/s</td><td>22% · 47 MB</td><td class="ok">0.6 s ago</td><td class="act"><span>INSPECT</span><span class="r">KILL</span></td></tr>
+                        <tr id="r3"><td class="id">r3</td><td class="nm">Friends only</td><td>2/4</td><td id="r3t">60/s</td><td id="r3c">9% · 31 MB</td><td id="r3h" class="ok">0.2 s ago</td><td class="act"><span>INSPECT</span><span class="r">KILL</span></td></tr>
+                    </table>
+
+                    <div class="two">
+                        <div>
+                            <div class="sec"><span>players</span><span>11 online</span></div>
+                            <table>
+                                <tr><th>user</th><th>at</th><th>ping</th><th>loss</th><th>actions</th></tr>
+                                <tr><td class="nm">nova</td><td class="id">r1</td><td class="ok">32</td><td>0%</td><td class="act"><span>KICK</span><span class="r">BAN</span></td></tr>
+                                <tr><td class="nm">k4ze</td><td class="id">r2</td><td class="warn">148</td><td class="warn">3%</td><td class="act"><span>KICK</span><span class="r">BAN</span></td></tr>
+                                <tr id="pcheat"><td class="nm">sp33dy</td><td class="id">r1</td><td class="ok">41</td><td>0%</td><td class="act" id="pcheatAct"><span>KICK</span><span class="r">BAN</span></td></tr>
+                                <tr><td class="nm">lumen</td><td class="id">L</td><td class="ok">27</td><td>0%</td><td class="act"><span>KICK</span><span class="r">BAN</span></td></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <div class="sec"><span>console</span><span>same actions, typed</span></div>
+                            <div class="console" id="con"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="adm-right">
+            <div class="eyebrow">Epitech Afrique — Track #2 · Bonus</div>
+            <div class="title">Admin Dashboard<span class="cursor"></span></div>
+            <div class="subtitle">See everything. <b>Act on anything.</b></div>
+
+            <div class="points">
+                <div class="pt"><b>Hosted by the lobby.</b> It already knows the rooms, the heartbeats and the accounts.</div>
+                <div class="pt"><b>Console first</b>, web panel later. Same commands underneath: <code>kick</code>, <code>ban</code>, <code>kill</code>, <code>say</code>.</div>
+                <div class="pt"><b>Show your numbers</b>: ping, loss, bandwidth per room. The metrics the subject asks for, live.</div>
+                <div class="pt"><b>Actions hit the real system</b>: a ban goes in the users DB, a kill tells the room to stop.</div>
+            </div>
+
+            <div class="warnbox"><b>Admins are users too.</b> Admin role checked by the server, never on the game port, never open to the internet.</div>
+        </div>
+    </section>
+
+    <script>
+        // ---- uptime
+        let up = 2 * 3600 + 14 * 60 + 7;
+        const pad = n => String(n).padStart(2, '0');
+        (async () => { for (;;) { await sleep(1000); up++;
+            document.getElementById('up').textContent = pad(Math.floor(up / 3600)) + ':' + pad(Math.floor(up / 60) % 60) + ':' + pad(up % 60); } })();
+
+        // ---- sparklines
+        const series = [
+            { id: 'sp1', el: 'pl', base: 11, amp: 1.2, col: '#00FFAA', fmt: v => Math.round(v) },
+            { id: 'sp2', el: 'bw', base: 410, amp: 40, col: '#FFB000', fmt: v => Math.round(v) },
+            { id: 'sp3', el: 'pg', base: 48, amp: 9, col: '#8899EE', fmt: v => Math.round(v) },
+            { id: 'sp4', el: 'ls', base: 0.5, amp: 0.4, col: '#FF7755', fmt: v => Math.max(0, v).toFixed(1) },
+        ];
+        series.forEach(s => {
+            const c = document.getElementById(s.id);
+            c.width = c.clientWidth * 2; c.height = c.clientHeight * 2;
+            s.ctx = c.getContext('2d'); s.data = [];
+            for (let i = 0; i < 40; i++) s.data.push(s.base + (Math.random() - 0.5) * 2 * s.amp);
+        });
+        function draw(s) {
+            const { ctx, data } = s, w = ctx.canvas.width, h = ctx.canvas.height;
+            const lo = s.base - s.amp * 1.4, hi = s.base + s.amp * 1.4;
+            ctx.clearRect(0, 0, w, h);
+            ctx.beginPath();
+            data.forEach((v, i) => { const x = i / (data.length - 1) * w, y = h - (v - lo) / (hi - lo) * h;
+                i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+            ctx.strokeStyle = s.col; ctx.lineWidth = 2; ctx.stroke();
+        }
+        series.forEach(draw);
+        (async () => { for (;;) { await sleep(800);
+            series.forEach(s => { const last = s.data[s.data.length - 1];
+                let v = last + (Math.random() - 0.5) * s.amp * 0.8;
+                v = Math.min(s.base + s.amp, Math.max(s.base - s.amp, v));
+                s.data.shift(); s.data.push(v); draw(s);
+                document.getElementById(s.el).textContent = s.fmt(v); });
+        } })();
+
+        // ---- console story
+        const con = document.getElementById('con');
+        const now = () => pad(Math.floor(up / 3600)) + ':' + pad(Math.floor(up / 60) % 60) + ':' + pad(up % 60);
+        function line(html) {
+            const d = document.createElement('div');
+            d.innerHTML = '<span class="t">' + now() + '</span> ' + html;
+            con.appendChild(d);
+            while (con.children.length > 7) con.removeChild(con.firstChild);
+            return d;
+        }
+        async function type(text) {
+            const d = line('<span class="cmd">&gt;</span> <span class="in"></span><span class="cur"></span>');
+            const inp = d.querySelector('.in');
+            for (const ch of text) { inp.textContent += ch; await sleep(90); }
+            await sleep(400);
+            d.querySelector('.cur').remove();
+        }
+        const $ = id => document.getElementById(id);
+        async function story() {
+            con.innerHTML = '';
+            $('r3').classList.remove('dead'); $('r3t').textContent = '60/s'; $('r3c').textContent = '9% · 31 MB';
+            $('r3h').className = 'ok'; $('r3h').textContent = '0.2 s ago';
+            $('pcheat').classList.remove('banned'); $('pcheatAct').innerHTML = '<span>KICK</span><span class="r">BAN</span>';
+
+            line('r1 ready · r2 ready · r3 ready');
+            await sleep(1500);
+            line('<span class="warn">r1 sp33dy: moved 3× max speed</span>');
+            await sleep(1500);
+            await type('ban sp33dy "speed hack"');
+            line('<span class="ok">banned · saved in users DB</span>');
+            $('pcheat').classList.add('banned'); $('pcheatAct').innerHTML = '<span class="bn">BANNED</span>';
+            await sleep(2500);
+
+            $('r3h').className = 'warn'; $('r3h').textContent = '2.1 s ago';
+            line('<span class="warn">r3 heartbeat late (2 s)</span>');
+            await sleep(1500);
+            $('r3').classList.add('dead'); $('r3t').textContent = '—'; $('r3c').textContent = '— · —';
+            $('r3h').className = 'bad'; $('r3h').textContent = 'lost (5 s)';
+            line('<span class="bad">r3 lost · 2 players back to L</span>');
+            await sleep(2000);
+            await type('say "r3 crashed, sorry!"');
+            line('<span class="ok">sent to 11 players</span>');
+            await sleep(4000);
+        }
+        (async () => { for (;;) await story(); })();
+    </script>
+</body>
+</html>

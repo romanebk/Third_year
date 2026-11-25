@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Track #2 — Packets &amp; Serialization</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .slide-pk { background: var(--epi-light); display: flex; align-items: stretch; }
+
+        .pk-left {
+            position: relative; z-index: 1;
+            width: 57%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5vh 1.2vw 5vh 4vw;
+        }
+        .panel {
+            width: 100%; background: #0d0d0d; border-radius: 10px; padding: 2.2vh 1.5vw;
+            font-family: "JetBrains Mono", monospace; color: #cdd6f4;
+            display: flex; flex-direction: column; gap: 1.3vh;
+        }
+        .ph { display: flex; justify-content: space-between; font-size: 0.85vw; color: #9a9aae; }
+        .ph b { color: #FF7755; }
+
+        /* byte layout */
+        .bytes { display: flex; gap: 2px; }
+        .f {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3vh;
+            padding: 1vh 0; border-radius: 4px; color: #0d0d0d; font-weight: 700;
+        }
+        .f .fn { font-size: 0.85vw; }
+        .f .fs { font-size: 0.68vw; font-weight: 500; opacity: 0.75; }
+        .hdr-lbl { display: flex; font-size: 0.72vw; color: #8899EE; }
+        .hdr-lbl span { text-align: center; border-top: 1.5px solid #3a3a6a; padding-top: 0.4vh; }
+
+        .ex { font-size: 0.85vw; line-height: 1.6; background: #15152a; border-radius: 6px; padding: 1vh 0.9vw; }
+        .ex > div { white-space: pre; }
+        .hex { color: #9a9aae; }
+        .hex b { font-weight: 700; }
+
+        .trap { font-size: 0.85vw; line-height: 1.6; border: 1.5px dashed #FF440088; border-radius: 6px; padding: 1vh 0.9vw; background: #FF44000d; }
+        .trap > div { white-space: pre; }
+        .forbid { color: #fff; background: #cc3300; font-weight: 700; padding: 0.3vh 0.6vw; border-radius: 4px; align-self: flex-start; display: inline-block; margin-bottom: 0.6vh; }
+        .why { color: #FF9977; } .why b { color: #FF7755; }
+        .ok { color: #00FFAA; margin-top: 0.6vh; }
+        .dec { display: grid; grid-template-columns: auto auto 1fr; column-gap: 1vw; row-gap: 0.1vh; margin-top: 0.8vh; padding-top: 0.8vh; border-top: 1px solid #2a2a4a; font-size: 0.8vw; }
+        .dec span:nth-child(3n+1) { font-weight: 700; }
+        .dec span:nth-child(3n+2) { color: #8899EE; }
+        .dec span:nth-child(3n) { color: #cdd6f4; }
+        .dec .pl { color: #cdd6f4; }
+        .dec i { color: #7a7a8a; font-style: normal; }
+        .seqn { white-space: normal !important; margin-top: 0.8vh; font-size: 0.8vw; color: #FFB000; }
+        .seqn b { color: #FFD060; }
+        .kw { color: #FF7755; } .ty { color: #00FFAA; } .cm { color: #7a7a8a; } .bad { color: #FF7755; font-weight: 700; }
+
+        .pk-right {
+            position: relative; z-index: 1;
+            width: 43%;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 4.5vw 5vh 1.2vw;
+            gap: 1.5vh;
+        }
+        .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 1.1vw; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+        .title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 3.1vw; line-height: 1.05; white-space: nowrap; color: var(--epi-dark-blue); }
+        .title .cursor { display: inline-block; width: 2vw; height: 0.6vw; background: var(--epi-orange); vertical-align: baseline; margin-left: 0.3vw; animation: blink 1s steps(1) infinite; }
+        .subtitle { font-size: 1.6vw; color: #333; }
+        .subtitle b { color: var(--epi-dark-blue); }
+
+        .points { display: flex; flex-direction: column; gap: 1vh; }
+        .pt { font-size: 1.1vw; color: #333; line-height: 1.3; padding-left: 0.9vw; border-left: 3px solid #D0D8F0; }
+        .pt b { color: var(--epi-dark-blue); }
+        .pt code { font-family: "JetBrains Mono", monospace; font-size: 0.92vw; color: #1A1ACC; }
+
+        .std {
+            font-size: 1.05vw; color: #333; line-height: 1.4;
+            border-left: 4px solid #00C080; background: #00FFAA14; padding: 1vh 1vw;
+        }
+        .std b { color: #00885F; }
+        .std code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+
+        .tek1 {
+            font-size: 1.05vw; color: #333; line-height: 1.4;
+            border-left: 4px solid var(--epi-orange); background: #FF440010; padding: 1vh 1vw;
+        }
+        .tek1 b { color: #cc3300; }
+        .tek1 code { font-family: "JetBrains Mono", monospace; font-size: 0.9vw; color: #1A1ACC; }
+
+        .slide-pk .deco-block-1, .slide-pk .deco-block-2 { background: #D0D8F0; }
+        .slide-pk .logo-epitech { color: var(--epi-dark-blue); }
+    </style>
+</head>
+<body>
+    <section class="slide slide-pk">
+        <div class="logo-epitech" title="Click to export PDF">{EPITECH}</div>
+        <div class="deco-block-1"></div>
+        <div class="deco-block-2"></div>
+
+        <div class="pk-left">
+            <div class="panel">
+                <div class="ph"><span>a packet = header + payload</span><span><b>one possible layout</b> — not the answer</span></div>
+
+                <div class="bytes">
+                    <div class="f" style="flex:2;background:#8899EE"><span class="fn">magic</span><span class="fs">2 B</span></div>
+                    <div class="f" style="flex:1;background:#AAB6FF"><span class="fn">ver</span><span class="fs">1 B</span></div>
+                    <div class="f" style="flex:1;background:#FF00CC"><span class="fn">type</span><span class="fs">1 B</span></div>
+                    <div class="f" style="flex:4;background:#FFB000"><span class="fn">sequence</span><span class="fs">4 B · packet #</span></div>
+                    <div class="f" style="flex:2;background:#00C080"><span class="fn">size</span><span class="fs">2 B · length</span></div>
+                    <div class="f" style="flex:6;background:#cdd6f4"><span class="fn">payload</span><span class="fs">"size" bytes</span></div>
+                </div>
+                <div class="hdr-lbl"><span style="flex:10">header — fixed size, always the same</span><span style="flex:6">depends on type</span></div>
+
+                <div class="ex">
+                    <div><span class="cm">// "entity 6 moved to (320, 90)" on the wire — 16 bytes</span></div>
+                    <div class="hex"><b style="color:#8899EE">52 54</b> <b style="color:#AAB6FF">01</b> <b style="color:#FF00CC">04</b> <b style="color:#FFB000">00 00 02 A1</b> <b style="color:#00C080">00 06</b> <b style="color:#cdd6f4">00 06 01 40 00 5A</b></div>
+                    <div class="dec">
+                        <span style="color:#8899EE">52 54</span><span>magic</span><span>"RT": this is one of our packets</span>
+                        <span style="color:#AAB6FF">01</span><span>ver</span><span>protocol version 1</span>
+                        <span style="color:#FF00CC">04</span><span>type</span><span>4 = MOVE → tells how to read the payload</span>
+                        <span style="color:#FFB000">00 00 02 A1</span><span>seq</span><span>673rd packet this sender sent: +1 every send</span>
+                        <span style="color:#00C080">00 06</span><span>size</span><span>6 bytes of payload follow</span>
+                        <span class="pl">00 06</span><span>id</span><span class="pl">entity 6 &nbsp;<i>payload 2 B</i></span>
+                        <span class="pl">01 40</span><span>x</span><span class="pl">320 &nbsp;<i>payload 2 B</i></span>
+                        <span class="pl">00 5A</span><span>y</span><span class="pl">90 &nbsp;<i>payload 2 B</i></span>
+                    </div>
+                    <div class="seqn">seq lets the receiver spot <b>lost</b> (672 → 674), <b>late</b> (671 after 673) and <b>duplicate</b> packets. UDP won't do it for you.</div>
+                </div>
+
+                <div class="trap">
+                    <div class="forbid">✗ FORBIDDEN — sending a struct's memory as-is</div>
+                    <div><span class="kw">struct</span> <span class="ty">Move</span> { uint8_t id; <span class="kw">float</span> x; };</div>
+                    <div>send(sock, &amp;move, <span class="kw">sizeof</span>(move));</div>
+                    <div class="why">→ sizeof is <b>8</b>, not 5: the compiler adds <b>3 padding bytes</b></div>
+                    <div class="why">→ bytes go out in <b>this CPU's order</b>: another machine reads garbage</div>
+                    <div class="ok">✓ instead: write each field yourself, in the wire's byte order</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pk-right">
+            <div class="eyebrow">Epitech Afrique — Track #2</div>
+            <div class="title">Packets &amp; Serialization<span class="cursor"></span></div>
+            <div class="subtitle">Your protocol, <b>your design</b>.</div>
+
+            <div class="tek1"><b>You've done this in Tek1.</b> <b>Robot Factory</b> wrote a <code>.cor</code>: magic number, header, big-endian, opcode + coding byte. <b>Corewar</b> read it back and checked it. A packet is the same thing — through a socket, not a file.</div>
+
+            <div class="points">
+                <div class="pt"><b>Binary</b> — the subject says MUST. Fixed-width types: <code>uint16_t</code>, not <code>int</code>.</div>
+                <div class="pt">Pick <b>one byte order</b> for the wire and stick to it.</div>
+                <div class="pt">Never send <b>raw structs</b> or pointers: padding, alignment, CPU.</div>
+                <div class="pt"><b>Validate every length</b>. Malformed packet → drop it, never crash.</div>
+                <div class="pt">Keep a <b>version</b> field. Your protocol will change.</div>
+            </div>
+
+            <div class="std">Design your own — or <b>study the standards</b> first: RFC-style specs, the <code>TLV</code> pattern, <code>MessagePack</code> and <code>Protobuf</code> wire formats, how <code>QUIC</code> or <code>ENet</code> build headers. Then <b>document yours</b>: the subject requires it.</div>
+        </div>
+    </section>
+</body>
+</html>
